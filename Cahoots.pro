@@ -2,7 +2,7 @@
 # Project created by QtCreator 2009-09-14T19:31:57
 # -------------------------------------------------
 QT += network
-TARGET = Thumper
+TARGET = Cahoots
 TEMPLATE = app
 SOURCES += main.cpp \
     mainwindow.cpp \

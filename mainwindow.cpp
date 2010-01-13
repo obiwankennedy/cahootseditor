@@ -58,7 +58,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
 
 void MainWindow::readSettings()
 {
-    QSettings settings("Thumper", "MainWindow");
+    QSettings settings("Cahoots", "MainWindow");
     QDesktopWidget *desktop = QApplication::desktop();
     int width = static_cast<int>(desktop->width() * 0.80);
     int height = static_cast<int>(desktop->height() * 0.70);
@@ -72,7 +72,7 @@ void MainWindow::readSettings()
 
 void MainWindow::writeSettings()
 {
-    QSettings settings("Thumper", "MainWindow");
+    QSettings settings("Cahoots", "MainWindow");
     settings.setValue("pos", pos());
     settings.setValue("size", size());
 }
@@ -111,7 +111,7 @@ bool MainWindow::maybeSave(int index)
     if (tabWidgetToDocumentMap.value(ui->tabWidget->widget(index))->isModified()) {
         ui->tabWidget->setCurrentIndex(index);
         QMessageBox::StandardButton ret;
-        ret = QMessageBox::warning(this, "Thumper",
+        ret = QMessageBox::warning(this, "Cahoots",
                                    "The document has been modified.\n"
                                    "Do you want to save your changes?",
                                    QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
