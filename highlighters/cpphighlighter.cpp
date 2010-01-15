@@ -16,9 +16,20 @@ CppHighlighter::CppHighlighter(QTextDocument *parent)
     declarationFormat.setFontItalic(true);
     declarationFormat.setForeground(Qt::darkBlue);
     QStringList declarationPatterns;
-    declarationPatterns << "\\bbool\\b" << "\\bchar\\b" << "\\bconst\\b" << "\\bcase\\b"
-                    << "\\benum\\b" << "\\bint\\b" << "\\bnamespace\\b" << "\\bstruct\\b"
-                    << "\\busing\\b" << "\\#include\\b" << "\\bvoid\\b";
+// This is a temporary bunch of rules until I sort them into declarations and keywords
+    declarationPatterns << "\\basm\\b" << "\\bdynamic_cast\\b" << "\\bnamespace\\b" << "\\breinterpret_cast\\b" << "\\btry\\b"
+            << "\\bbool\\b" << "\\bexplicit\\b" << "\\bnew\\b" << "\\bstatic_cast\\b" << "\\btypeid\\b" << "\\bcatch\\b"
+            << "\\bfalse\\b" << "\\boperator\\b" << "\\btemplate\\b" << "\\btypename\\b" << "\\bclass\\b" <<  "\\bfriend\\b"
+            << "\\bprivate\\b" << "\\bthis\\b" << "\\busing\\b" << "\\bconst_cast\\b" << "\\binline\\b"
+            << "\\bpublic\\b" << "\\bthrow\\b" << "\\bvirtual\\b" << "\\bdelete\\b" << "\\bmutable\\b"
+            << "\\bprotected\\b" << "\\btrue\\b" << "\\bwchar_t\\b";
+//asm         dynamic_cast  namespace  reinterpret_cast  try
+//bool        explicit      new        static_cast       typeid
+//catch       false         operator   template          typename
+//class       friend        private    this              using
+//const_cast  inline        public     throw             virtual
+//delete      mutable       protected  true              wchar_t
+
     foreach (const QString &pattern, declarationPatterns) {
         rule.pattern = QRegExp(pattern);
         rule.format = declarationFormat;

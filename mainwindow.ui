@@ -70,6 +70,8 @@
     <addaction name="actionFile_Open"/>
     <addaction name="actionFile_Save"/>
     <addaction name="actionFile_Save_As"/>
+    <addaction name="actionSave_A_Copy_As"/>
+    <addaction name="actionSave_All"/>
     <addaction name="actionFile_Close"/>
     <addaction name="separator"/>
     <addaction name="actionFile_Print"/>
@@ -103,10 +105,27 @@
     <addaction name="actionView_Show_Participants"/>
     <addaction name="separator"/>
     <addaction name="actionView_Line_Wrap"/>
+    <addaction name="actionSplit_Window"/>
+   </widget>
+   <widget class="QMenu" name="menuText">
+    <property name="title">
+     <string>Text</string>
+    </property>
+    <addaction name="actionShift_Left"/>
+    <addaction name="actionShift_Right"/>
+    <addaction name="actionComment_Uncomment"/>
+   </widget>
+   <widget class="QMenu" name="menuTools">
+    <property name="title">
+     <string>Tools</string>
+    </property>
+    <addaction name="actionPreview_as_HTML"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
    <addaction name="menuView"/>
+   <addaction name="menuText"/>
+   <addaction name="menuTools"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
    <property name="enabled">
@@ -301,6 +320,41 @@
   <action name="actionEdit_Python">
    <property name="text">
     <string>Python</string>
+   </property>
+  </action>
+  <action name="actionShift_Left">
+   <property name="text">
+    <string>Shift Left</string>
+   </property>
+  </action>
+  <action name="actionShift_Right">
+   <property name="text">
+    <string>Shift Right</string>
+   </property>
+  </action>
+  <action name="actionComment_Uncomment">
+   <property name="text">
+    <string>Comment/Uncomment</string>
+   </property>
+  </action>
+  <action name="actionPreview_as_HTML">
+   <property name="text">
+    <string>Preview as HTML</string>
+   </property>
+  </action>
+  <action name="actionSplit_Window">
+   <property name="text">
+    <string>Split Window</string>
+   </property>
+  </action>
+  <action name="actionSave_A_Copy_As">
+   <property name="text">
+    <string>Save A Copy As...</string>
+   </property>
+  </action>
+  <action name="actionSave_All">
+   <property name="text">
+    <string>Save All</string>
    </property>
   </action>
  </widget>
