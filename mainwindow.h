@@ -4,6 +4,8 @@
 #include <QtGui/QMainWindow>
 #include "document.h"
 
+#include <QXmlReader>
+
 namespace Ui
 {
     class MainWindow;
