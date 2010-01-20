@@ -36,7 +36,7 @@ public:
     QString curFile;
     
 private:
-    Ui::Document *m_ui;
+    Ui::Document *ui;
 
     QTcpServer *server;
     QTcpSocket *socket;
@@ -44,7 +44,11 @@ private:
     CppHighlighter *cppHighlighter;
 
     bool eventFilter(QObject *object, QEvent *event);
-    
+
+private slots:
+    void onNewConnection();
+    void on_pushButton_clicked();
+
 signals:
     void redoAvailable(bool);
     void undoAvailable(bool);

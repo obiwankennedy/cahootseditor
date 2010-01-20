@@ -6,86 +6,91 @@
 
 Document::Document(QWidget *parent) :
     QWidget(parent),
-    m_ui(new Ui::Document)
+    ui(new Ui::Document)
 {
-    m_ui->setupUi(this);
+    ui->setupUi(this);
 
-    cppHighlighter = new CppHighlighter(m_ui->codeTextEdit->document());
+    cppHighlighter = new CppHighlighter(ui->codeTextEdit->document());
 
-    connect(m_ui->codeTextEdit, SIGNAL(undoAvailable(bool)), this, SIGNAL(undoAvailable(bool)));
-    connect(m_ui->codeTextEdit, SIGNAL(redoAvailable(bool)), this, SIGNAL(redoAvailable(bool)));
+    connect(ui->codeTextEdit, SIGNAL(undoAvailable(bool)), this, SIGNAL(undoAvailable(bool)));
+    connect(ui->codeTextEdit, SIGNAL(redoAvailable(bool)), this, SIGNAL(redoAvailable(bool)));
 
-//    m_ui->listWidget->hide();
+//    ui->listWidget->hide();
 
     server = new QTcpServer(this);
     socket = new QTcpSocket(this);
 
-    qApp->installEventFilter(this);
+    connect(server, SIGNAL(newConnection()), this, SLOT(onNewConnection()));
+
+    server->listen(QHostAddress("137.159.47.71"), 3000);
+    ui->chatTextEdit->setText("Listening...");
+
+//    qApp->installEventFilter(this);
 }
 
 Document::~Document()
 {
-    delete m_ui;
+    delete ui;
 }
 
 void Document::undo()
 {
-    m_ui->codeTextEdit->undo();
+    ui->codeTextEdit->undo();
 }
 
 void Document::redo()
 {
-    m_ui->codeTextEdit->redo();
+    ui->codeTextEdit->redo();
 }
 
 void Document::cut()
 {
-    m_ui->codeTextEdit->cut();
+    ui->codeTextEdit->cut();
 }
 
 void Document::copy()
 {
-    m_ui->codeTextEdit->copy();
+    ui->codeTextEdit->copy();
 }
 
 void Document::paste()
 {
-    m_ui->codeTextEdit->paste();
+    ui->codeTextEdit->paste();
 }
 
 bool Document::isUndoable()
 {
-    return m_ui->codeTextEdit->document()->isUndoAvailable();
+    return ui->codeTextEdit->document()->isUndoAvailable();
 }
 
 bool Document::isRedoable()
 {
-    return m_ui->codeTextEdit->document()->isRedoAvailable();
+    return ui->codeTextEdit->document()->isRedoAvailable();
 }
 
 bool Document::isModified()
 {
-    return m_ui->codeTextEdit->document()->isModified();
+    return ui->codeTextEdit->document()->isModified();
 }
 
 QString Document::getPlainText()
 {
-    return m_ui->codeTextEdit->toPlainText();
+    return ui->codeTextEdit->toPlainText();
 }
 
 void Document::setPlainText(QString text)
 {
-    m_ui->codeTextEdit->setPlainText(text);
+    ui->codeTextEdit->setPlainText(text);
 }
 
 void Document::setModified(bool b)
 {
-    m_ui->codeTextEdit->document()->setModified(b);
+    ui->codeTextEdit->document()->setModified(b);
 }
 
 bool Document::eventFilter(QObject *object, QEvent *event)
 {
-    if (event->type() == QEvent::KeyPress && object == m_ui->codeTextEdit) {
+    if (event->type() == QEvent::KeyPress && object == ui->codeTextEdit) {
         QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
         if (!keyEvent->text().isEmpty()) {
             socket->write(keyEvent->text().toAscii());
@@ -95,3 +100,17 @@ bool Document::eventFilter(QObject *object, QEvent *event)
     return false;
 }
 
+void Document::onNewConnection()
+{
+//    ui->statusBar->showMessage("We have signal! Main screen turn on!");
+
+//    clientList.append(server->nextPendingConnection());
+//    connect(clientList.last(), SIGNAL(readyRead()), this, SLOT(onIncomingData()));
+}
+
+void Document::on_pushButton_clicked()
+{
+//    QString string = ui->textEdit->toPlainText();
+//    sock->write(string.toAscii());
+//    ui->textEdit->append(QString("Sent \"%1\"\n").arg(string));
+}
