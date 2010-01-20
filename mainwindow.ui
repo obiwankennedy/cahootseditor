@@ -70,8 +70,8 @@
     <addaction name="actionFile_Open"/>
     <addaction name="actionFile_Save"/>
     <addaction name="actionFile_Save_As"/>
-    <addaction name="actionSave_A_Copy_As"/>
-    <addaction name="actionSave_All"/>
+    <addaction name="actionFile_Save_A_Copy_As"/>
+    <addaction name="actionFile_Save_All"/>
     <addaction name="actionFile_Close"/>
     <addaction name="separator"/>
     <addaction name="actionFile_Print"/>
@@ -105,7 +105,7 @@
     <addaction name="actionView_Show_Participants"/>
     <addaction name="separator"/>
     <addaction name="actionView_Line_Wrap"/>
-    <addaction name="actionSplit_Window"/>
+    <addaction name="actionView_Split_Window"/>
    </widget>
    <widget class="QMenu" name="menuText">
     <property name="title">
@@ -114,18 +114,31 @@
     <addaction name="actionShift_Left"/>
     <addaction name="actionShift_Right"/>
     <addaction name="actionComment_Uncomment"/>
+    <addaction name="separator"/>
    </widget>
    <widget class="QMenu" name="menuTools">
     <property name="title">
      <string>Tools</string>
     </property>
-    <addaction name="actionPreview_as_HTML"/>
+    <addaction name="actionTools_Preview_as_HTML"/>
+    <addaction name="separator"/>
+    <addaction name="actionTools_Announce_Document"/>
+   </widget>
+   <widget class="QMenu" name="menuWindow">
+    <property name="title">
+     <string>Window</string>
+    </property>
+    <addaction name="actionWindow_Show_Participants"/>
+    <addaction name="actionWindow_Hide_Participants"/>
+    <addaction name="actionWindow_Show_Chat"/>
+    <addaction name="actionWindow_Hide_Chat"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
    <addaction name="menuView"/>
    <addaction name="menuText"/>
    <addaction name="menuTools"/>
+   <addaction name="menuWindow"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
    <property name="enabled">
@@ -337,24 +350,49 @@
     <string>Comment/Uncomment</string>
    </property>
   </action>
-  <action name="actionPreview_as_HTML">
+  <action name="actionTools_Preview_as_HTML">
    <property name="text">
     <string>Preview as HTML</string>
    </property>
   </action>
-  <action name="actionSplit_Window">
+  <action name="actionView_Split_Window">
    <property name="text">
     <string>Split Window</string>
    </property>
   </action>
-  <action name="actionSave_A_Copy_As">
+  <action name="actionFile_Save_A_Copy_As">
    <property name="text">
     <string>Save A Copy As...</string>
    </property>
   </action>
-  <action name="actionSave_All">
+  <action name="actionFile_Save_All">
    <property name="text">
     <string>Save All</string>
+   </property>
+  </action>
+  <action name="actionTools_Announce_Document">
+   <property name="text">
+    <string>Announce Document</string>
+   </property>
+  </action>
+  <action name="actionWindow_Show_Participants">
+   <property name="text">
+    <string>Show Participants</string>
+   </property>
+  </action>
+  <action name="actionWindow_Hide_Participants">
+   <property name="text">
+    <string>Hide Participants</string>
+   </property>
+  </action>
+  <action name="actionWindow_Show_Chat">
+   <property name="text">
+    <string>Show Chat</string>
+   </property>
+  </action>
+  <action name="actionWindow_Hide_Chat">
+   <property name="text">
+    <string>Hide Chat</string>
    </property>
   </action>
  </widget>
