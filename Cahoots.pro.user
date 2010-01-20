@@ -45,6 +45,7 @@
   <valuemap type="QVariantMap" >
    <value key="ProjectExplorer.BuildConfiguration.DisplayName" type="QString" >Debug</value>
    <value key="QtVersionId" type="int" >0</value>
+   <value key="addQDumper" type="" ></value>
   </valuemap>
  </data>
  <data>
@@ -52,12 +53,48 @@
   <valuemap type="QVariantMap" >
    <value key="ProjectExplorer.BuildConfiguration.DisplayName" type="QString" >Release</value>
    <value key="QtVersionId" type="int" >0</value>
+   <value key="addQDumper" type="" ></value>
   </valuemap>
  </data>
  <data>
   <variable>buildconfiguration-Debug-buildstep0</variable>
   <valuemap type="QVariantMap" >
    <value key="ProjectExplorer.BuildConfiguration.DisplayName" type="QString" >Debug</value>
+   <valuelist key="abstractProcess.Environment" type="QVariantList" >
+    <value type="QString" >Apple_PubSub_Socket_Render=/tmp/launch-Djk6Da/Render</value>
+    <value type="QString" >COMMAND_MODE=legacy</value>
+    <value type="QString" >DISPLAY=/tmp/launch-PDIphg/:0</value>
+    <value type="QString" >HOME=/Users/dimpfl</value>
+    <value type="QString" >INFOPATH=/sw/share/info:/sw/info:/usr/share/info</value>
+    <value type="QString" >LANG=en_US.UTF-8</value>
+    <value type="QString" >LOGNAME=dimpfl</value>
+    <value type="QString" >MANPATH=/sw/share/man:/usr/share/man:/usr/local/share/man:/usr/X11/man:/sw/lib/perl5/5.8.8/man:/usr/X11R6/man</value>
+    <value type="QString" >OLDPWD=/Users/dimpfl/Projects</value>
+    <value type="QString" >PATH=/Developer/Tools/Qt:/sw/bin:/sw/sbin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/usr/X11/bin:/usr/X11R6/bin</value>
+    <value type="QString" >PERL5LIB=/sw/lib/perl5:/sw/lib/perl5/darwin</value>
+    <value type="QString" >PWD=/Users/dimpfl/Projects/cahootseditor</value>
+    <value type="QString" >QTDIR=/usr</value>
+    <value type="QString" >SECURITYSESSIONID=724c2e00</value>
+    <value type="QString" >SHELL=/bin/bash</value>
+    <value type="QString" >SHLVL=1</value>
+    <value type="QString" >SSH_AUTH_SOCK=/tmp/launch-M9HMZ7/Listeners</value>
+    <value type="QString" >TERM=xterm-color</value>
+    <value type="QString" >TERM_PROGRAM=Apple_Terminal</value>
+    <value type="QString" >TERM_PROGRAM_VERSION=240.2</value>
+    <value type="QString" >TMPDIR=/var/folders/y3/y3lPtLyEHAujogWHWoyqV++++UI/-Tmp-/</value>
+    <value type="QString" >USER=dimpfl</value>
+    <value type="QString" >_=/usr/bin/open</value>
+    <value type="QString" >__CF_USER_TEXT_ENCODING=0x205:0:0</value>
+   </valuelist>
+   <valuelist key="abstractProcess.arguments" type="QVariantList" >
+    <value type="QString" >/Users/dimpfl/Projects/cahootseditor/Cahoots.pro</value>
+    <value type="QString" >-spec</value>
+    <value type="QString" >macx-g++</value>
+    <value type="QString" >-r</value>
+   </valuelist>
+   <value key="abstractProcess.command" type="QString" >/usr/bin/qmake</value>
+   <value key="abstractProcess.enabled" type="bool" >false</value>
+   <value key="abstractProcess.workingDirectory" type="QString" >/Users/dimpfl/Projects/cahootseditor</value>
    <value key="buildConfiguration" type="int" >2</value>
   </valuemap>
  </data>
@@ -65,6 +102,38 @@
   <variable>buildconfiguration-Debug-buildstep1</variable>
   <valuemap type="QVariantMap" >
    <value key="ProjectExplorer.BuildConfiguration.DisplayName" type="QString" >Debug</value>
+   <valuelist key="abstractProcess.Environment" type="QVariantList" >
+    <value type="QString" >Apple_PubSub_Socket_Render=/tmp/launch-Djk6Da/Render</value>
+    <value type="QString" >COMMAND_MODE=legacy</value>
+    <value type="QString" >DISPLAY=/tmp/launch-PDIphg/:0</value>
+    <value type="QString" >HOME=/Users/dimpfl</value>
+    <value type="QString" >INFOPATH=/sw/share/info:/sw/info:/usr/share/info</value>
+    <value type="QString" >LANG=en_US.UTF-8</value>
+    <value type="QString" >LOGNAME=dimpfl</value>
+    <value type="QString" >MANPATH=/sw/share/man:/usr/share/man:/usr/local/share/man:/usr/X11/man:/sw/lib/perl5/5.8.8/man:/usr/X11R6/man</value>
+    <value type="QString" >OLDPWD=/Users/dimpfl/Projects</value>
+    <value type="QString" >PATH=/Developer/Tools/Qt:/sw/bin:/sw/sbin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/usr/X11/bin:/usr/X11R6/bin</value>
+    <value type="QString" >PERL5LIB=/sw/lib/perl5:/sw/lib/perl5/darwin</value>
+    <value type="QString" >PWD=/Users/dimpfl/Projects/cahootseditor</value>
+    <value type="QString" >QTDIR=/usr</value>
+    <value type="QString" >SECURITYSESSIONID=724c2e00</value>
+    <value type="QString" >SHELL=/bin/bash</value>
+    <value type="QString" >SHLVL=1</value>
+    <value type="QString" >SSH_AUTH_SOCK=/tmp/launch-M9HMZ7/Listeners</value>
+    <value type="QString" >TERM=xterm-color</value>
+    <value type="QString" >TERM_PROGRAM=Apple_Terminal</value>
+    <value type="QString" >TERM_PROGRAM_VERSION=240.2</value>
+    <value type="QString" >TMPDIR=/var/folders/y3/y3lPtLyEHAujogWHWoyqV++++UI/-Tmp-/</value>
+    <value type="QString" >USER=dimpfl</value>
+    <value type="QString" >_=/usr/bin/open</value>
+    <value type="QString" >__CF_USER_TEXT_ENCODING=0x205:0:0</value>
+   </valuelist>
+   <valuelist key="abstractProcess.arguments" type="QVariantList" >
+    <value type="QString" >-w</value>
+   </valuelist>
+   <value key="abstractProcess.command" type="QString" >/usr/bin/make</value>
+   <value key="abstractProcess.enabled" type="bool" >true</value>
+   <value key="abstractProcess.workingDirectory" type="QString" >/Users/dimpfl/Projects/cahootseditor</value>
   </valuemap>
  </data>
  <data>
