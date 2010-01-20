@@ -15,8 +15,6 @@ Document::Document(QWidget *parent) :
     connect(ui->codeTextEdit, SIGNAL(undoAvailable(bool)), this, SIGNAL(undoAvailable(bool)));
     connect(ui->codeTextEdit, SIGNAL(redoAvailable(bool)), this, SIGNAL(redoAvailable(bool)));
 
-//    ui->listWidget->hide();
-
     server = new QTcpServer(this);
     socket = new QTcpSocket(this);
 
@@ -58,6 +56,30 @@ void Document::paste()
     ui->codeTextEdit->paste();
 }
 
+void Document::invisibleList()
+{
+    ui->listWidget->hide();
+}
+
+void Document::visibleList()
+{
+    ui->listWidget->show();
+}
+
+void Document::invisibleChat()
+{
+    ui->chatTextEdit->hide();
+    ui->lineEdit->hide();
+    ui->pushButton->hide();
+}
+
+void Document::visibleChat()
+{
+    ui->chatTextEdit->show();
+    ui->lineEdit->show();
+    ui->pushButton->show();
+}
+
 bool Document::isUndoable()
 {
     return ui->codeTextEdit->document()->isUndoAvailable();
@@ -72,6 +94,26 @@ bool Document::isModified()
 {
     return ui->codeTextEdit->document()->isModified();
 }
+
+/*bool Document::isListHideable()
+{
+    return ui->listWidget->isVisible();
+}
+
+bool Document::isListShowable()
+{
+    return ui->listWidget->isHidden();
+}
+
+bool Document::isChatHideable()
+{
+    return ui->chatTextEdit->isVisible();
+}
+
+bool Document::isChatShowable()
+{
+    return ui->chatTextEdit->isHidden();
+}*/
 
 QString Document::getPlainText()
 {

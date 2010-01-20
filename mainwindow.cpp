@@ -31,6 +31,11 @@ MainWindow::MainWindow(QWidget *parent)
     connect(document, SIGNAL(undoAvailable(bool)), this, SLOT(setUndoability(bool)));
     connect(document, SIGNAL(redoAvailable(bool)), this, SLOT(setRedoability(bool)));
 
+    on_actionWindow_Show_Participants_triggered();
+    //setListHideability(true);
+    on_actionWindow_Show_Chat_triggered();
+    //setChatHideability(true);
+
     readSettings();
     openPath = QDir::homePath();
 }
@@ -102,7 +107,7 @@ bool MainWindow::save(int index)
         return on_actionFile_Save_As_triggered();
     }
     else {
-        return saveFile(tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->curFile);
+        return saveFile(tabWidgetToDocumentMap.value(ui->tabWidget->widget(index))->curFile);
     }
 }
 
@@ -202,6 +207,11 @@ void MainWindow::on_actionFile_New_triggered()
 
     connect(document, SIGNAL(undoAvailable(bool)), this, SLOT(setUndoability(bool)));
     connect(document, SIGNAL(redoAvailable(bool)), this, SLOT(setRedoability(bool)));
+    
+    on_actionWindow_Show_Participants_triggered();
+    //setListHideability(true);
+    on_actionWindow_Show_Chat_triggered();
+    //setChatHideability(true);
 
     ui->tabWidget->setCurrentIndex(index);
 }
@@ -229,6 +239,7 @@ void MainWindow::on_actionFile_Open_triggered()
         connect(document, SIGNAL(undoAvailable(bool)), this, SLOT(setUndoability(bool)));
         connect(document, SIGNAL(redoAvailable(bool)), this, SLOT(setRedoability(bool)));
 
+
         ui->tabWidget->setCurrentIndex(index);
 
         openPath = QFileInfo(fileName).path();
@@ -245,6 +256,19 @@ bool MainWindow::on_actionFile_Save_triggered()
     }
 }
 
+bool MainWindow::on_actionFile_Save_All_triggered()
+{
+    bool isAllSaved = false;
+    int originalWidget = ui->tabWidget->currentIndex();
+    for (int i = 0; i < tabWidgetToDocumentMap.count(); i++)
+    {
+        ui->tabWidget->setCurrentWidget(ui->tabWidget->widget(i));
+        isAllSaved = on_actionFile_Save_triggered();
+    }
+    ui->tabWidget->setCurrentWidget(ui->tabWidget->widget(originalWidget));
+    return isAllSaved;
+}
+
 bool MainWindow::on_actionFile_Save_As_triggered()
 {
     QString fileName = QFileDialog::getSaveFileName(
@@ -258,6 +282,33 @@ bool MainWindow::on_actionFile_Save_As_triggered()
         return false;
 
     return saveFile(fileName);
+}
+
+bool MainWindow::on_actionFile_Save_A_Copy_As_triggered()
+{
+    bool isCopySaved = false;
+
+    int index = ui->tabWidget->addTab(new QWidget(), "untitled.txt");
+    int originalIndex = ui->tabWidget->currentIndex();
+    Document *document = new Document(ui->tabWidget->widget(index));
+    QGridLayout *tabLayout = new QGridLayout;
+    tabLayout->addWidget(document);
+    tabLayout->setContentsMargins(0,0,0,0);
+    ui->tabWidget->widget(index)->setLayout(tabLayout);
+
+    tabWidgetToDocumentMap.insert(ui->tabWidget->widget(index), document);
+    QString copyData = tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->getPlainText();
+    tabWidgetToDocumentMap.value(ui->tabWidget->widget(index))->setPlainText(copyData);
+
+    ui->tabWidget->setCurrentIndex(index);
+
+    isCopySaved = on_actionFile_Save_As_triggered();
+    on_actionFile_Close_triggered();
+    ui->tabWidget->setCurrentIndex(originalIndex);
+
+    delete document;
+    return isCopySaved;
+
 }
 
 void MainWindow::on_actionFile_Close_triggered()
@@ -305,6 +356,30 @@ void MainWindow::on_actionEdit_Paste_triggered()
     tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->paste();
 }
 
+void MainWindow::on_actionWindow_Hide_Participants_triggered()
+{
+    tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->invisibleList();
+    setListShowability(true);
+}
+
+void MainWindow::on_actionWindow_Show_Participants_triggered()
+{
+    tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->visibleList();
+    setListHideability(true);
+}
+
+void MainWindow::on_actionWindow_Hide_Chat_triggered()
+{
+    tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->invisibleChat();
+    setChatShowability(true);
+}
+
+void MainWindow::on_actionWindow_Show_Chat_triggered()
+{
+    tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->visibleChat();
+    setChatHideability(true);
+}
+
 void MainWindow::setUndoability(bool b)
 {
     ui->actionEdit_Undo->setEnabled(b);
@@ -313,6 +388,30 @@ void MainWindow::setUndoability(bool b)
 void MainWindow::setRedoability(bool b)
 {
     ui->actionEdit_Redo->setEnabled(b);
+}
+
+void MainWindow::setListHideability(bool b)
+{
+    ui->actionWindow_Hide_Participants->setEnabled(b);
+    ui->actionWindow_Show_Participants->setDisabled(b);
+}
+
+void MainWindow::setListShowability(bool b)
+{
+    ui->actionWindow_Show_Participants->setEnabled(b);
+    ui->actionWindow_Hide_Participants->setDisabled(b);
+}
+
+void MainWindow::setChatHideability(bool b)
+{
+    ui->actionWindow_Hide_Chat->setEnabled(b);
+    ui->actionWindow_Show_Chat->setDisabled(b);
+}
+
+void MainWindow::setChatShowability(bool b)
+{
+    ui->actionWindow_Show_Chat->setEnabled(b);
+    ui->actionWindow_Hide_Chat->setDisabled(b);
 }
 
 void MainWindow::documentChanged(int index)

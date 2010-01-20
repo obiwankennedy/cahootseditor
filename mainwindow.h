@@ -41,7 +41,10 @@ private slots:
     void on_actionFile_New_triggered();
     void on_actionFile_Open_triggered();
     bool on_actionFile_Save_triggered();
+    bool on_actionFile_Save_All_triggered();
     bool on_actionFile_Save_As_triggered();
+    bool on_actionFile_Save_A_Copy_As_triggered();
+
     void on_actionFile_Close_triggered();
     void on_actionFile_Print_triggered();
 
@@ -51,11 +54,21 @@ private slots:
     void on_actionEdit_Copy_triggered();
     void on_actionEdit_Paste_triggered();
 
+    void on_actionWindow_Show_Participants_triggered();
+    void on_actionWindow_Hide_Participants_triggered();
+    void on_actionWindow_Show_Chat_triggered();
+    void on_actionWindow_Hide_Chat_triggered();
+
     void setUndoability(bool b);
     void setRedoability(bool b);
+    void setListHideability(bool b);
+    void setListShowability(bool b);
+    void setChatHideability(bool b);
+    void setChatShowability(bool b);
 
     void documentChanged(int index);
     void tabCloseClicked(int index);
+    //void viewChanged();
 };
 
 #endif // MAINWINDOW_H
