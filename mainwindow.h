@@ -41,9 +41,9 @@ private slots:
     void on_actionFile_New_triggered();
     void on_actionFile_Open_triggered();
     bool on_actionFile_Save_triggered();
-    bool on_actionFile_Save_All_triggered();
     bool on_actionFile_Save_As_triggered();
     bool on_actionFile_Save_A_Copy_As_triggered();
+    bool on_actionFile_Save_All_triggered();
 
     void on_actionFile_Close_triggered();
     void on_actionFile_Print_triggered();
@@ -61,10 +61,6 @@ private slots:
 
     void setUndoability(bool b);
     void setRedoability(bool b);
-    void setListHideability(bool b);
-    void setListShowability(bool b);
-    void setChatHideability(bool b);
-    void setChatShowability(bool b);
 
     void documentChanged(int index);
     void tabCloseClicked(int index);

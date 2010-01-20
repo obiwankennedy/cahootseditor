@@ -31,10 +31,8 @@ MainWindow::MainWindow(QWidget *parent)
     connect(document, SIGNAL(undoAvailable(bool)), this, SLOT(setUndoability(bool)));
     connect(document, SIGNAL(redoAvailable(bool)), this, SLOT(setRedoability(bool)));
 
-    on_actionWindow_Show_Participants_triggered();
-    //setListHideability(true);
-    on_actionWindow_Show_Chat_triggered();
-    //setChatHideability(true);
+    ui->actionWindow_Show_Chat->setDisabled(true);
+    ui->actionWindow_Show_Participants->setDisabled(true);
 
     readSettings();
     openPath = QDir::homePath();
@@ -148,7 +146,6 @@ bool MainWindow::saveFile(const QString &fileName)
     setCurrentFile(fileName);
     statusBar()->showMessage("File saved", 4000);
     return true;
-
 }
 
 void MainWindow::loadFile(const QString &fileName)
@@ -176,7 +173,7 @@ void MainWindow::setCurrentFile(const QString &fileName)
 {
      tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->curFile = fileName;
      tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->setModified(false);
-//     setWindowModified(false);
+//     setWindowModified(false); // Possible future mechanic for showing in the title bar if the document isModified
 
      QString shownName;
      if (tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->curFile.isEmpty())
@@ -209,9 +206,7 @@ void MainWindow::on_actionFile_New_triggered()
     connect(document, SIGNAL(redoAvailable(bool)), this, SLOT(setRedoability(bool)));
     
     on_actionWindow_Show_Participants_triggered();
-    //setListHideability(true);
     on_actionWindow_Show_Chat_triggered();
-    //setChatHideability(true);
 
     ui->tabWidget->setCurrentIndex(index);
 }
@@ -256,21 +251,10 @@ bool MainWindow::on_actionFile_Save_triggered()
     }
 }
 
-bool MainWindow::on_actionFile_Save_All_triggered()
-{
-    bool isAllSaved = false;
-    int originalWidget = ui->tabWidget->currentIndex();
-    for (int i = 0; i < tabWidgetToDocumentMap.count(); i++)
-    {
-        ui->tabWidget->setCurrentWidget(ui->tabWidget->widget(i));
-        isAllSaved = on_actionFile_Save_triggered();
-    }
-    ui->tabWidget->setCurrentWidget(ui->tabWidget->widget(originalWidget));
-    return isAllSaved;
-}
-
 bool MainWindow::on_actionFile_Save_As_triggered()
 {
+    qApp->processEvents(); // Redraw so we see the document we're saving along with the dialog
+    // This is in case program control changes documents on a "Save All" or closeEvent
     QString fileName = QFileDialog::getSaveFileName(
             this,
             "Save As...",
@@ -285,6 +269,9 @@ bool MainWindow::on_actionFile_Save_As_triggered()
 }
 
 bool MainWindow::on_actionFile_Save_A_Copy_As_triggered()
+        // This needs some cleanup: because we can getPlainText of the document we're working on, making a new
+        // document is overkill. Just need to do a "Save As" type deal with the contents without modifying the curFile.
+#warning: Needs a new mechanic for saving a copy
 {
     bool isCopySaved = false;
 
@@ -309,6 +296,19 @@ bool MainWindow::on_actionFile_Save_A_Copy_As_triggered()
     delete document;
     return isCopySaved;
 
+}
+
+bool MainWindow::on_actionFile_Save_All_triggered()
+{
+    bool isAllSaved = false;
+    QWidget *originalWidget = ui->tabWidget->currentWidget();
+    for (int i = 0; i < tabWidgetToDocumentMap.size(); i++)
+    {
+        ui->tabWidget->setCurrentIndex(i);
+        isAllSaved += on_actionFile_Save_triggered();
+    }
+    ui->tabWidget->setCurrentWidget(originalWidget);
+    return isAllSaved;
 }
 
 void MainWindow::on_actionFile_Close_triggered()
@@ -358,26 +358,30 @@ void MainWindow::on_actionEdit_Paste_triggered()
 
 void MainWindow::on_actionWindow_Hide_Participants_triggered()
 {
-    tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->invisibleList();
-    setListShowability(true);
+    tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->setParticipantsHidden(true);
+    ui->actionWindow_Hide_Participants->setDisabled(true);
+    ui->actionWindow_Show_Participants->setDisabled(false);
 }
 
 void MainWindow::on_actionWindow_Show_Participants_triggered()
 {
-    tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->visibleList();
-    setListHideability(true);
+    tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->setParticipantsHidden(false);
+    ui->actionWindow_Hide_Participants->setDisabled(false);
+    ui->actionWindow_Show_Participants->setDisabled(true);
 }
 
 void MainWindow::on_actionWindow_Hide_Chat_triggered()
 {
-    tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->invisibleChat();
-    setChatShowability(true);
+    tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->setChatHidden(true);
+    ui->actionWindow_Hide_Chat->setDisabled(true);
+    ui->actionWindow_Show_Chat->setDisabled(false);
 }
 
 void MainWindow::on_actionWindow_Show_Chat_triggered()
 {
-    tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->visibleChat();
-    setChatHideability(true);
+    tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->setChatHidden(false);
+    ui->actionWindow_Hide_Chat->setDisabled(false);
+    ui->actionWindow_Show_Chat->setDisabled(true);
 }
 
 void MainWindow::setUndoability(bool b)
@@ -388,30 +392,6 @@ void MainWindow::setUndoability(bool b)
 void MainWindow::setRedoability(bool b)
 {
     ui->actionEdit_Redo->setEnabled(b);
-}
-
-void MainWindow::setListHideability(bool b)
-{
-    ui->actionWindow_Hide_Participants->setEnabled(b);
-    ui->actionWindow_Show_Participants->setDisabled(b);
-}
-
-void MainWindow::setListShowability(bool b)
-{
-    ui->actionWindow_Show_Participants->setEnabled(b);
-    ui->actionWindow_Hide_Participants->setDisabled(b);
-}
-
-void MainWindow::setChatHideability(bool b)
-{
-    ui->actionWindow_Hide_Chat->setEnabled(b);
-    ui->actionWindow_Show_Chat->setDisabled(b);
-}
-
-void MainWindow::setChatShowability(bool b)
-{
-    ui->actionWindow_Show_Chat->setEnabled(b);
-    ui->actionWindow_Hide_Chat->setDisabled(b);
 }
 
 void MainWindow::documentChanged(int index)

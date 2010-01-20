@@ -56,28 +56,28 @@ void Document::paste()
     ui->codeTextEdit->paste();
 }
 
-void Document::invisibleList()
+void Document::setParticipantsHidden(bool b)
 {
-    ui->listWidget->hide();
+    if (b) {
+        ui->listWidget->hide();
+    }
+    else {
+        ui->listWidget->show();
+    }
 }
 
-void Document::visibleList()
+void Document::setChatHidden(bool b)
 {
-    ui->listWidget->show();
-}
-
-void Document::invisibleChat()
-{
-    ui->chatTextEdit->hide();
-    ui->lineEdit->hide();
-    ui->pushButton->hide();
-}
-
-void Document::visibleChat()
-{
-    ui->chatTextEdit->show();
-    ui->lineEdit->show();
-    ui->pushButton->show();
+    if (b) {
+        ui->chatTextEdit->hide();
+        ui->lineEdit->hide();
+        ui->pushButton->hide();
+    }
+    else {
+        ui->chatTextEdit->show();
+        ui->lineEdit->show();
+        ui->pushButton->show();
+    }
 }
 
 bool Document::isUndoable()
@@ -94,26 +94,6 @@ bool Document::isModified()
 {
     return ui->codeTextEdit->document()->isModified();
 }
-
-/*bool Document::isListHideable()
-{
-    return ui->listWidget->isVisible();
-}
-
-bool Document::isListShowable()
-{
-    return ui->listWidget->isHidden();
-}
-
-bool Document::isChatHideable()
-{
-    return ui->chatTextEdit->isVisible();
-}
-
-bool Document::isChatShowable()
-{
-    return ui->chatTextEdit->isHidden();
-}*/
 
 QString Document::getPlainText()
 {

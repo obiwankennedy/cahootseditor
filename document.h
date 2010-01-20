@@ -23,18 +23,12 @@ public:
     void cut();
     void copy();
     void paste();
-    void invisibleList();
-    void visibleList();
-    void invisibleChat();
-    void visibleChat();
+    void setParticipantsHidden(bool b);
+    void setChatHidden(bool b);
 
     bool isUndoable();
     bool isRedoable();
     bool isModified();
-    //bool isListShowable();
-    //bool isListHideable();
-    //bool isChatShowable();
-    //bool isChatHideable();
 
     QString getPlainText();
     void setPlainText(QString text);
