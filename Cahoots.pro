@@ -7,12 +7,15 @@ TEMPLATE = app
 SOURCES += main.cpp \
     mainwindow.cpp \
     document.cpp \
-    highlighters/cpphighlighter.cpp
+    highlighters/cpphighlighter.cpp \
+    connecttodocument.cpp
 HEADERS += mainwindow.h \
     document.h \
-    highlighters/cpphighlighter.h
+    highlighters/cpphighlighter.h \
+    connecttodocument.h
 FORMS += mainwindow.ui \
-    document.ui
+    document.ui \
+    connecttodocument.ui
 RESOURCES += cahootsresc.qrc \
     highlighters.qrc
 OTHER_FILES += highlighters/xml.plist \

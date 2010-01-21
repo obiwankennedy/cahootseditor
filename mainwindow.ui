@@ -123,15 +123,14 @@
     <addaction name="actionTools_Preview_as_HTML"/>
     <addaction name="separator"/>
     <addaction name="actionTools_Announce_Document"/>
+    <addaction name="actionTools_Connect_to_Document"/>
    </widget>
    <widget class="QMenu" name="menuWindow">
     <property name="title">
      <string>Window</string>
     </property>
-    <addaction name="actionWindow_Show_Participants"/>
-    <addaction name="actionWindow_Hide_Participants"/>
-    <addaction name="actionWindow_Show_Chat"/>
-    <addaction name="actionWindow_Hide_Chat"/>
+    <addaction name="actionWindow_Hide_Show_Participants"/>
+    <addaction name="actionWindow_Hide_Show_Chat"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
@@ -375,24 +374,19 @@
     <string>Announce Document</string>
    </property>
   </action>
-  <action name="actionWindow_Show_Participants">
+  <action name="actionWindow_Hide_Show_Participants">
    <property name="text">
-    <string>Show Participants</string>
+    <string>Show/Hide Participants</string>
    </property>
   </action>
-  <action name="actionWindow_Hide_Participants">
+  <action name="actionWindow_Hide_Show_Chat">
    <property name="text">
-    <string>Hide Participants</string>
+    <string>Show/Hide Chat</string>
    </property>
   </action>
-  <action name="actionWindow_Show_Chat">
+  <action name="actionTools_Connect_to_Document">
    <property name="text">
-    <string>Show Chat</string>
-   </property>
-  </action>
-  <action name="actionWindow_Hide_Chat">
-   <property name="text">
-    <string>Hide Chat</string>
+    <string>Connect to Document...</string>
    </property>
   </action>
  </widget>

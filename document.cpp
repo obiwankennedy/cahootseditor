@@ -68,15 +68,12 @@ void Document::setParticipantsHidden(bool b)
 
 void Document::setChatHidden(bool b)
 {
+    // Hide/show the widget (contains the chat widget) below the code text edit
     if (b) {
-        ui->chatTextEdit->hide();
-        ui->lineEdit->hide();
-        ui->pushButton->hide();
+        ui->codeChatSplitter->widget(1)->hide();
     }
     else {
-        ui->chatTextEdit->show();
-        ui->lineEdit->show();
-        ui->pushButton->show();
+        ui->codeChatSplitter->widget(1)->show();
     }
 }
 
@@ -93,6 +90,16 @@ bool Document::isRedoable()
 bool Document::isModified()
 {
     return ui->codeTextEdit->document()->isModified();
+}
+
+bool Document::isChatHidden()
+{
+    return ui->chatTextEdit->isHidden();
+}
+
+bool Document::isParticipantsHidden()
+{
+    return ui->listWidget->isHidden();
 }
 
 QString Document::getPlainText()
@@ -112,11 +119,12 @@ void Document::setModified(bool b)
 
 bool Document::eventFilter(QObject *object, QEvent *event)
 {
+    // filter for keypress events and make sure the source is our text edit.
     if (event->type() == QEvent::KeyPress && object == ui->codeTextEdit) {
         QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
         if (!keyEvent->text().isEmpty()) {
-            socket->write(keyEvent->text().toAscii());
-            qDebug() << keyEvent->text() << " sent.";
+//            socket->write(keyEvent->text().toAscii()); // Don't send...yet. Incomplete.
+//            qDebug() << keyEvent->text() << " sent.";
         }
     }
     return false;

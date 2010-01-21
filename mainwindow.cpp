@@ -31,9 +31,6 @@ MainWindow::MainWindow(QWidget *parent)
     connect(document, SIGNAL(undoAvailable(bool)), this, SLOT(setUndoability(bool)));
     connect(document, SIGNAL(redoAvailable(bool)), this, SLOT(setRedoability(bool)));
 
-    ui->actionWindow_Show_Chat->setDisabled(true);
-    ui->actionWindow_Show_Participants->setDisabled(true);
-
     readSettings();
     openPath = QDir::homePath();
 }
@@ -205,9 +202,6 @@ void MainWindow::on_actionFile_New_triggered()
     connect(document, SIGNAL(undoAvailable(bool)), this, SLOT(setUndoability(bool)));
     connect(document, SIGNAL(redoAvailable(bool)), this, SLOT(setRedoability(bool)));
     
-    on_actionWindow_Show_Participants_triggered();
-    on_actionWindow_Show_Chat_triggered();
-
     ui->tabWidget->setCurrentIndex(index);
 }
 
@@ -355,32 +349,32 @@ void MainWindow::on_actionEdit_Paste_triggered()
     tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->paste();
 }
 
-void MainWindow::on_actionWindow_Hide_Participants_triggered()
+void MainWindow::on_actionTools_Connect_to_Document_triggered()
 {
-    tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->setParticipantsHidden(true);
-    ui->actionWindow_Hide_Participants->setDisabled(true);
-    ui->actionWindow_Show_Participants->setDisabled(false);
+    // Create our dialog and show it. When they user clicks "okay", we'll emit a signal to the mainwindow, and pass that to the document.
+    ConnectToDocument *connectDialog = new ConnectToDocument(this);
+    connectDialog->show();
 }
 
-void MainWindow::on_actionWindow_Show_Participants_triggered()
+void MainWindow::on_actionWindow_Hide_Show_Participants_triggered()
 {
-    tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->setParticipantsHidden(false);
-    ui->actionWindow_Hide_Participants->setDisabled(false);
-    ui->actionWindow_Show_Participants->setDisabled(true);
+
+    if (tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->isParticipantsHidden()) {
+        tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->setParticipantsHidden(false);
+    }
+    else {
+        tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->setParticipantsHidden(true);
+    }
 }
 
-void MainWindow::on_actionWindow_Hide_Chat_triggered()
+void MainWindow::on_actionWindow_Hide_Show_Chat_triggered()
 {
-    tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->setChatHidden(true);
-    ui->actionWindow_Hide_Chat->setDisabled(true);
-    ui->actionWindow_Show_Chat->setDisabled(false);
-}
-
-void MainWindow::on_actionWindow_Show_Chat_triggered()
-{
-    tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->setChatHidden(false);
-    ui->actionWindow_Hide_Chat->setDisabled(false);
-    ui->actionWindow_Show_Chat->setDisabled(true);
+    if (tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->isChatHidden()) {
+        tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->setChatHidden(false);
+    }
+    else {
+        tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->setChatHidden(true);
+    }
 }
 
 void MainWindow::setUndoability(bool b)

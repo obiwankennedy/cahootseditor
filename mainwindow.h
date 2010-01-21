@@ -3,6 +3,7 @@
 
 #include <QtGui/QMainWindow>
 #include "document.h"
+#include "connecttodocument.h"
 
 namespace Ui
 {
@@ -54,10 +55,10 @@ private slots:
     void on_actionEdit_Copy_triggered();
     void on_actionEdit_Paste_triggered();
 
-    void on_actionWindow_Show_Participants_triggered();
-    void on_actionWindow_Hide_Participants_triggered();
-    void on_actionWindow_Show_Chat_triggered();
-    void on_actionWindow_Hide_Chat_triggered();
+    void on_actionTools_Connect_to_Document_triggered();
+
+    void on_actionWindow_Hide_Show_Participants_triggered();
+    void on_actionWindow_Hide_Show_Chat_triggered();
 
     void setUndoability(bool b);
     void setRedoability(bool b);

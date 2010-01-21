@@ -29,6 +29,8 @@ public:
     bool isUndoable();
     bool isRedoable();
     bool isModified();
+    bool isChatHidden();
+    bool isParticipantsHidden();
 
     QString getPlainText();
     void setPlainText(QString text);
