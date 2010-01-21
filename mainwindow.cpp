@@ -293,7 +293,6 @@ bool MainWindow::on_actionFile_Save_A_Copy_As_triggered()
     on_actionFile_Close_triggered();
     ui->tabWidget->setCurrentIndex(originalIndex);
 
-    delete document;
     return isCopySaved;
 
 }
@@ -406,6 +405,8 @@ void MainWindow::tabCloseClicked(int index)
         if (ui->tabWidget->count() == 1) {
             on_actionFile_New_triggered();
         }
+        ui->tabWidget->widget(index)->deleteLater();
+        tabWidgetToDocumentMap.remove(ui->tabWidget->widget(index));
         ui->tabWidget->removeTab(index);
     }
 }
