@@ -358,6 +358,11 @@ void MainWindow::on_actionTools_Connect_to_Document_triggered()
     connectDialog->show();
 }
 
+void MainWindow::on_actionText_Shift_Left_triggered()
+{
+    tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->shiftLeft();
+}
+
 void MainWindow::on_actionWindow_Hide_Show_Participants_triggered()
 {
 

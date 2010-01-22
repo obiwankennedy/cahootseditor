@@ -2,6 +2,7 @@
 #include "ui_document.h"
 
 #include <QKeyEvent>
+#include <QTextCursor>
 #include <QDebug>
 
 Document::Document(QWidget *parent) :
@@ -80,6 +81,15 @@ void Document::setChatHidden(bool b)
     else {
         ui->codeChatSplitter->widget(1)->show();
     }
+}
+
+void Document::shiftLeft()
+{
+    QTextCursor *cursor = new QTextCursor(ui->codeTextEdit->document());
+    int currentPosition = cursor->position();
+    cursor->setPosition(0, QTextCursor::MoveAnchor);
+    cursor->insertText("    ");
+    cursor->setPosition(currentPosition, QTextCursor::MoveAnchor);
 }
 
 bool Document::isUndoable()

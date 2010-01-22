@@ -27,6 +27,7 @@ public:
     void paste();
     void setParticipantsHidden(bool b);
     void setChatHidden(bool b);
+    void shiftLeft();
 
     bool isUndoable();
     bool isRedoable();
