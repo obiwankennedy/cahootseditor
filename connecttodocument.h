@@ -15,6 +15,13 @@ public:
 
 private:
     Ui::ConnectToDocument *ui;
+
+private slots:
+    void dialogAccepted();
+
+signals:
+    void connectToDocumentClicked(QStringList *list);
+
 };
 
 #endif // CONNECTTODOCUMENT_H

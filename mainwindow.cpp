@@ -20,6 +20,9 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->tabWidget, SIGNAL(currentChanged(int)), this, SLOT(documentChanged(int)));
     connect(ui->tabWidget, SIGNAL(tabCloseRequested(int)), this, SLOT(tabCloseClicked(int)));
 
+    connectDialog = new ConnectToDocument(this);
+    connect(connectDialog, SIGNAL(connectToDocumentClicked(QStringList*)), this, SLOT(connectToDocument(QStringList*)));
+
     Document *document = new Document(ui->tab);
     QGridLayout *tabLayout = new QGridLayout;
     tabLayout->addWidget(document);
@@ -352,7 +355,6 @@ void MainWindow::on_actionEdit_Paste_triggered()
 void MainWindow::on_actionTools_Connect_to_Document_triggered()
 {
     // Create our dialog and show it. When they user clicks "okay", we'll emit a signal to the mainwindow, and pass that to the document.
-    ConnectToDocument *connectDialog = new ConnectToDocument(this);
     connectDialog->show();
 }
 
@@ -403,4 +405,9 @@ void MainWindow::tabCloseClicked(int index)
         tabWidgetToDocumentMap.remove(ui->tabWidget->widget(index));
         ui->tabWidget->removeTab(index);
     }
+}
+
+void MainWindow::connectToDocument(QStringList *list)
+{
+    tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->connectToDocument(list);;
 }

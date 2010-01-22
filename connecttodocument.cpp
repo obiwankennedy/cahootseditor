@@ -6,9 +6,19 @@ ConnectToDocument::ConnectToDocument(QWidget *parent) :
     ui(new Ui::ConnectToDocument)
 {
     ui->setupUi(this);
+
+    connect(ui->buttonBox, SIGNAL(accepted()), this, SLOT(dialogAccepted()));
 }
 
 ConnectToDocument::~ConnectToDocument()
 {
     delete ui;
+}
+
+void ConnectToDocument::dialogAccepted()
+{
+    QStringList *list = new QStringList();
+    list->append(ui->addressLineEdit->text());
+    list->append(ui->portLineEdit->text());
+    emit connectToDocumentClicked(list);
 }

@@ -31,6 +31,11 @@ Document::~Document()
     delete ui;
 }
 
+void Document::connectToDocument(QStringList *list)
+{
+    qDebug() << list->first();
+}
+
 void Document::undo()
 {
     ui->codeTextEdit->undo();
@@ -94,7 +99,7 @@ bool Document::isModified()
 
 bool Document::isChatHidden()
 {
-    return ui->chatTextEdit->isHidden();
+    return ui->codeChatSplitter->widget(1)->isHidden();
 }
 
 bool Document::isParticipantsHidden()

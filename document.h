@@ -18,6 +18,8 @@ public:
     Document(QWidget *parent = 0);
     ~Document();
 
+    void connectToDocument(QStringList *list);
+
     void undo();
     void redo();
     void cut();

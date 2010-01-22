@@ -25,6 +25,7 @@ private:
     Ui::MainWindow *ui;
     QMap<QWidget *, Document *> tabWidgetToDocumentMap;
     QString openPath;
+    ConnectToDocument *connectDialog;
 
     bool save(int index);
     bool maybeSave(int index);
@@ -65,6 +66,8 @@ private slots:
 
     void documentChanged(int index);
     void tabCloseClicked(int index);
+
+    void connectToDocument(QStringList *list);
     //void viewChanged();
 };
 
