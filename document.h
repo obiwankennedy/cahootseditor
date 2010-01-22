@@ -28,6 +28,7 @@ public:
     void setParticipantsHidden(bool b);
     void setChatHidden(bool b);
     void shiftLeft();
+    void shiftRight();
 
     bool isUndoable();
     bool isRedoable();

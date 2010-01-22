@@ -363,6 +363,11 @@ void MainWindow::on_actionText_Shift_Left_triggered()
     tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->shiftLeft();
 }
 
+void MainWindow::on_actionText_Shift_Right_triggered()
+{
+    tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->shiftRight();
+}
+
 void MainWindow::on_actionWindow_Hide_Show_Participants_triggered()
 {
 

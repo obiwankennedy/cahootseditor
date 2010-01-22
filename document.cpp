@@ -92,6 +92,13 @@ void Document::shiftLeft()
     cursor->setPosition(currentPosition, QTextCursor::MoveAnchor);
 }
 
+void Document::shiftRight()
+{
+    QTextCursor cursor = ui->codeTextEdit->textCursor();
+    cursor.movePosition(QTextCursor::StartOfLine);
+    cursor.insertText("    ");
+}
+
 bool Document::isUndoable()
 {
     return ui->codeTextEdit->document()->isUndoAvailable();

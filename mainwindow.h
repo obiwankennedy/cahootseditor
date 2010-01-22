@@ -59,6 +59,7 @@ private slots:
     void on_actionTools_Connect_to_Document_triggered();
 
     void on_actionText_Shift_Left_triggered();
+    void on_actionText_Shift_Right_triggered();
 
     void on_actionWindow_Hide_Show_Participants_triggered();
     void on_actionWindow_Hide_Show_Chat_triggered();
