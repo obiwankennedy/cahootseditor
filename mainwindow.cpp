@@ -352,6 +352,11 @@ void MainWindow::on_actionEdit_Paste_triggered()
     tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->paste();
 }
 
+void MainWindow::on_actionTools_Announce_Document_triggered()
+{
+    tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->announceDocument();
+}
+
 void MainWindow::on_actionTools_Connect_to_Document_triggered()
 {
     // Create our dialog and show it. When they user clicks "okay", we'll emit a signal to the mainwindow, and pass that to the document.
@@ -419,5 +424,6 @@ void MainWindow::tabCloseClicked(int index)
 
 void MainWindow::connectToDocument(QStringList *list)
 {
+    on_actionFile_New_triggered();
     tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->connectToDocument(list);;
 }

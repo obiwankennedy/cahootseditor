@@ -19,12 +19,16 @@ Document::Document(QWidget *parent) :
     server = new QTcpServer(this);
     socket = new QTcpSocket(this);
 
+    // Hide the panels that only matter if we're using the collaborative portion of the app
+    setChatHidden(true);
+    setParticipantsHidden(true);
+
     connect(server, SIGNAL(newConnection()), this, SLOT(onNewConnection()));
 
-    server->listen(QHostAddress("137.159.47.71"), 3000);
-    ui->chatTextEdit->setText("Listening...");
-
 //    qApp->installEventFilter(this);
+
+    isOwner = true; // We are the document owner, unless we're connecting to someone elses document
+
 }
 
 Document::~Document()
@@ -34,7 +38,10 @@ Document::~Document()
 
 void Document::connectToDocument(QStringList *list)
 {
-    qDebug() << list->first();
+    isOwner = false;
+    if (list->size() == 2) {
+        sock->connectToHost(QHostAddress(list->at(0)), list->at(1));
+    }
 }
 
 void Document::undo()
@@ -87,7 +94,7 @@ void Document::shiftLeft()
 {
     QTextCursor *cursor = new QTextCursor(ui->codeTextEdit->document());
     int currentPosition = cursor->position();
-    cursor->setPosition(0, QTextCursor::MoveAnchor);
+    cursor->setPosition(0, QTextCursor::MoveAnchor); // This only affects the first line of the document
     cursor->insertText("    ");
     cursor->setPosition(currentPosition, QTextCursor::MoveAnchor);
 }
@@ -97,6 +104,15 @@ void Document::shiftRight()
     QTextCursor cursor = ui->codeTextEdit->textCursor();
     cursor.movePosition(QTextCursor::StartOfLine);
     cursor.insertText("    ");
+}
+
+void Document::announceDocument()
+{
+    setChatHidden(false);
+    setParticipantsHidden(false);
+    server->listen(QHostAddress("137.159.47.71"), 3000);
+    ui->chatTextEdit->setText("Listening...");
+
 }
 
 bool Document::isUndoable()
@@ -152,17 +168,42 @@ bool Document::eventFilter(QObject *object, QEvent *event)
     return false;
 }
 
-void Document::onNewConnection()
-{
-//    ui->statusBar->showMessage("We have signal! Main screen turn on!");
-
-//    clientList.append(server->nextPendingConnection());
-//    connect(clientList.last(), SIGNAL(readyRead()), this, SLOT(onIncomingData()));
-}
-
 void Document::on_pushButton_clicked()
 {
-//    QString string = ui->textEdit->toPlainText();
-//    sock->write(string.toAscii());
-//    ui->textEdit->append(QString("Sent \"%1\"\n").arg(string));
+    QString string = ui->lineEdit->text();
+    socket->write(QString("Them: ").toAscii() + string.toAscii());
+    ui->chatTextEdit->append(QString("Me: %1\n").arg(string));
 }
+
+void Document::onIncomingData()
+{
+    if (isOwner) { // We're hosting the document, and are in charge of distributing data.
+        QString data;
+        qDebug() << "sender() == " << sender();
+        // We know we have incoming data, so iterate through our current participants to find the
+        // correct sender, and then read the data.
+        for (int i = 0; i < clientList.size(); i++) {
+            qDebug() << "clientList.at(" << i << ") = " << clientList.at(i);
+            if (sender() == clientList.at(i)) {
+                data = clientList.at(i)->readAll();
+                ui->chatTextEdit->insertPlainText(data);
+                #warning: To do: distribute data to the rest of the participants
+            }
+        }
+    }
+    else { // We are a participant
+        ui->chatTextEdit->append(socket->readAll());
+    }
+}
+
+void Document::onNewConnection()
+{
+    if (isOwner) {
+        clientList.append(server->nextPendingConnection());
+        connect(clientList.last(), SIGNAL(readyRead()), this, SLOT(onIncomingData()));
+    }
+    else {
+        connect(socket, SIGNAL(readyRead()), this, SLOT(onIncomingData()));
+    }
+}
+

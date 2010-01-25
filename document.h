@@ -30,6 +30,11 @@ public:
     void shiftLeft();
     void shiftRight();
 
+    // This sets up the document so people can connect to it.
+    // Hopefully we can do something with Bonjour so you can browse for local documents
+    // but that's down the road.
+    void announceDocument();
+
     bool isUndoable();
     bool isRedoable();
     bool isModified();
@@ -41,6 +46,8 @@ public:
 
     void setModified(bool b);
 
+    // This tells us if we're the host/owner of the document, and affects how we talk with participants
+    bool isOwner;
     QString curFile;
     
 private:
@@ -49,13 +56,16 @@ private:
     QTcpServer *server;
     QTcpSocket *socket;
 
+    QList<QTcpSocket *> clientList;
+
     CppHighlighter *cppHighlighter;
 
     bool eventFilter(QObject *object, QEvent *event);
 
 private slots:
-    void onNewConnection();
     void on_pushButton_clicked();
+    void onIncomingData();
+    void onNewConnection();
 
 signals:
     void redoAvailable(bool);
