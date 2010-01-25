@@ -40,7 +40,10 @@ void Document::connectToDocument(QStringList *list)
 {
     isOwner = false;
     if (list->size() == 2) {
-        sock->connectToHost(QHostAddress(list->at(0)), list->at(1));
+        QString address = list->at(0);
+        QString portString = list->at(1);
+        int port = portString.toInt();
+        socket->connectToHost(QHostAddress(address), port);
     }
 }
 
