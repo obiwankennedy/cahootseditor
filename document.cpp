@@ -46,6 +46,7 @@ void Document::connectToDocument(QStringList *list)
         qDebug() << "Address: " << address;
         qDebug() << "Port: " << port;
         socket->connectToHost(QHostAddress(address), 3000); // port); // port 3000 magic number for the time being
+        connect(socket, SIGNAL(readyRead()), this, SLOT(onIncomingData()));
         setChatHidden(false);
         setParticipantsHidden(false);
     }
@@ -117,7 +118,7 @@ void Document::announceDocument()
 {
     setChatHidden(false);
     setParticipantsHidden(false);
-    server->listen(QHostAddress("127.0.0.1"), 3000);
+    server->listen(QHostAddress("137.159.47.71"), 3000);
     ui->chatTextEdit->setText("Listening...");
 
 }
@@ -184,6 +185,7 @@ void Document::on_pushButton_clicked()
 
 void Document::onIncomingData()
 {
+    qDebug() << "Incoming data!";
     if (isOwner) { // We're hosting the document, and are in charge of distributing data.
         QString data;
         qDebug() << "sender() == " << sender();
@@ -205,6 +207,7 @@ void Document::onIncomingData()
 
 void Document::onNewConnection()
 {
+    qDebug() << "New connection.";
     if (isOwner) {
         clientList.append(server->nextPendingConnection());
         connect(clientList.last(), SIGNAL(readyRead()), this, SLOT(onIncomingData()));

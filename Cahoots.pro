@@ -4,6 +4,7 @@
 QT += network
 TARGET = Cahoots
 TEMPLATE = app
+CONFIG += x86 ppc
 SOURCES += main.cpp \
     mainwindow.cpp \
     document.cpp \
