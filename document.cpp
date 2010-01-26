@@ -43,7 +43,11 @@ void Document::connectToDocument(QStringList *list)
         QString address = list->at(0);
         QString portString = list->at(1);
         int port = portString.toInt();
-        socket->connectToHost(QHostAddress(address), port);
+        qDebug() << "Address: " << address;
+        qDebug() << "Port: " << port;
+        socket->connectToHost(QHostAddress(address), 3000); // port); // port 3000 magic number for the time being
+        setChatHidden(false);
+        setParticipantsHidden(false);
     }
 }
 
@@ -113,7 +117,7 @@ void Document::announceDocument()
 {
     setChatHidden(false);
     setParticipantsHidden(false);
-    server->listen(QHostAddress("137.159.47.71"), 3000);
+    server->listen(QHostAddress("127.0.0.1"), 3000);
     ui->chatTextEdit->setText("Listening...");
 
 }
@@ -175,7 +179,7 @@ void Document::on_pushButton_clicked()
 {
     QString string = ui->lineEdit->text();
     socket->write(QString("Them: ").toAscii() + string.toAscii());
-    ui->chatTextEdit->append(QString("Me: %1\n").arg(string));
+    ui->chatTextEdit->append(QString("Me: %1").arg(string));
 }
 
 void Document::onIncomingData()
