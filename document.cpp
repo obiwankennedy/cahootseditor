@@ -3,7 +3,9 @@
 
 #include <QKeyEvent>
 #include <QTextCursor>
+#include <QRegExp>
 #include <QDebug>
+#include <QTextCursor>
 
 Document::Document(QWidget *parent) :
     QWidget(parent),
@@ -100,11 +102,20 @@ void Document::setChatHidden(bool b)
 
 void Document::shiftLeft()
 {
-    QTextCursor *cursor = new QTextCursor(ui->codeTextEdit->document());
-    int currentPosition = cursor->position();
-    cursor->setPosition(0, QTextCursor::MoveAnchor); // This only affects the first line of the document
-    cursor->insertText("    ");
-    cursor->setPosition(currentPosition, QTextCursor::MoveAnchor);
+    QTextCursor cursor = ui->codeTextEdit->textCursor();
+    cursor.movePosition(QTextCursor::StartOfLine);
+    cursor.movePosition(QTextCursor::EndOfLine, QTextCursor::KeepAnchor);
+    QString line = cursor.selectedText();
+    cursor.movePosition(QTextCursor::StartOfLine, QTextCursor::MoveAnchor);
+    if (line.startsWith("    ")) {
+        cursor.deleteChar();
+        cursor.deleteChar();
+        cursor.deleteChar();
+        cursor.deleteChar();
+    }
+    else if (line.startsWith("\t")) {
+        cursor.deleteChar();
+    }
 }
 
 void Document::shiftRight()
@@ -112,6 +123,21 @@ void Document::shiftRight()
     QTextCursor cursor = ui->codeTextEdit->textCursor();
     cursor.movePosition(QTextCursor::StartOfLine);
     cursor.insertText("    ");
+}
+
+void Document::comment()
+{
+    QTextCursor cursor = ui->codeTextEdit->textCursor();
+    cursor.movePosition(QTextCursor::StartOfLine);
+    cursor.movePosition(QTextCursor::EndOfLine, QTextCursor::KeepAnchor);
+    QString line = cursor.selectedText();
+    cursor.movePosition(QTextCursor::StartOfLine, QTextCursor::MoveAnchor);
+    if (line.startsWith("//")) {
+        cursor.deleteChar();
+        cursor.deleteChar();
+    } else {
+        cursor.insertText("//");
+    }
 }
 
 void Document::announceDocument()

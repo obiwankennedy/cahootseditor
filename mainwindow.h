@@ -61,6 +61,7 @@ private slots:
 
     void on_actionText_Shift_Left_triggered();
     void on_actionText_Shift_Right_triggered();
+    void on_actionText_Comment_Line_triggered();
 
     void on_actionWindow_Hide_Show_Participants_triggered();
     void on_actionWindow_Hide_Show_Chat_triggered();
