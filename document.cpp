@@ -25,8 +25,6 @@ Document::Document(QWidget *parent) :
     setChatHidden(true);
     setParticipantsHidden(true);
 
-    connect(server, SIGNAL(newConnection()), this, SLOT(onNewConnection()));
-
 //    qApp->installEventFilter(this);
 
     isOwner = true; // We are the document owner, unless we're connecting to someone elses document
@@ -41,7 +39,7 @@ Document::~Document()
 void Document::connectToDocument(QStringList *list)
 {
     isOwner = false;
-    if (list->size() == 2) {
+    if (list->size() == 2) { // More thorough checking is needed to ensure the contents are usable.
         QString address = list->at(0);
         QString portString = list->at(1);
         int port = portString.toInt();
@@ -144,9 +142,10 @@ void Document::announceDocument()
 {
     setChatHidden(false);
     setParticipantsHidden(false);
+
+    connect(server, SIGNAL(newConnection()), this, SLOT(onNewConnection()));
     server->listen(QHostAddress("137.159.47.71"), 3000);
     ui->chatTextEdit->setText("Listening...");
-
 }
 
 bool Document::isUndoable()
@@ -204,21 +203,28 @@ bool Document::eventFilter(QObject *object, QEvent *event)
 
 void Document::on_pushButton_clicked()
 {
-    QString string = ui->lineEdit->text();
-    socket->write(QString("Them: ").toAscii() + string.toAscii());
-    ui->chatTextEdit->append(QString("Me: %1").arg(string));
+    if (isOwner) {
+        QString string = ui->lineEdit->text();
+        for (int i = 0; i < clientList.size(); i++) {
+            clientList.at(i)->write(string.toAscii());
+        }
+        ui->chatTextEdit->append("Me: " + string);
+    }
+    else {
+        QString string = ui->lineEdit->text();
+        socket->write(QString("Them: ").toAscii() + string.toAscii());
+        ui->chatTextEdit->append(QString("Me: %1").arg(string));
+    }
 }
 
 void Document::onIncomingData()
 {
-    qDebug() << "Incoming data!";
-    if (isOwner) { // We're hosting the document, and are in charge of distributing data.
+    if (isOwner) {
+        // We're hosting the document, and are in charge of distributing data.
         QString data;
-        qDebug() << "sender() == " << sender();
         // We know we have incoming data, so iterate through our current participants to find the
         // correct sender, and then read the data.
         for (int i = 0; i < clientList.size(); i++) {
-            qDebug() << "clientList.at(" << i << ") = " << clientList.at(i);
             if (sender() == clientList.at(i)) {
                 data = clientList.at(i)->readAll();
                 ui->chatTextEdit->insertPlainText(data);
