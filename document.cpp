@@ -206,7 +206,8 @@ void Document::on_pushButton_clicked()
     if (isOwner) {
         QString string = ui->lineEdit->text();
         for (int i = 0; i < clientList.size(); i++) {
-            clientList.at(i)->write(string.toAscii());
+            clientList.at(i)->write(QString("Me: ") + string.toAscii());
+            // "Me" is bad, but we don't have a participants list set up yet. To be changed!
         }
         ui->chatTextEdit->append("Me: " + string);
     }
@@ -227,7 +228,7 @@ void Document::onIncomingData()
         for (int i = 0; i < clientList.size(); i++) {
             if (sender() == clientList.at(i)) {
                 data = clientList.at(i)->readAll();
-                ui->chatTextEdit->insertPlainText(data);
+                ui->chatTextEdit->append(data);
                 #warning: To do: distribute data to the rest of the participants
             }
         }
