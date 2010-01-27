@@ -124,8 +124,25 @@ void Document::shiftLeft()
 void Document::shiftRight()
 {
     QTextCursor cursor = ui->codeTextEdit->textCursor();
-    cursor.movePosition(QTextCursor::StartOfLine);
-    cursor.insertText("    ");
+    if (cursor.hasSelection()) {
+        cursor.movePosition(QTextCursor::StartOfBlock);
+        QString selection = cursor.selectedText();
+/*        if (selection.contains() == 1) {
+            cursor.insertText("Contains 1 \n");
+        }*/
+//        if (selection.contains(QString("\n").toUtf8()));
+        for (int i = 0; i <= selection.count("\n"); i++) {
+            cursor.movePosition(QTextCursor::StartOfLine);
+            cursor.insertText("    ");
+            cursor.movePosition(QTextCursor::Down);
+        }
+    } else {
+        cursor.movePosition(QTextCursor::StartOfLine);
+        cursor.insertText("    ");
+    }
+    //QTextCursor cursor = ui->codeTextEdit->textCursor();
+    //cursor.movePosition(QTextCursor::StartOfLine);
+    //cursor.insertText("    ");
 }
 
 void Document::comment()
