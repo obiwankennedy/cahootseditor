@@ -211,7 +211,7 @@ void Document::on_pushButton_clicked()
     if (isOwner) {
         QString string = ui->lineEdit->text();
         for (int i = 0; i < clientList.size(); i++) {
-            clientList.at(i)->write(QString("Me: ") + string.toAscii());
+            clientList.at(i)->write(QString("Me: ").toAscii() + string.toAscii());
             // "Me" is bad, but we don't have a participants list set up yet. To be changed!
         }
         ui->chatTextEdit->append("Me: " + string);
