@@ -9,14 +9,17 @@ SOURCES += main.cpp \
     mainwindow.cpp \
     document.cpp \
     highlighters/cpphighlighter.cpp \
-    connecttodocument.cpp
+    connecttodocument.cpp \
+    finddialog.cpp
 HEADERS += mainwindow.h \
     document.h \
     highlighters/cpphighlighter.h \
-    connecttodocument.h
+    connecttodocument.h \
+    finddialog.h
 FORMS += mainwindow.ui \
     document.ui \
-    connecttodocument.ui
+    connecttodocument.ui \
+    finddialog.ui
 RESOURCES += cahootsresc.qrc \
     highlighters.qrc
 OTHER_FILES += highlighters/xml.plist \

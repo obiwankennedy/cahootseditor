@@ -77,6 +77,11 @@ void Document::paste()
     ui->codeTextEdit->paste();
 }
 
+void Document::find()
+{
+
+}
+
 void Document::setParticipantsHidden(bool b)
 {
     if (b) {

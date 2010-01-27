@@ -23,6 +23,8 @@ MainWindow::MainWindow(QWidget *parent)
     connectDialog = new ConnectToDocument(this);
     connect(connectDialog, SIGNAL(connectToDocumentClicked(QStringList*)), this, SLOT(connectToDocument(QStringList*)));
 
+    findDialog = new FindDialog(this);
+
     Document *document = new Document(ui->tab);
     QGridLayout *tabLayout = new QGridLayout;
     tabLayout->addWidget(document);
@@ -350,6 +352,17 @@ void MainWindow::on_actionEdit_Copy_triggered()
 void MainWindow::on_actionEdit_Paste_triggered()
 {
     tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->paste();
+}
+
+void MainWindow::on_actionEdit_Find_triggered()
+{
+    //Open the Find dialogue
+    findDialog->show();
+}
+
+void MainWindow::on_actionView_Line_Wrap_triggered()
+{
+    //Line Wrap
 }
 
 void MainWindow::on_actionTools_Announce_Document_triggered()

@@ -25,6 +25,7 @@ public:
     void cut();
     void copy();
     void paste();
+    void find();
     void setParticipantsHidden(bool b);
     void setChatHidden(bool b);
     void shiftLeft();

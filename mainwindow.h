@@ -4,6 +4,7 @@
 #include <QtGui/QMainWindow>
 #include "document.h"
 #include "connecttodocument.h"
+#include "finddialog.h"
 
 namespace Ui
 {
@@ -26,6 +27,7 @@ private:
     QMap<QWidget *, Document *> tabWidgetToDocumentMap;
     QString openPath;
     ConnectToDocument *connectDialog;
+    FindDialog *findDialog;
 
     bool save(int index);
     bool maybeSave(int index);
@@ -55,6 +57,9 @@ private slots:
     void on_actionEdit_Cut_triggered();
     void on_actionEdit_Copy_triggered();
     void on_actionEdit_Paste_triggered();
+    void on_actionEdit_Find_triggered();
+
+    void on_actionView_Line_Wrap_triggered();
 
     void on_actionTools_Announce_Document_triggered();
     void on_actionTools_Connect_to_Document_triggered();
