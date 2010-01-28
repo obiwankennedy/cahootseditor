@@ -18,6 +18,8 @@ Document::Document(QWidget *parent) :
     connect(ui->codeTextEdit, SIGNAL(undoAvailable(bool)), this, SIGNAL(undoAvailable(bool)));
     connect(ui->codeTextEdit, SIGNAL(redoAvailable(bool)), this, SIGNAL(redoAvailable(bool)));
 
+    connect(ui->lineEdit, SIGNAL(returnPressed()), this, SLOT(on_pushButton_clicked()));
+
     server = new QTcpServer(this);
     socket = new QTcpSocket(this);
 
@@ -85,10 +87,10 @@ void Document::find()
 void Document::setParticipantsHidden(bool b)
 {
     if (b) {
-        ui->listWidget->hide();
+        ui->mainSplitter->widget(1)->hide();
     }
     else {
-        ui->listWidget->show();
+        ui->mainSplitter->widget(1)->show();
     }
 }
 
@@ -236,7 +238,7 @@ bool Document::isChatHidden()
 
 bool Document::isParticipantsHidden()
 {
-    return ui->listWidget->isHidden();
+    return ui->mainSplitter->widget(1)->isHidden();
 }
 
 QString Document::getPlainText()
