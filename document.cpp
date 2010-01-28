@@ -106,18 +106,50 @@ void Document::setChatHidden(bool b)
 void Document::shiftLeft()
 {
     QTextCursor cursor = ui->codeTextEdit->textCursor();
-    cursor.movePosition(QTextCursor::StartOfLine);
-    cursor.movePosition(QTextCursor::EndOfLine, QTextCursor::KeepAnchor);
-    QString line = cursor.selectedText();
-    cursor.movePosition(QTextCursor::StartOfLine, QTextCursor::MoveAnchor);
-    if (line.startsWith("    ")) {
-        cursor.deleteChar();
-        cursor.deleteChar();
-        cursor.deleteChar();
-        cursor.deleteChar();
-    }
-    else if (line.startsWith("\t")) {
-        cursor.deleteChar();
+    if (cursor.hasSelection()) {
+        int start = cursor.selectionStart();
+        int end = cursor.selectionEnd();
+        cursor.setPosition(start);
+        int i = cursor.position();
+        int count = 0;
+        while (i < (end - (4 * count))) {
+            cursor.movePosition(QTextCursor::StartOfLine);
+            cursor.movePosition(QTextCursor::EndOfLine, QTextCursor::KeepAnchor);
+            QString line = cursor.selectedText();
+            cursor.movePosition(QTextCursor::StartOfLine, QTextCursor::MoveAnchor);
+            if (line.startsWith("    ")) {
+                cursor.deleteChar();
+                cursor.deleteChar();
+                cursor.deleteChar();
+                cursor.deleteChar();
+            }
+            else if (line.startsWith("\t")) {
+                cursor.deleteChar();
+            }
+            cursor.movePosition(QTextCursor::EndOfLine);
+            if (cursor.atEnd()) {
+                break;
+            } else {
+                cursor.movePosition(QTextCursor::StartOfLine);
+                cursor.movePosition(QTextCursor::Down);
+                i = cursor.position();
+            }
+            count++;
+        }
+    } else {
+        cursor.movePosition(QTextCursor::StartOfLine);
+        cursor.movePosition(QTextCursor::EndOfLine, QTextCursor::KeepAnchor);
+        QString line = cursor.selectedText();
+        cursor.movePosition(QTextCursor::StartOfLine, QTextCursor::MoveAnchor);
+        if (line.startsWith("    ")) {
+            cursor.deleteChar();
+            cursor.deleteChar();
+            cursor.deleteChar();
+            cursor.deleteChar();
+        }
+        else if (line.startsWith("\t")) {
+            cursor.deleteChar();
+        }
     }
 }
 
@@ -125,38 +157,50 @@ void Document::shiftRight()
 {
     QTextCursor cursor = ui->codeTextEdit->textCursor();
     if (cursor.hasSelection()) {
-        cursor.movePosition(QTextCursor::StartOfBlock);
-        QString selection = cursor.selectedText();
-/*        if (selection.contains() == 1) {
-            cursor.insertText("Contains 1 \n");
-        }*/
-//        if (selection.contains(QString("\n").toUtf8()));
-        for (int i = 0; i <= selection.count("\n"); i++) {
-            cursor.movePosition(QTextCursor::StartOfLine);
+        int start = cursor.selectionStart(); //need this so that shift works regardless of direction of selection
+        int end = cursor.selectionEnd();
+        cursor.setPosition(start);
+        int i = cursor.position();
+        int count = 0;
+        while (i < (end + (4 * count))) {   //4 because that is the number of spaces we add for tab
             cursor.insertText("    ");
-            cursor.movePosition(QTextCursor::Down);
+            cursor.movePosition(QTextCursor::EndOfLine);
+            if (cursor.atEnd()) {
+                break;
+            } else {
+                cursor.movePosition(QTextCursor::StartOfLine);
+                cursor.movePosition(QTextCursor::Down);
+                i = cursor.position();
+            }
+            count++;
         }
     } else {
         cursor.movePosition(QTextCursor::StartOfLine);
         cursor.insertText("    ");
     }
-    //QTextCursor cursor = ui->codeTextEdit->textCursor();
-    //cursor.movePosition(QTextCursor::StartOfLine);
-    //cursor.insertText("    ");
 }
 
 void Document::comment()
 {
     QTextCursor cursor = ui->codeTextEdit->textCursor();
-    cursor.movePosition(QTextCursor::StartOfLine);
-    cursor.movePosition(QTextCursor::EndOfLine, QTextCursor::KeepAnchor);
-    QString line = cursor.selectedText();
-    cursor.movePosition(QTextCursor::StartOfLine, QTextCursor::MoveAnchor);
-    if (line.startsWith("//")) {
-        cursor.deleteChar();
-        cursor.deleteChar();
+    if (cursor.hasSelection()) {
+        int start = cursor.selectionStart();
+        int end = cursor.selectionEnd();
+        cursor.setPosition(start);
+        int i = cursor.position();
+        int count = 0;
+        //while ()                              *NEED TO FIGURE SOMETHING OUT SINCE LINE CAN GET OR LOOSE CHARACTERS...*
     } else {
-        cursor.insertText("//");
+        cursor.movePosition(QTextCursor::StartOfLine);
+        cursor.movePosition(QTextCursor::EndOfLine, QTextCursor::KeepAnchor);
+        QString line = cursor.selectedText();
+        cursor.movePosition(QTextCursor::StartOfLine, QTextCursor::MoveAnchor);
+        if (line.startsWith("//")) {
+            cursor.deleteChar();
+            cursor.deleteChar();
+        } else {
+            cursor.insertText("//");
+        }
     }
 }
 
