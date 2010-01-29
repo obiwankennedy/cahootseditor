@@ -294,10 +294,17 @@ void Document::onIncomingData()
         // We know we have incoming data, so iterate through our current participants to find the
         // correct sender, and then read the data.
         for (int i = 0; i < clientList.size(); i++) {
+            // sender() is the sender of the signal that calls this function
+            // so we use it to figure out which connection has new data for us
             if (sender() == clientList.at(i)) {
                 data = clientList.at(i)->readAll();
-                ui->chatTextEdit->append(data);
-                #warning: To do: distribute data to the rest of the participants
+                ui->chatTextEdit->append(QString("Person %1: %2").arg(i).arg(data));
+            }
+        }
+        // Distribute data to all the other participants
+        for (int i = 0; i < clientList.size(); i++) {
+            if (clientList.at(i) != sender()) {
+                clientList.at(i)->write(QString("Person %1: %2").arg(i).arg(data).toAscii());
             }
         }
     }
@@ -312,6 +319,7 @@ void Document::onNewConnection()
     if (isOwner) {
         clientList.append(server->nextPendingConnection());
         connect(clientList.last(), SIGNAL(readyRead()), this, SLOT(onIncomingData()));
+        ui->noPermissionsListWidget->insertItem(0, QString("Person %1").arg(clientList.size()));
     }
     else {
         connect(socket, SIGNAL(readyRead()), this, SLOT(onIncomingData()));
