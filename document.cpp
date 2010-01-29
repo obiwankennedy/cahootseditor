@@ -297,15 +297,14 @@ void Document::on_pushButton_clicked()
     if (isOwner) {
         QString string = ui->lineEdit->text();
         for (int i = 0; i < clientList.size(); i++) {
-            clientList.at(i)->write(QString("Me: ").toAscii() + string.toAscii());
-            // "Me" is bad, but we don't have a participants list set up yet. To be changed!
+            clientList.at(i)->write(string.toAscii());
         }
         ui->chatTextEdit->append("Me: " + string);
     }
     else {
         QString string = ui->lineEdit->text();
-        socket->write(QString("Them: ").toAscii() + string.toAscii());
-        ui->chatTextEdit->append(QString("Me: %1").arg(string));
+        socket->write(string.toAscii());
+        ui->chatTextEdit->append(string);
     }
 }
 
@@ -321,13 +320,13 @@ void Document::onIncomingData()
             // so we use it to figure out which connection has new data for us
             if (sender() == clientList.at(i)) {
                 data = clientList.at(i)->readAll();
-                ui->chatTextEdit->append(QString("Person %1: %2").arg(i).arg(data));
+                ui->chatTextEdit->append(QString("Person %1: %2").arg(i + 1).arg(data));
             }
         }
         // Distribute data to all the other participants
         for (int i = 0; i < clientList.size(); i++) {
             if (clientList.at(i) != sender()) {
-                clientList.at(i)->write(QString("Person %1: %2").arg(i).arg(data).toAscii());
+                clientList.at(i)->write(QString("Person %1: %2").arg(i + 1).arg(data).toAscii());
             }
         }
     }
