@@ -29,6 +29,8 @@ Document::Document(QWidget *parent) :
 
 //    qApp->installEventFilter(this);
 
+    myName = "Me"; // temporary
+
     isOwner = true; // We are the document owner, unless we're connecting to someone elses document
 
 }
@@ -41,9 +43,10 @@ Document::~Document()
 void Document::connectToDocument(QStringList *list)
 {
     isOwner = false;
-    if (list->size() == 2) { // More thorough checking is needed to ensure the contents are usable.
-        QString address = list->at(0);
-        QString portString = list->at(1);
+    if (list->size() == 3) { // More thorough checking is needed to ensure the contents are usable.
+        myName = list->at(0);
+        QString address = list->at(1);
+        QString portString = list->at(2);
         int port = portString.toInt();
         qDebug() << "Address: " << address;
         qDebug() << "Port: " << port;
@@ -235,7 +238,7 @@ void Document::announceDocument()
     setParticipantsHidden(false);
 
     connect(server, SIGNAL(newConnection()), this, SLOT(onNewConnection()));
-    server->listen(QHostAddress("137.159.47.71"), 3000);
+    server->listen(QHostAddress::Any, 3000);
     ui->chatTextEdit->setText("Listening...");
 }
 
@@ -294,18 +297,17 @@ bool Document::eventFilter(QObject *object, QEvent *event)
 
 void Document::on_pushButton_clicked()
 {
+    QString string = ui->lineEdit->text();
     if (isOwner) {
-        QString string = ui->lineEdit->text();
         for (int i = 0; i < clientList.size(); i++) {
-            clientList.at(i)->write(string.toAscii());
+            clientList.at(i)->write(QString(myName + ": ").toAscii() + string.toAscii());
         }
-        ui->chatTextEdit->append("Me: " + string);
     }
     else {
-        QString string = ui->lineEdit->text();
         socket->write(string.toAscii());
-        ui->chatTextEdit->append(string);
     }
+    ui->chatTextEdit->append(myName + ": " + string);
+    ui->lineEdit->clear();
 }
 
 void Document::onIncomingData()
@@ -313,6 +315,7 @@ void Document::onIncomingData()
     if (isOwner) {
         // We're hosting the document, and are in charge of distributing data.
         QString data;
+        bool newParticipant = false;
         // We know we have incoming data, so iterate through our current participants to find the
         // correct sender, and then read the data.
         for (int i = 0; i < clientList.size(); i++) {
@@ -320,13 +323,19 @@ void Document::onIncomingData()
             // so we use it to figure out which connection has new data for us
             if (sender() == clientList.at(i)) {
                 data = clientList.at(i)->readAll();
-                ui->chatTextEdit->append(QString("Person %1: %2").arg(i + 1).arg(data));
+                if (socketToNameMap.value(sender()) == "") {
+                    socketToNameMap.insert(sender(), data);
+                    newParticipant = true;
+                }
+                else {
+                    ui->chatTextEdit->append(QString("%1: %2").arg(socketToNameMap.value(sender(), "Unknown")).arg(data));
+                }
             }
         }
         // Distribute data to all the other participants
         for (int i = 0; i < clientList.size(); i++) {
-            if (clientList.at(i) != sender()) {
-                clientList.at(i)->write(QString("Person %1: %2").arg(i + 1).arg(data).toAscii());
+            if (clientList.at(i) != sender() && !newParticipant) {
+                clientList.at(i)->write(QString("%1: %2").arg(socketToNameMap.value(sender(), "Unknown")).arg(data).toAscii());
             }
         }
     }
@@ -340,11 +349,13 @@ void Document::onNewConnection()
     qDebug() << "New connection.";
     if (isOwner) {
         clientList.append(server->nextPendingConnection());
+        socketToNameMap.insert(clientList.last(), ""); // Empty entry for this connection, to be filled in.
         connect(clientList.last(), SIGNAL(readyRead()), this, SLOT(onIncomingData()));
         ui->noPermissionsListWidget->insertItem(0, QString("Person %1").arg(clientList.size()));
     }
     else {
         connect(socket, SIGNAL(readyRead()), this, SLOT(onIncomingData()));
+        socket->write(myName.toAscii());
     }
 }
 

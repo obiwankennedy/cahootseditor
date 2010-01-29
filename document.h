@@ -59,6 +59,9 @@ private:
     QTcpSocket *socket;
 
     QList<QTcpSocket *> clientList;
+    QMap<QObject*, QString> socketToNameMap;
+
+    QString myName;
 
     CppHighlighter *cppHighlighter;
 

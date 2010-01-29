@@ -18,6 +18,7 @@ ConnectToDocument::~ConnectToDocument()
 void ConnectToDocument::dialogAccepted()
 {
     QStringList *list = new QStringList();
+    list->append(ui->usernameLineEdit->text());
     list->append(ui->addressLineEdit->text());
     list->append(ui->portLineEdit->text());
     emit connectToDocumentClicked(list);
