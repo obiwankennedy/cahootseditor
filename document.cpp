@@ -191,7 +191,30 @@ void Document::comment()
         cursor.setPosition(start);
         int i = cursor.position();
         int count = 0;
-        //while ()                              *NEED TO FIGURE SOMETHING OUT SINCE LINE CAN GET OR LOOSE CHARACTERS...*
+        bool keepGoing;
+        while (i < end) {
+            cursor.movePosition(QTextCursor::StartOfLine);
+            cursor.movePosition(QTextCursor::EndOfLine, QTextCursor::KeepAnchor);
+            QString line = cursor.selectedText();
+            keepGoing = cursor.atEnd();
+            cursor.movePosition(QTextCursor::StartOfLine, QTextCursor::MoveAnchor);
+            if (line.startsWith("//")) {
+                cursor.deleteChar();
+                cursor.deleteChar();
+                end -= 2;
+            } else {
+                cursor.insertText("//");
+                end += 2;
+            }
+            if (!keepGoing) {
+                cursor.movePosition(QTextCursor::StartOfLine);
+                cursor.movePosition(QTextCursor::Down);
+                i = cursor.position();
+            } else {
+                break;
+            }
+            count++;
+        }
     } else {
         cursor.movePosition(QTextCursor::StartOfLine);
         cursor.movePosition(QTextCursor::EndOfLine, QTextCursor::KeepAnchor);
