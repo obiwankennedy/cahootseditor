@@ -193,15 +193,35 @@ void Document::comment()
         int end = cursor.selectionEnd();
         cursor.setPosition(start);
         int i = cursor.position();
-        int count = 0;
-        bool keepGoing;
+        //int count = 0;
+        bool isCommented = true;
         while (i < end) {
             cursor.movePosition(QTextCursor::StartOfLine);
             cursor.movePosition(QTextCursor::EndOfLine, QTextCursor::KeepAnchor);
             QString line = cursor.selectedText();
-            keepGoing = cursor.atEnd();
             cursor.movePosition(QTextCursor::StartOfLine, QTextCursor::MoveAnchor);
-            if (line.startsWith("//")) {
+            if (line.startsWith("//") && isCommented) {
+                //cool
+            } else {
+                isCommented = false;
+            }
+            cursor.movePosition(QTextCursor::EndOfLine);
+            if (cursor.atEnd()) {
+                break;
+            } else {
+                cursor.movePosition(QTextCursor::StartOfLine);
+                cursor.movePosition(QTextCursor::Down);
+                i = cursor.position();
+            }
+        }
+        cursor.setPosition(start);
+        i = cursor.position();
+        while (i < end) {
+            cursor.movePosition(QTextCursor::StartOfLine);
+            cursor.movePosition(QTextCursor::EndOfLine, QTextCursor::KeepAnchor);
+            QString line = cursor.selectedText();
+            cursor.movePosition(QTextCursor::StartOfLine, QTextCursor::MoveAnchor);
+            if (isCommented) {
                 cursor.deleteChar();
                 cursor.deleteChar();
                 end -= 2;
@@ -209,14 +229,14 @@ void Document::comment()
                 cursor.insertText("//");
                 end += 2;
             }
-            if (!keepGoing) {
+            cursor.movePosition(QTextCursor::EndOfLine);
+            if (cursor.atEnd()) {
+                break;
+            } else {
                 cursor.movePosition(QTextCursor::StartOfLine);
                 cursor.movePosition(QTextCursor::Down);
                 i = cursor.position();
-            } else {
-                break;
             }
-            count++;
         }
     } else {
         cursor.movePosition(QTextCursor::StartOfLine);
