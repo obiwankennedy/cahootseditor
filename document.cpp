@@ -116,8 +116,7 @@ void Document::shiftLeft()
         int end = cursor.selectionEnd();
         cursor.setPosition(start);
         int i = cursor.position();
-        int count = 0;
-        while (i < (end - (4 * count))) {
+        while ( i < end) {
             cursor.movePosition(QTextCursor::StartOfLine);
             cursor.movePosition(QTextCursor::EndOfLine, QTextCursor::KeepAnchor);
             QString line = cursor.selectedText();
@@ -127,6 +126,7 @@ void Document::shiftLeft()
                 cursor.deleteChar();
                 cursor.deleteChar();
                 cursor.deleteChar();
+                end -= 4;
             }
             else if (line.startsWith("\t")) {
                 cursor.deleteChar();
@@ -139,7 +139,6 @@ void Document::shiftLeft()
                 cursor.movePosition(QTextCursor::Down);
                 i = cursor.position();
             }
-            count++;
         }
     } else {
         cursor.movePosition(QTextCursor::StartOfLine);
@@ -161,14 +160,14 @@ void Document::shiftLeft()
 void Document::shiftRight()
 {
     QTextCursor cursor = ui->codeTextEdit->textCursor();
+    int end = cursor.selectionEnd();
+    int start = cursor.selectionStart();
     if (cursor.hasSelection()) {
-        int start = cursor.selectionStart(); //need this so that shift works regardless of direction of selection
-        int end = cursor.selectionEnd();
         cursor.setPosition(start);
         int i = cursor.position();
-        int count = 0;
-        while (i < (end + (4 * count))) {   //4 because that is the number of spaces we add for tab
+        while ( i < end) {   //4 because that is the number of spaces we add for tab
             cursor.insertText("    ");
+            end += 4;
             cursor.movePosition(QTextCursor::EndOfLine);
             if (cursor.atEnd()) {
                 break;
@@ -177,20 +176,22 @@ void Document::shiftRight()
                 cursor.movePosition(QTextCursor::Down);
                 i = cursor.position();
             }
-            count++;
         }
     } else {
         cursor.movePosition(QTextCursor::StartOfLine);
         cursor.insertText("    ");
     }
+    cursor.setPosition(start);
+    cursor.setPosition(end, QTextCursor::KeepAnchor);
+    ui->codeTextEdit->setTextCursor(cursor);
 }
 
 void Document::comment()
 {
     QTextCursor cursor = ui->codeTextEdit->textCursor();
+    int start = cursor.selectionStart();
+    int end = cursor.selectionEnd();
     if (cursor.hasSelection()) {
-        int start = cursor.selectionStart();
-        int end = cursor.selectionEnd();
         cursor.setPosition(start);
         int i = cursor.position();
         //int count = 0;
@@ -201,7 +202,7 @@ void Document::comment()
             QString line = cursor.selectedText();
             cursor.movePosition(QTextCursor::StartOfLine, QTextCursor::MoveAnchor);
             if (line.startsWith("//") && isCommented) {
-                //cool
+                //cool - Don't do anything
             } else {
                 isCommented = false;
             }
@@ -250,6 +251,9 @@ void Document::comment()
             cursor.insertText("//");
         }
     }
+    cursor.setPosition(start);
+    cursor.setPosition(end, QTextCursor::KeepAnchor);
+    ui->codeTextEdit->setTextCursor(cursor);
 }
 
 void Document::announceDocument()
