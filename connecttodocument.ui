@@ -72,6 +72,9 @@
      </item>
      <item>
       <widget class="QLineEdit" name="addressLineEdit">
+       <property name="inputMethodHints">
+        <set>Qt::ImhNone</set>
+       </property>
        <property name="text">
         <string>137.159.47.71</string>
        </property>

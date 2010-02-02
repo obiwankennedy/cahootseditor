@@ -2,6 +2,7 @@
 #define CONNECTTODOCUMENT_H
 
 #include <QDialog>
+#include <QRegExpValidator>
 
 namespace Ui {
     class ConnectToDocument;
@@ -15,6 +16,9 @@ public:
 
 private:
     Ui::ConnectToDocument *ui;
+
+    QRegExpValidator* addressValidator;
+    QRegExpValidator* portValidator;
 
 private slots:
     void dialogAccepted();

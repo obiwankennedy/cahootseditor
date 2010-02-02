@@ -27,6 +27,8 @@ Document::Document(QWidget *parent) :
     setChatHidden(true);
     setParticipantsHidden(true);
 
+    ui->connectInfoLabel->hide();
+
 //    qApp->installEventFilter(this);
 
     myName = "Me"; // temporary
@@ -379,6 +381,7 @@ void Document::onNewConnection()
     }
     else {
         connect(socket, SIGNAL(readyRead()), this, SLOT(onIncomingData()));
+        qApp->processEvents();
         socket->write(myName.toAscii());
     }
 }

@@ -4,22 +4,26 @@
 QT += network
 TARGET = Cahoots
 TEMPLATE = app
-CONFIG += x86 ppc
+CONFIG += x86 \
+    ppc
 SOURCES += main.cpp \
     mainwindow.cpp \
     document.cpp \
     highlighters/cpphighlighter.cpp \
     connecttodocument.cpp \
-    finddialog.cpp
+    finddialog.cpp \
+    preferencesdialog.cpp
 HEADERS += mainwindow.h \
     document.h \
     highlighters/cpphighlighter.h \
     connecttodocument.h \
-    finddialog.h
+    finddialog.h \
+    preferencesdialog.h
 FORMS += mainwindow.ui \
     document.ui \
     connecttodocument.ui \
-    finddialog.ui
+    finddialog.ui \
+    preferencesdialog.ui
 RESOURCES += cahootsresc.qrc \
     highlighters.qrc
 OTHER_FILES += highlighters/xml.plist \
