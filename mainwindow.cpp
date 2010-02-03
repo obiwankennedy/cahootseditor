@@ -363,6 +363,7 @@ void MainWindow::on_actionEdit_Find_triggered()
 void MainWindow::on_actionView_Line_Wrap_triggered()
 {
     //Line Wrap
+    tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->toggleLineWrap();
 }
 
 void MainWindow::on_actionTools_Announce_Document_triggered()

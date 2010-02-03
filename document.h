@@ -45,6 +45,7 @@ public:
 
     QString getPlainText();
     void setPlainText(QString text);
+    void toggleLineWrap();
 
     void setModified(bool b);
 

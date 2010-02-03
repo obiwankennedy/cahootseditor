@@ -303,6 +303,17 @@ void Document::setPlainText(QString text)
     ui->codeTextEdit->setPlainText(text);
 }
 
+void Document::toggleLineWrap()
+{
+//    if (ui->codeTextEdit->lineWrapMode() == QTextEdit::NoWrap) {
+//        ui->codeTextEdit->setLineWrapMode(QTextEdit::WidgetWidth);
+//    }
+//    else {
+//        ui->codeTextEdit->setLineWrapMode(QTextEdit::NoWrap);
+//    }
+}
+
+
 void Document::setModified(bool b)
 {
     ui->codeTextEdit->document()->setModified(b);
