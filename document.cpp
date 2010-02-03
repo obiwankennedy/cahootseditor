@@ -56,6 +56,8 @@ void Document::connectToDocument(QStringList *list)
         connect(socket, SIGNAL(readyRead()), this, SLOT(onIncomingData()));
         setChatHidden(false);
         setParticipantsHidden(false);
+        ui->connectInfoLabel->show();
+        ui->connectInfoLabel->setText(QString("%1:%1").arg(address).arg(port));
     }
 }
 
@@ -253,6 +255,7 @@ void Document::comment()
             cursor.insertText("//");
         }
     }
+
     cursor.setPosition(start);
     cursor.setPosition(end, QTextCursor::KeepAnchor);
     ui->codeTextEdit->setTextCursor(cursor);
@@ -264,8 +267,12 @@ void Document::announceDocument()
     setParticipantsHidden(false);
 
     connect(server, SIGNAL(newConnection()), this, SLOT(onNewConnection()));
-    server->listen(QHostAddress::Any, 3000);
+    server->listen(QHostAddress::Any, 0); // Port is chosen automatically, listening on all NICs
     ui->chatTextEdit->setText("Listening...");
+
+    ui->connectInfoLabel->show();
+    ui->connectInfoLabel->setText(QString("%1:%1").arg(server->serverAddress().toString()).arg(server->serverPort()));
+
 }
 
 bool Document::isUndoable()
@@ -305,12 +312,12 @@ void Document::setPlainText(QString text)
 
 void Document::toggleLineWrap()
 {
-//    if (ui->codeTextEdit->lineWrapMode() == QTextEdit::NoWrap) {
-//        ui->codeTextEdit->setLineWrapMode(QTextEdit::WidgetWidth);
-//    }
-//    else {
-//        ui->codeTextEdit->setLineWrapMode(QTextEdit::NoWrap);
-//    }
+    if (ui->codeTextEdit->lineWrapMode() == QTextEdit::NoWrap) {
+        ui->codeTextEdit->setLineWrapMode(QTextEdit::WidgetWidth);
+    }
+    else {
+        ui->codeTextEdit->setLineWrapMode(QTextEdit::NoWrap);
+    }
 }
 
 
