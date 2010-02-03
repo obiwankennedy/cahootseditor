@@ -73,6 +73,8 @@ void MainWindow::readSettings()
     QSize size = settings.value("size", QSize(width, height)).toSize();
     resize(size);
     move(pos);
+
+
 }
 
 void MainWindow::writeSettings()

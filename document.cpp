@@ -271,8 +271,8 @@ void Document::announceDocument()
     ui->chatTextEdit->setText("Listening...");
 
     ui->connectInfoLabel->show();
-    ui->connectInfoLabel->setText(QString("%1:%1").arg(server->serverAddress().toString()).arg(server->serverPort()));
-
+    QString port = QString::number(server->serverPort(), 10);
+    ui->connectInfoLabel->setText(port);
 }
 
 bool Document::isUndoable()
@@ -319,7 +319,6 @@ void Document::toggleLineWrap()
         ui->codeTextEdit->setLineWrapMode(QTextEdit::NoWrap);
     }
 }
-
 
 void Document::setModified(bool b)
 {
