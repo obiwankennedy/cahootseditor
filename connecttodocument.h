@@ -14,6 +14,8 @@ public:
     ConnectToDocument(QWidget *parent = 0);
     ~ConnectToDocument();
 
+    void setName(QString name);
+
 private:
     Ui::ConnectToDocument *ui;
 

@@ -74,7 +74,7 @@ void MainWindow::readSettings()
     resize(size);
     move(pos);
 
-    myName = settings.value("name", "Owner");
+    myName = settings.value("name", "Owner").toString();
 }
 
 void MainWindow::writeSettings()
@@ -377,6 +377,7 @@ void MainWindow::on_actionTools_Connect_to_Document_triggered()
 {
     // Create our dialog and show it. When they user clicks "okay", we'll emit a signal to the mainwindow, and pass that to the document.
     connectDialog->show();
+    connectDialog->setName(myName);
 }
 
 void MainWindow::on_actionText_Shift_Left_triggered()

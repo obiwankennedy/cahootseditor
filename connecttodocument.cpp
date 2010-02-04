@@ -23,6 +23,11 @@ ConnectToDocument::~ConnectToDocument()
     delete ui;
 }
 
+void ConnectToDocument::setName(QString name)
+{
+    ui->usernameLineEdit->setText(name);
+}
+
 void ConnectToDocument::dialogAccepted()
 {
     QStringList *list = new QStringList();
