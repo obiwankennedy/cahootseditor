@@ -74,7 +74,7 @@ void MainWindow::readSettings()
     resize(size);
     move(pos);
 
-
+    myName = settings.value("name", "Owner");
 }
 
 void MainWindow::writeSettings()
@@ -82,6 +82,7 @@ void MainWindow::writeSettings()
     QSettings settings("Cahoots", "MainWindow");
     settings.setValue("pos", pos());
     settings.setValue("size", size());
+    settings.setValue("name", myName);
 }
 
 QString MainWindow::getSystem() {
@@ -358,7 +359,6 @@ void MainWindow::on_actionEdit_Paste_triggered()
 
 void MainWindow::on_actionEdit_Find_triggered()
 {
-    //Open the Find dialogue
     findDialog->show();
 }
 
@@ -447,4 +447,7 @@ void MainWindow::connectToDocument(QStringList *list)
 {
     on_actionFile_New_triggered();
     tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->connectToDocument(list);;
+    if (tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->myName != "") {
+        myName = tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->myName;
+    }
 }

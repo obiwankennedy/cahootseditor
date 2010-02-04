@@ -53,6 +53,8 @@ public:
     bool isOwner;
     QString curFile;
     
+    QString myName;
+
 private:
     Ui::Document *ui;
 
@@ -61,8 +63,6 @@ private:
 
     QList<QTcpSocket *> clientList;
     QMap<QObject*, QString> socketToNameMap;
-
-    QString myName;
 
     CppHighlighter *cppHighlighter;
 

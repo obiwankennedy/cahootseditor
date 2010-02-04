@@ -31,7 +31,7 @@ Document::Document(QWidget *parent) :
 
 //    qApp->installEventFilter(this);
 
-    myName = "Me"; // temporary
+    myName = "Owner"; // temporary
 
     isOwner = true; // We are the document owner, unless we're connecting to someone elses document
 
@@ -273,6 +273,8 @@ void Document::announceDocument()
     ui->connectInfoLabel->show();
     QString port = QString::number(server->serverPort(), 10);
     ui->connectInfoLabel->setText(port);
+
+    ui->readWriteListWidget->insertItem(0, myName);
 }
 
 bool Document::isUndoable()

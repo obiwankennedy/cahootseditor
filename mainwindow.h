@@ -39,6 +39,8 @@ private:
     void readSettings();
     void writeSettings();
 
+    QString myName; // global name used for connecting to documents
+
     QString getSystem();
 
 private slots:
