@@ -20,6 +20,8 @@ Document::Document(QWidget *parent) :
 
     connect(ui->lineEdit, SIGNAL(returnPressed()), this, SLOT(on_pushButton_clicked()));
 
+    connect(ui->codeTextEdit->document(), SIGNAL(blockCountChanged(int)), this, SLOT(codeTextEditTextChanged(int)));
+
     server = new QTcpServer(this);
     socket = new QTcpSocket(this);
 
@@ -353,6 +355,16 @@ void Document::on_pushButton_clicked()
     }
     ui->chatTextEdit->append(myName + ": " + string);
     ui->lineEdit->clear();
+}
+
+void Document::codeTextEditTextChanged(int lineCount)
+{
+    qDebug() << "Line count: " << lineCount;
+    QString string = "";
+    for (int i = 1; i <= lineCount; i++) {
+        string.append(QString("%1\n").arg(i));
+    }
+    ui->lineNumberTextEdit->setText(string);
 }
 
 void Document::onIncomingData()

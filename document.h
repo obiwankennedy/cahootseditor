@@ -72,6 +72,7 @@ private:
 
 private slots:
     void on_pushButton_clicked();
+    void codeTextEditTextChanged(int);
     void onIncomingData();
     void onNewConnection();
 
