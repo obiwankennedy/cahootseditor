@@ -5,7 +5,6 @@
 #include <QTextCursor>
 #include <QRegExp>
 #include <QDebug>
-#include <QTextCursor>
 
 Document::Document(QWidget *parent) :
     QWidget(parent),
@@ -65,7 +64,21 @@ void Document::connectToDocument(QStringList *list)
 
 void Document::undo()
 {
-    ui->codeTextEdit->undo();
+//    QTextCursor cursor = ui->codeTextEdit->textCursor();
+//    if (cursor.hasSelection()) {
+//        int start = cursor.selectionStart();
+//        cursor.setPosition(cursor.selectionEnd());
+//        cursor.movePosition(QTextCursor::StartOfLine);
+//        int end = cursor.position();
+//        ui->codeTextEdit->undo();
+//        ui->codeTextEdit->setTextCursor(cursor);
+//        cursor.setPosition(start);
+//        cursor.setPosition(end, QTextCursor::KeepAnchor);
+//        //cursor.movePosition(QTextCursor::EndOfLine, QTextCursor::KeepAnchor);
+//        ui->codeTextEdit->setTextCursor(cursor);
+//    } else {
+       ui->codeTextEdit->undo();
+//    }
 }
 
 void Document::redo()
@@ -122,6 +135,7 @@ void Document::shiftLeft()
         int end = cursor.selectionEnd();
         cursor.setPosition(start);
         int i = cursor.position();
+        cursor.beginEditBlock();
         while ( i < end) {
             cursor.movePosition(QTextCursor::StartOfLine);
             cursor.movePosition(QTextCursor::EndOfLine, QTextCursor::KeepAnchor);
@@ -146,6 +160,7 @@ void Document::shiftLeft()
                 i = cursor.position();
             }
         }
+        cursor.endEditBlock();
     } else {
         cursor.movePosition(QTextCursor::StartOfLine);
         cursor.movePosition(QTextCursor::EndOfLine, QTextCursor::KeepAnchor);
@@ -171,7 +186,8 @@ void Document::shiftRight()
     if (cursor.hasSelection()) {
         cursor.setPosition(start);
         int i = cursor.position();
-        while ( i < end) {   //4 because that is the number of spaces we add for tab
+        cursor.beginEditBlock();
+        while (i < end) {
             cursor.insertText("    ");
             end += 4;
             cursor.movePosition(QTextCursor::EndOfLine);
@@ -183,6 +199,7 @@ void Document::shiftRight()
                 i = cursor.position();
             }
         }
+        cursor.endEditBlock();
     } else {
         cursor.movePosition(QTextCursor::StartOfLine);
         cursor.insertText("    ");
@@ -198,52 +215,76 @@ void Document::comment()
     int start = cursor.selectionStart();
     int end = cursor.selectionEnd();
     if (cursor.hasSelection()) {
+        QString line = cursor.selectedText();
         cursor.setPosition(start);
-        int i = cursor.position();
-        //int count = 0;
-        bool isCommented = true;
-        while (i < end) {
-            cursor.movePosition(QTextCursor::StartOfLine);
-            cursor.movePosition(QTextCursor::EndOfLine, QTextCursor::KeepAnchor);
-            QString line = cursor.selectedText();
-            cursor.movePosition(QTextCursor::StartOfLine, QTextCursor::MoveAnchor);
-            if (line.startsWith("//") && isCommented) {
-                //cool - Don't do anything
-            } else {
-                isCommented = false;
-            }
-            cursor.movePosition(QTextCursor::EndOfLine);
-            if (cursor.atEnd()) {
-                break;
-            } else {
-                cursor.movePosition(QTextCursor::StartOfLine);
-                cursor.movePosition(QTextCursor::Down);
-                i = cursor.position();
-            }
-        }
-        cursor.setPosition(start);
-        i = cursor.position();
-        while (i < end) {
-            cursor.movePosition(QTextCursor::StartOfLine);
-            cursor.movePosition(QTextCursor::EndOfLine, QTextCursor::KeepAnchor);
-            QString line = cursor.selectedText();
-            cursor.movePosition(QTextCursor::StartOfLine, QTextCursor::MoveAnchor);
-            if (isCommented) {
+        if (!cursor.atBlockStart()) {
+            if (line.startsWith("/*") && line.endsWith("*/")) {
+                cursor.beginEditBlock();
                 cursor.deleteChar();
                 cursor.deleteChar();
                 end -= 2;
+                cursor.setPosition(end);
+                cursor.deletePreviousChar();
+                cursor.deletePreviousChar();
+                end -= 2;
+                cursor.endEditBlock();
             } else {
-                cursor.insertText("//");
+                cursor.beginEditBlock();
+                cursor.setPosition(start);
+                cursor.insertText("/*");
                 end += 2;
+                cursor.setPosition(end);
+                cursor.insertText("*/");
+                end += 2;
+                cursor.endEditBlock();
             }
-            cursor.movePosition(QTextCursor::EndOfLine);
-            if (cursor.atEnd()) {
-                break;
-            } else {
+        } else {
+            int i = cursor.position();
+            //int count = 0;
+            bool isCommented = true;
+            while (i < end) {
                 cursor.movePosition(QTextCursor::StartOfLine);
-                cursor.movePosition(QTextCursor::Down);
-                i = cursor.position();
+                cursor.movePosition(QTextCursor::EndOfLine, QTextCursor::KeepAnchor);
+                QString line = cursor.selectedText();
+                cursor.movePosition(QTextCursor::StartOfLine, QTextCursor::MoveAnchor);
+                if (!(line.startsWith("//") && isCommented)) {
+                    isCommented = false;
+                }
+                cursor.movePosition(QTextCursor::EndOfLine);
+                if (cursor.atEnd()) {
+                    break;
+                } else {
+                    cursor.movePosition(QTextCursor::StartOfLine);
+                    cursor.movePosition(QTextCursor::Down);
+                    i = cursor.position();
+                }
             }
+            cursor.setPosition(start);
+            i = cursor.position();
+            cursor.beginEditBlock();
+            while (i < end) {
+                cursor.movePosition(QTextCursor::StartOfLine);
+                cursor.movePosition(QTextCursor::EndOfLine, QTextCursor::KeepAnchor);
+                QString line = cursor.selectedText();
+                cursor.movePosition(QTextCursor::StartOfLine, QTextCursor::MoveAnchor);
+                if (isCommented) {
+                    cursor.deleteChar();
+                    cursor.deleteChar();
+                    end -= 2;
+                } else {
+                    cursor.insertText("//");
+                    end += 2;
+                }
+                cursor.movePosition(QTextCursor::EndOfLine);
+                if (cursor.atEnd()) {
+                    break;
+                } else {
+                    cursor.movePosition(QTextCursor::StartOfLine);
+                    cursor.movePosition(QTextCursor::Down);
+                    i = cursor.position();
+                }
+            }
+            cursor.endEditBlock();
         }
     } else {
         cursor.movePosition(QTextCursor::StartOfLine);

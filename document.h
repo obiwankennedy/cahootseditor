@@ -7,8 +7,6 @@
 #include <QtNetwork>
 #include <QTcpServer>
 #include <QTcpSocket>
-#include <QUndoStack>
-#include <QUndoView>
 
 namespace Ui {
     class Document;
