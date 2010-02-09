@@ -5,6 +5,8 @@
 #include <QTextCursor>
 #include <QRegExp>
 #include <QDebug>
+#include <QWheelEvent>
+#include <QTextEdit>
 
 Document::Document(QWidget *parent) :
     QWidget(parent),
@@ -30,7 +32,7 @@ Document::Document(QWidget *parent) :
 
     ui->connectInfoLabel->hide();
 
-//    qApp->installEventFilter(this);
+    qApp->installEventFilter(this);
 
     myName = "Owner"; // temporary
 
@@ -51,9 +53,7 @@ void Document::connectToDocument(QStringList *list)
         QString address = list->at(1);
         QString portString = list->at(2);
         int port = portString.toInt();
-        qDebug() << "Address: " << address;
-        qDebug() << "Port: " << port;
-        socket->connectToHost(QHostAddress(address), 3000); // port); // port 3000 magic number for the time being
+        socket->connectToHost(QHostAddress(address), port);
         connect(socket, SIGNAL(readyRead()), this, SLOT(onIncomingData()));
         setChatHidden(false);
         setParticipantsHidden(false);
@@ -379,6 +379,12 @@ bool Document::eventFilter(QObject *object, QEvent *event)
 //            socket->write(keyEvent->text().toAscii()); // Don't send...yet. Incomplete.
 //            qDebug() << keyEvent->text() << " sent.";
         }
+    }
+    else if (event->type() == QEvent::Wheel && object == ui->codeTextEdit) {
+        QWheelEvent *wheelEvent = static_cast<QWheelEvent *>(event);
+//        ui->codeTextEdit->wheelEvent(wheelEvent);
+//        ui->lineNumberTextEdit->wheelEvent(wheelEvent);
+//        return true;
     }
     return false;
 }
