@@ -1,7 +1,5 @@
 #include <QtGui>
-
 #include <codeeditor.h>
-
 
 CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
 {
@@ -14,8 +12,6 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     updateLineNumberAreaWidth(0);
     highlightCurrentLine();
 }
-
-
 
 int CodeEditor::lineNumberAreaWidth()
 {
@@ -31,14 +27,10 @@ int CodeEditor::lineNumberAreaWidth()
     return space;
 }
 
-
-
 void CodeEditor::updateLineNumberAreaWidth(int /* newBlockCount */)
 {
     setViewportMargins(lineNumberAreaWidth(), 0, 0, 0);
 }
-
-
 
 void CodeEditor::updateLineNumberArea(const QRect &rect, int dy)
 {
@@ -51,8 +43,6 @@ void CodeEditor::updateLineNumberArea(const QRect &rect, int dy)
         updateLineNumberAreaWidth(0);
 }
 
-
-
 void CodeEditor::resizeEvent(QResizeEvent *e)
 {
     QPlainTextEdit::resizeEvent(e);
@@ -60,8 +50,6 @@ void CodeEditor::resizeEvent(QResizeEvent *e)
     QRect cr = contentsRect();
     lineNumberArea->setGeometry(QRect(cr.left(), cr.top(), lineNumberAreaWidth(), cr.height()));
 }
-
-
 
 void CodeEditor::highlightCurrentLine()
 {
@@ -81,8 +69,6 @@ void CodeEditor::highlightCurrentLine()
 
     setExtraSelections(extraSelections);
 }
-
-
 
 void CodeEditor::lineNumberAreaPaintEvent(QPaintEvent *event)
 {

@@ -389,6 +389,9 @@ bool Document::eventFilter(QObject *object, QEvent *event)
 void Document::on_pushButton_clicked()
 {
     QString string = ui->lineEdit->text();
+    if (string == "") {
+        return;
+    }
     if (isOwner) {
         for (int i = 0; i < clientList.size(); i++) {
             clientList.at(i)->write(QString(myName + ": ").toAscii() + string.toAscii());

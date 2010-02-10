@@ -77,6 +77,12 @@
             <property name="text">
              <string>Send</string>
             </property>
+            <property name="checkable">
+             <bool>false</bool>
+            </property>
+            <property name="flat">
+             <bool>false</bool>
+            </property>
            </widget>
           </item>
          </layout>
