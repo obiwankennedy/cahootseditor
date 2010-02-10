@@ -14,14 +14,17 @@ Document::Document(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    cppHighlighter = new CppHighlighter(ui->codeTextEdit->document());
+    delete ui->frame;
+    editor = new CodeEditor(this);
+    editor->setFont(QFont("Courier"));
+    ui->codeChatSplitter->insertWidget(0, editor);
 
-    connect(ui->codeTextEdit, SIGNAL(undoAvailable(bool)), this, SIGNAL(undoAvailable(bool)));
-    connect(ui->codeTextEdit, SIGNAL(redoAvailable(bool)), this, SIGNAL(redoAvailable(bool)));
+    cppHighlighter = new CppHighlighter(editor->document());
+
+    connect(editor, SIGNAL(undoAvailable(bool)), this, SIGNAL(undoAvailable(bool)));
+    connect(editor, SIGNAL(redoAvailable(bool)), this, SIGNAL(redoAvailable(bool)));
 
     connect(ui->lineEdit, SIGNAL(returnPressed()), this, SLOT(on_pushButton_clicked()));
-
-    connect(ui->codeTextEdit->document(), SIGNAL(blockCountChanged(int)), this, SLOT(codeTextEditTextChanged(int)));
 
     server = new QTcpServer(this);
     socket = new QTcpSocket(this);
@@ -32,7 +35,7 @@ Document::Document(QWidget *parent) :
 
     ui->connectInfoLabel->hide();
 
-    qApp->installEventFilter(this);
+//    qApp->installEventFilter(this);
 
     myName = "Owner"; // temporary
 
@@ -64,41 +67,41 @@ void Document::connectToDocument(QStringList *list)
 
 void Document::undo()
 {
-//    QTextCursor cursor = ui->codeTextEdit->textCursor();
+//    QTextCursor cursor = editor->textCursor();
 //    if (cursor.hasSelection()) {
 //        int start = cursor.selectionStart();
 //        cursor.setPosition(cursor.selectionEnd());
 //        cursor.movePosition(QTextCursor::StartOfLine);
 //        int end = cursor.position();
-//        ui->codeTextEdit->undo();
-//        ui->codeTextEdit->setTextCursor(cursor);
+//        editor->undo();
+//        editor->setTextCursor(cursor);
 //        cursor.setPosition(start);
 //        cursor.setPosition(end, QTextCursor::KeepAnchor);
 //        //cursor.movePosition(QTextCursor::EndOfLine, QTextCursor::KeepAnchor);
-//        ui->codeTextEdit->setTextCursor(cursor);
+//        editor->setTextCursor(cursor);
 //    } else {
-       ui->codeTextEdit->undo();
+       editor->undo();
 //    }
 }
 
 void Document::redo()
 {
-    ui->codeTextEdit->redo();
+    editor->redo();
 }
 
 void Document::cut()
 {
-    ui->codeTextEdit->cut();
+    editor->cut();
 }
 
 void Document::copy()
 {
-    ui->codeTextEdit->copy();
+    editor->copy();
 }
 
 void Document::paste()
 {
-    ui->codeTextEdit->paste();
+    editor->paste();
 }
 
 void Document::find()
@@ -129,7 +132,7 @@ void Document::setChatHidden(bool b)
 
 void Document::shiftLeft()
 {
-    QTextCursor cursor = ui->codeTextEdit->textCursor();
+    QTextCursor cursor = editor->textCursor();
     if (cursor.hasSelection()) {
         int start = cursor.selectionStart();
         int end = cursor.selectionEnd();
@@ -180,7 +183,7 @@ void Document::shiftLeft()
 
 void Document::shiftRight()
 {
-    QTextCursor cursor = ui->codeTextEdit->textCursor();
+    QTextCursor cursor = editor->textCursor();
     int end = cursor.selectionEnd();
     int start = cursor.selectionStart();
     if (cursor.hasSelection()) {
@@ -206,12 +209,12 @@ void Document::shiftRight()
     }
     cursor.setPosition(start);
     cursor.setPosition(end, QTextCursor::KeepAnchor);
-    ui->codeTextEdit->setTextCursor(cursor);
+    editor->setTextCursor(cursor);
 }
 
 void Document::comment()
 {
-    QTextCursor cursor = ui->codeTextEdit->textCursor();
+    QTextCursor cursor = editor->textCursor();
     int start = cursor.selectionStart();
     int end = cursor.selectionEnd();
     if (cursor.hasSelection()) {
@@ -301,7 +304,7 @@ void Document::comment()
 
     cursor.setPosition(start);
     cursor.setPosition(end, QTextCursor::KeepAnchor);
-    ui->codeTextEdit->setTextCursor(cursor);
+    editor->setTextCursor(cursor);
 }
 
 void Document::announceDocument()
@@ -322,17 +325,17 @@ void Document::announceDocument()
 
 bool Document::isUndoable()
 {
-    return ui->codeTextEdit->document()->isUndoAvailable();
+    return editor->document()->isUndoAvailable();
 }
 
 bool Document::isRedoable()
 {
-    return ui->codeTextEdit->document()->isRedoAvailable();
+    return editor->document()->isRedoAvailable();
 }
 
 bool Document::isModified()
 {
-    return ui->codeTextEdit->document()->isModified();
+    return editor->document()->isModified();
 }
 
 bool Document::isChatHidden()
@@ -347,44 +350,38 @@ bool Document::isParticipantsHidden()
 
 QString Document::getPlainText()
 {
-    return ui->codeTextEdit->toPlainText();
+    return editor->toPlainText();
 }
 
 void Document::setPlainText(QString text)
 {
-    ui->codeTextEdit->setPlainText(text);
+    editor->setPlainText(text);
 }
 
 void Document::toggleLineWrap()
 {
-    if (ui->codeTextEdit->lineWrapMode() == QTextEdit::NoWrap) {
-        ui->codeTextEdit->setLineWrapMode(QTextEdit::WidgetWidth);
+    if (editor->lineWrapMode() == QPlainTextEdit::NoWrap) {
+        editor->setLineWrapMode(QPlainTextEdit::WidgetWidth);
     }
     else {
-        ui->codeTextEdit->setLineWrapMode(QTextEdit::NoWrap);
+        editor->setLineWrapMode(QPlainTextEdit::NoWrap);
     }
 }
 
 void Document::setModified(bool b)
 {
-    ui->codeTextEdit->document()->setModified(b);
+    editor->document()->setModified(b);
 }
 
 bool Document::eventFilter(QObject *object, QEvent *event)
 {
     // filter for keypress events and make sure the source is our text edit.
-    if (event->type() == QEvent::KeyPress && object == ui->codeTextEdit) {
+    if (event->type() == QEvent::KeyPress && object == editor) {
         QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
         if (!keyEvent->text().isEmpty()) {
 //            socket->write(keyEvent->text().toAscii()); // Don't send...yet. Incomplete.
 //            qDebug() << keyEvent->text() << " sent.";
         }
-    }
-    else if (event->type() == QEvent::Wheel && object == ui->codeTextEdit) {
-        QWheelEvent *wheelEvent = static_cast<QWheelEvent *>(event);
-//        ui->codeTextEdit->wheelEvent(wheelEvent);
-//        ui->lineNumberTextEdit->wheelEvent(wheelEvent);
-//        return true;
     }
     return false;
 }
@@ -402,16 +399,6 @@ void Document::on_pushButton_clicked()
     }
     ui->chatTextEdit->append(myName + ": " + string);
     ui->lineEdit->clear();
-}
-
-void Document::codeTextEditTextChanged(int lineCount)
-{
-    qDebug() << "Line count: " << lineCount;
-    QString string = "";
-    for (int i = 1; i <= lineCount; i++) {
-        string.append(QString("%1\n").arg(i));
-    }
-    ui->lineNumberTextEdit->setText(string);
 }
 
 void Document::onIncomingData()

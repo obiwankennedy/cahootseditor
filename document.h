@@ -3,6 +3,7 @@
 
 #include <QtGui/QWidget>
 #include "highlighters/cpphighlighter.h"
+#include "codeeditor.h"
 
 #include <QtNetwork>
 #include <QTcpServer>
@@ -66,11 +67,12 @@ private:
 
     CppHighlighter *cppHighlighter;
 
+    CodeEditor *editor;
+
     bool eventFilter(QObject *object, QEvent *event);
 
 private slots:
     void on_pushButton_clicked();
-    void codeTextEditTextChanged(int);
     void onIncomingData();
     void onNewConnection();
 

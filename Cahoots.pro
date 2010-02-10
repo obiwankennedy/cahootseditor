@@ -12,13 +12,15 @@ SOURCES += main.cpp \
     highlighters/cpphighlighter.cpp \
     connecttodocument.cpp \
     finddialog.cpp \
-    preferencesdialog.cpp
+    preferencesdialog.cpp \
+    codeeditor.cpp
 HEADERS += mainwindow.h \
     document.h \
     highlighters/cpphighlighter.h \
     connecttodocument.h \
     finddialog.h \
-    preferencesdialog.h
+    preferencesdialog.h \
+    codeeditor.h
 FORMS += mainwindow.ui \
     document.ui \
     connecttodocument.ui \
