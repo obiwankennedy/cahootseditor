@@ -1,6 +1,8 @@
 #include "document.h"
 #include "ui_document.h"
 
+#include "utilities.h"
+
 #include <QKeyEvent>
 #include <QTextCursor>
 #include <QRegExp>
@@ -8,6 +10,7 @@
 #include <QWheelEvent>
 #include <QTextEdit>
 #include <QTextBlock>
+#include <QFontMetrics>
 
 Document::Document(QWidget *parent) :
     QWidget(parent),
@@ -200,99 +203,9 @@ void Document::shiftRight()
     editor->setTextCursor(cursor);
 }
 
-void Document::comment()
+void Document::unCommentSelection()
 {
-    QTextCursor cursor = editor->textCursor();
-    int start = cursor.selectionStart();
-    int end = cursor.selectionEnd();
-    if (cursor.hasSelection()) {
-        QString line = cursor.selectedText();
-        cursor.setPosition(start);
-        if (!cursor.atBlockStart()) {
-            if (line.startsWith("/*") && line.endsWith("*/")) {
-                cursor.beginEditBlock();
-                cursor.deleteChar();
-                cursor.deleteChar();
-                end -= 2;
-                cursor.setPosition(end);
-                cursor.deletePreviousChar();
-                cursor.deletePreviousChar();
-                end -= 2;
-                cursor.endEditBlock();
-            } else {
-                cursor.beginEditBlock();
-                cursor.setPosition(start);
-                cursor.insertText("/*");
-                end += 2;
-                cursor.setPosition(end);
-                cursor.insertText("*/");
-                end += 2;
-                cursor.endEditBlock();
-            }
-        } else {
-            int i = cursor.position();
-            //int count = 0;
-            bool isCommented = true;
-            while (i < end) {
-                cursor.movePosition(QTextCursor::StartOfLine);
-                cursor.movePosition(QTextCursor::EndOfLine, QTextCursor::KeepAnchor);
-                QString line = cursor.selectedText();
-                cursor.movePosition(QTextCursor::StartOfLine, QTextCursor::MoveAnchor);
-                if (!(line.startsWith("//") && isCommented)) {
-                    isCommented = false;
-                }
-                cursor.movePosition(QTextCursor::EndOfLine);
-                if (cursor.atEnd()) {
-                    break;
-                } else {
-                    cursor.movePosition(QTextCursor::StartOfLine);
-                    cursor.movePosition(QTextCursor::Down);
-                    i = cursor.position();
-                }
-            }
-            cursor.setPosition(start);
-            i = cursor.position();
-            cursor.beginEditBlock();
-            while (i < end) {
-                cursor.movePosition(QTextCursor::StartOfLine);
-                cursor.movePosition(QTextCursor::EndOfLine, QTextCursor::KeepAnchor);
-                QString line = cursor.selectedText();
-                cursor.movePosition(QTextCursor::StartOfLine, QTextCursor::MoveAnchor);
-                if (isCommented) {
-                    cursor.deleteChar();
-                    cursor.deleteChar();
-                    end -= 2;
-                } else {
-                    cursor.insertText("//");
-                    end += 2;
-                }
-                cursor.movePosition(QTextCursor::EndOfLine);
-                if (cursor.atEnd()) {
-                    break;
-                } else {
-                    cursor.movePosition(QTextCursor::StartOfLine);
-                    cursor.movePosition(QTextCursor::Down);
-                    i = cursor.position();
-                }
-            }
-            cursor.endEditBlock();
-        }
-    } else {
-        cursor.movePosition(QTextCursor::StartOfLine);
-        cursor.movePosition(QTextCursor::EndOfLine, QTextCursor::KeepAnchor);
-        QString line = cursor.selectedText();
-        cursor.movePosition(QTextCursor::StartOfLine, QTextCursor::MoveAnchor);
-        if (line.startsWith("//")) {
-            cursor.deleteChar();
-            cursor.deleteChar();
-        } else {
-            cursor.insertText("//");
-        }
-    }
-
-    cursor.setPosition(start);
-    cursor.setPosition(end, QTextCursor::KeepAnchor);
-    editor->setTextCursor(cursor);
+    Utilities::unCommentSelection(editor);
 }
 
 void Document::announceDocument()
