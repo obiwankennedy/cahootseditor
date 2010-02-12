@@ -69,11 +69,11 @@ private:
 
     CodeEditor *editor;
 
-    bool eventFilter(QObject *object, QEvent *event);
+    bool newParticipant;
 
 private slots:
     // The elephant in the room. Handles collaborative editing.
-    void onTextChanged();
+    void onTextChanged(int line);
 
     void on_pushButton_clicked();
     void onIncomingData();

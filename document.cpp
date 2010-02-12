@@ -25,7 +25,7 @@ Document::Document(QWidget *parent) :
     connect(editor, SIGNAL(undoAvailable(bool)), this, SIGNAL(undoAvailable(bool)));
     connect(editor, SIGNAL(redoAvailable(bool)), this, SIGNAL(redoAvailable(bool)));
 
-    connect(editor, SIGNAL(textChanged()), this, SLOT(onTextChanged()));
+    connect(editor, SIGNAL(blockCountChanged(int)), this, SLOT(onTextChanged(int)));
     connect(ui->lineEdit, SIGNAL(returnPressed()), this, SLOT(on_pushButton_clicked()));
 
     server = new QTcpServer(this);
@@ -36,6 +36,8 @@ Document::Document(QWidget *parent) :
     setParticipantsHidden(true);
 
     ui->connectInfoLabel->hide();
+
+    newParticipant = true;
 
 //    qApp->installEventFilter(this);
 
@@ -69,21 +71,7 @@ void Document::connectToDocument(QStringList *list)
 
 void Document::undo()
 {
-//    QTextCursor cursor = editor->textCursor();
-//    if (cursor.hasSelection()) {
-//        int start = cursor.selectionStart();
-//        cursor.setPosition(cursor.selectionEnd());
-//        cursor.movePosition(QTextCursor::StartOfLine);
-//        int end = cursor.position();
-//        editor->undo();
-//        editor->setTextCursor(cursor);
-//        cursor.setPosition(start);
-//        cursor.setPosition(end, QTextCursor::KeepAnchor);
-//        //cursor.movePosition(QTextCursor::EndOfLine, QTextCursor::KeepAnchor);
-//        editor->setTextCursor(cursor);
-//    } else {
-       editor->undo();
-//    }
+    editor->undo();
 }
 
 void Document::redo()
@@ -147,10 +135,9 @@ void Document::shiftLeft()
             QString line = cursor.selectedText();
             cursor.movePosition(QTextCursor::StartOfLine, QTextCursor::MoveAnchor);
             if (line.startsWith("    ")) {
-                cursor.deleteChar();
-                cursor.deleteChar();
-                cursor.deleteChar();
-                cursor.deleteChar();
+                for (int i = 0; i < 4; i++) {
+                    cursor.deleteChar();
+                }
                 end -= 4;
             }
             else if (line.startsWith("\t")) {
@@ -172,10 +159,9 @@ void Document::shiftLeft()
         QString line = cursor.selectedText();
         cursor.movePosition(QTextCursor::StartOfLine, QTextCursor::MoveAnchor);
         if (line.startsWith("    ")) {
-            cursor.deleteChar();
-            cursor.deleteChar();
-            cursor.deleteChar();
-            cursor.deleteChar();
+            for (int i = 0; i < 4; i++) {
+                cursor.deleteChar();
+            }
         }
         else if (line.startsWith("\t")) {
             cursor.deleteChar();
@@ -375,29 +361,17 @@ void Document::setModified(bool b)
     editor->document()->setModified(b);
 }
 
-bool Document::eventFilter(QObject *object, QEvent *event)
-{
-    // filter for keypress events and make sure the source is our text edit.
-    if (event->type() == QEvent::KeyPress && object == editor) {
-        QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
-        if (!keyEvent->text().isEmpty()) {
-//            socket->write(keyEvent->text().toAscii()); // Don't send...yet. Incomplete.
-//            qDebug() << keyEvent->text() << " sent.";
-        }
-    }
-    return false;
-}
-
-void Document::onTextChanged()
+void Document::onTextChanged(int line)
 {
     QTextBlock block = editor->textCursor().block();
+    QString data = block.text();
     if (isOwner) {
         for (int i = 0; i < clientList.size(); i++) {
-            clientList.at(i)->write(QString("doc:").toAscii() + editor->toPlainText().toAscii());
+            clientList.at(i)->write(QString("doc:%1:%2").arg(line).arg(data).toAscii());
         }
     }
     else {
-        socket->write(QString("doc:%1").arg(editor->toPlainText()).toAscii());
+        socket->write(QString("doc:%1:%2").arg(line).arg(data).toAscii());
     }
 }
 
@@ -424,7 +398,7 @@ void Document::onIncomingData()
     if (isOwner) {
         // We're hosting the document, and are in charge of distributing data.
         QString data;
-        bool newParticipant = false;
+        bool haveNewParticipant = false;
         // We know we have incoming data, so iterate through our current participants to find the
         // correct sender, and then read the data.
         for (int i = 0; i < clientList.size(); i++) {
@@ -434,11 +408,13 @@ void Document::onIncomingData()
                 data = clientList.at(i)->readAll();
                 if (socketToNameMap.value(sender()) == "") {
                     socketToNameMap.insert(sender(), data);
-                    newParticipant = true;
+                    haveNewParticipant = true;
                 }
                 else {
                     if (data.startsWith("doc:")) {
-                        editor->setPlainText(data);
+                        data.remove(0, 4);
+                        // detect line number, then put text at that line.
+                        qDebug() << data;
                     }
                     else {
                         ui->chatTextEdit->append(QString("%1: %2").arg(socketToNameMap.value(sender(), "Unknown")).arg(data));
@@ -448,13 +424,21 @@ void Document::onIncomingData()
         }
         // Distribute data to all the other participants
         for (int i = 0; i < clientList.size(); i++) {
-            if (clientList.at(i) != sender() && !newParticipant) {
+            if (clientList.at(i) != sender() && !haveNewParticipant) {
                 clientList.at(i)->write(QString("%1: %2").arg(socketToNameMap.value(sender(), "Unknown")).arg(data).toAscii());
             }
         }
     }
     else { // We are a participant
-        ui->chatTextEdit->append(socket->readAll());
+        QString data = socket->readAll();
+        if (data.startsWith("doc:")) {
+            data.remove(0, 4);
+            // detect line number, then put text at that line.
+            qDebug() << data;
+        }
+        else {
+            ui->chatTextEdit->append(socket->readAll());
+        }
     }
 }
 
@@ -463,14 +447,23 @@ void Document::onNewConnection()
     qDebug() << "New connection.";
     if (isOwner) {
         clientList.append(server->nextPendingConnection());
-        socketToNameMap.insert(clientList.last(), ""); // Empty entry for this connection, to be filled in.
+        socketToNameMap.insert(clientList.last(), QString("Person %1").arg(clientList.size())); // Empty entry for this connection, to be filled in.
         connect(clientList.last(), SIGNAL(readyRead()), this, SLOT(onIncomingData()));
         ui->noPermissionsListWidget->insertItem(0, QString("Person %1").arg(clientList.size()));
+        clientList.last()->write(myName.toAscii());
     }
     else {
         connect(socket, SIGNAL(readyRead()), this, SLOT(onIncomingData()));
-        qApp->processEvents();
-        socket->write(myName.toAscii());
+//        socket->write(myName.toAscii());
     }
 }
+
+
+
+
+
+
+
+
+
 
