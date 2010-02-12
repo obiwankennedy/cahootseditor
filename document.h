@@ -72,6 +72,9 @@ private:
     bool eventFilter(QObject *object, QEvent *event);
 
 private slots:
+    // The elephant in the room. Handles collaborative editing.
+    void onTextChanged();
+
     void on_pushButton_clicked();
     void onIncomingData();
     void onNewConnection();

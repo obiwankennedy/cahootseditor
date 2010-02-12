@@ -7,6 +7,7 @@
 #include <QDebug>
 #include <QWheelEvent>
 #include <QTextEdit>
+#include <QTextBlock>
 
 Document::Document(QWidget *parent) :
     QWidget(parent),
@@ -16,7 +17,7 @@ Document::Document(QWidget *parent) :
 
     delete ui->frame;
     editor = new CodeEditor(this);
-    editor->setFont(QFont("Courier"));
+    editor->setFont(QFont("Monaco", 11));
     ui->codeChatSplitter->insertWidget(0, editor);
 
     cppHighlighter = new CppHighlighter(editor->document());
@@ -24,6 +25,7 @@ Document::Document(QWidget *parent) :
     connect(editor, SIGNAL(undoAvailable(bool)), this, SIGNAL(undoAvailable(bool)));
     connect(editor, SIGNAL(redoAvailable(bool)), this, SIGNAL(redoAvailable(bool)));
 
+    connect(editor, SIGNAL(textChanged()), this, SLOT(onTextChanged()));
     connect(ui->lineEdit, SIGNAL(returnPressed()), this, SLOT(on_pushButton_clicked()));
 
     server = new QTcpServer(this);
@@ -386,6 +388,19 @@ bool Document::eventFilter(QObject *object, QEvent *event)
     return false;
 }
 
+void Document::onTextChanged()
+{
+    QTextBlock block = editor->textCursor().block();
+    if (isOwner) {
+        for (int i = 0; i < clientList.size(); i++) {
+            clientList.at(i)->write(QString("doc:").toAscii() + editor->toPlainText().toAscii());
+        }
+    }
+    else {
+        socket->write(QString("doc:%1").arg(editor->toPlainText()).toAscii());
+    }
+}
+
 void Document::on_pushButton_clicked()
 {
     QString string = ui->lineEdit->text();
@@ -422,7 +437,12 @@ void Document::onIncomingData()
                     newParticipant = true;
                 }
                 else {
-                    ui->chatTextEdit->append(QString("%1: %2").arg(socketToNameMap.value(sender(), "Unknown")).arg(data));
+                    if (data.startsWith("doc:")) {
+                        editor->setPlainText(data);
+                    }
+                    else {
+                        ui->chatTextEdit->append(QString("%1: %2").arg(socketToNameMap.value(sender(), "Unknown")).arg(data));
+                    }
                 }
             }
         }
