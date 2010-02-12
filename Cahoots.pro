@@ -13,6 +13,7 @@ SOURCES += main.cpp \
     connecttodocument.cpp \
     finddialog.cpp \
     preferencesdialog.cpp \
+    utilities.cpp \
     codeeditor.cpp
 HEADERS += mainwindow.h \
     document.h \
@@ -20,6 +21,7 @@ HEADERS += mainwindow.h \
     connecttodocument.h \
     finddialog.h \
     preferencesdialog.h \
+    utilities.h \
     codeeditor.h
 FORMS += mainwindow.ui \
     document.ui \

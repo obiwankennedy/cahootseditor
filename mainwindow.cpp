@@ -392,7 +392,7 @@ void MainWindow::on_actionText_Shift_Right_triggered()
 
 void MainWindow::on_actionText_Comment_Line_triggered()
 {
-    tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->comment();
+    tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->unCommentSelection();
 }
 
 void MainWindow::on_actionWindow_Hide_Show_Participants_triggered()

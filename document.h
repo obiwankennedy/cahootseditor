@@ -31,7 +31,7 @@ public:
     void setChatHidden(bool b);
     void shiftLeft();
     void shiftRight();
-    void comment();
+    void unCommentSelection();
 
     // This sets up the document so people can connect to it.
     // Hopefully we can do something with Bonjour so you can browse for local documents
