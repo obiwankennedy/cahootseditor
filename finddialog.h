@@ -17,7 +17,13 @@ protected:
     void changeEvent(QEvent *e);
 
 private:
-    Ui::FindDialog *m_ui;
+    Ui::FindDialog *ui;
+
+private slots:
+    void on_pushButton_findNext_clicked();
+
+signals:
+    void findDialogFindNext(QString str);
 };
 
 #endif // FINDDIALOG_H

@@ -252,6 +252,11 @@ bool Document::isParticipantsHidden()
     return ui->mainSplitter->widget(1)->isHidden();
 }
 
+void Document::findNext(QString str)
+{
+    editor->find(str, QTextDocument::FindWholeWords);
+}
+
 QString Document::getPlainText()
 {
     return editor->toPlainText();

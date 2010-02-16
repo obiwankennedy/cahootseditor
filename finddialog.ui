@@ -15,7 +15,7 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <property name="spacing">
-    <number>-1</number>
+    <number>6</number>
    </property>
    <property name="leftMargin">
     <number>12</number>
@@ -46,7 +46,14 @@
       </widget>
      </item>
      <item>
-      <widget class="QTextEdit" name="textEdit"/>
+      <widget class="QTextEdit" name="textEdit_find">
+       <property name="minimumSize">
+        <size>
+         <width>100</width>
+         <height>1</height>
+        </size>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>
@@ -76,7 +83,14 @@
       </widget>
      </item>
      <item>
-      <widget class="QTextEdit" name="textEdit_2"/>
+      <widget class="QTextEdit" name="textEdit_replace">
+       <property name="minimumSize">
+        <size>
+         <width>100</width>
+         <height>1</height>
+        </size>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>
@@ -146,35 +160,35 @@
       </spacer>
      </item>
      <item>
-      <widget class="QPushButton" name="pushButton">
+      <widget class="QPushButton" name="pushButton_replaceAll">
        <property name="text">
         <string>Replace All</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="pushButton_2">
+      <widget class="QPushButton" name="pushButton_replace">
        <property name="text">
         <string>Replace</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="pushButton_3">
+      <widget class="QPushButton" name="pushButton_findRep">
        <property name="text">
-        <string>Replace &amp;&amp; Find</string>
+        <string>Find &amp;&amp; Replace</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="pushButton_4">
+      <widget class="QPushButton" name="pushButton_findPrev">
        <property name="text">
         <string>Previous</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="pushButton_5">
+      <widget class="QPushButton" name="pushButton_findNext">
        <property name="text">
         <string>Next</string>
        </property>

@@ -24,6 +24,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(connectDialog, SIGNAL(connectToDocumentClicked(QStringList*)), this, SLOT(connectToDocument(QStringList*)));
 
     findDialog = new FindDialog(this);
+    connect(findDialog, SIGNAL(findDialogFindNext(QString)), this, SLOT(findNextTriggered(QString)));
 
     Document *document = new Document(ui->tab);
     QGridLayout *tabLayout = new QGridLayout;
@@ -442,6 +443,11 @@ void MainWindow::tabCloseClicked(int index)
         tabWidgetToDocumentMap.remove(ui->tabWidget->widget(index));
         ui->tabWidget->removeTab(index);
     }
+}
+
+void MainWindow::findNextTriggered(QString str)
+{
+    tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->findNext(str);
 }
 
 void MainWindow::connectToDocument(QStringList *list)

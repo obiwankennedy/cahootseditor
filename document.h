@@ -44,6 +44,9 @@ public:
     bool isChatHidden();
     bool isParticipantsHidden();
 
+    // Find functions
+    void findNext(QString str);
+
     QString getPlainText();
     void setPlainText(QString text);
     void toggleLineWrap();

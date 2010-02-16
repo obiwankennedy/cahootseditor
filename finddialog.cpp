@@ -3,14 +3,14 @@
 
 FindDialog::FindDialog(QWidget *parent) :
     QDialog(parent),
-    m_ui(new Ui::FindDialog)
+    ui(new Ui::FindDialog)
 {
-    m_ui->setupUi(this);
+    ui->setupUi(this);
 }
 
 FindDialog::~FindDialog()
 {
-    delete m_ui;
+    delete ui;
 }
 
 void FindDialog::changeEvent(QEvent *e)
@@ -18,9 +18,17 @@ void FindDialog::changeEvent(QEvent *e)
     QDialog::changeEvent(e);
     switch (e->type()) {
     case QEvent::LanguageChange:
-        m_ui->retranslateUi(this);
+        ui->retranslateUi(this);
         break;
     default:
         break;
     }
+}
+
+
+void FindDialog::on_pushButton_findNext_clicked()
+{
+    QString searchString = ui->textEdit_find->toPlainText();
+    emit findDialogFindNext(searchString);
+//    document->textEdit->find(searchString, QTextDocument::FindWholeWords);
 }
