@@ -74,6 +74,7 @@ private:
 private slots:
     // The elephant in the room. Handles collaborative editing.
     void onTextChanged(int line);
+    void onTextChange(int pos, int charsRemoved, int charsAdded);
 
     void on_pushButton_clicked();
     void onIncomingData();

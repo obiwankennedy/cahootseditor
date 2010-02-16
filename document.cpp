@@ -12,6 +12,8 @@
 #include <QTextBlock>
 #include <QFontMetrics>
 
+#include <QTextDocumentFragment>
+
 Document::Document(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::Document)
@@ -29,6 +31,7 @@ Document::Document(QWidget *parent) :
     connect(editor, SIGNAL(redoAvailable(bool)), this, SIGNAL(redoAvailable(bool)));
 
     connect(editor, SIGNAL(blockCountChanged(int)), this, SLOT(onTextChanged(int)));
+    connect(editor->document(), SIGNAL(contentsChange(int,int,int)), this, SLOT(onTextChange(int,int,int)));
     connect(ui->lineEdit, SIGNAL(returnPressed()), this, SLOT(on_pushButton_clicked()));
 
     server = new QTcpServer(this);
@@ -276,16 +279,48 @@ void Document::setModified(bool b)
 
 void Document::onTextChanged(int line)
 {
-    QTextBlock block = editor->textCursor().block();
+    QTextBlock block = editor->textCursor().block().previous();
     QString data = block.text();
-    if (isOwner) {
-        for (int i = 0; i < clientList.size(); i++) {
-            clientList.at(i)->write(QString("doc:%1:%2").arg(line).arg(data).toAscii());
-        }
+    qDebug() << data;
+
+//    if (isOwner) {
+//        for (int i = 0; i < clientList.size(); i++) {
+//            clientList.at(i)->write(QString("doc:%1:%2").arg(line).arg(data).toAscii());
+//        }
+//    }
+//    else {
+//        socket->write(QString("doc:%1:%2").arg(line).arg(data).toAscii());
+//    }
+}
+
+void Document::onTextChange(int pos, int charsRemoved, int charsAdded)
+{
+    QString data;
+
+    if (charsRemoved > 0) {
+
     }
     else {
-        socket->write(QString("doc:%1:%2").arg(line).arg(data).toAscii());
+        QTextCursor *cursor = new QTextCursor(editor->document());
+        cursor->setPosition(pos, QTextCursor::MoveAnchor);
+        cursor->movePosition(QTextCursor::NextCharacter, QTextCursor::KeepAnchor, charsAdded);
+        data = cursor->selection().toPlainText();
     }
+    qDebug() << data;
+
+    if (isOwner) {
+        for (int i = 0; i < clientList.size(); i++) {
+            QString toSend = QString("doc:%1,%2,%3:%4").arg(pos).arg(charsRemoved).arg(charsAdded).arg(data);
+            clientList.at(i)->write(toSend.toAscii());
+//            QRegExp *exp = new QRegExp("^(\\d+),(\\d+),(\\d+):(.*)");
+//            if (toSend.contains(exp)) {
+//                qDebug() << exp->cap(0);
+//            }
+        }
+    }
+//    else {
+//        socket->write(QString("doc:%1:%2").arg(line).arg(data).toAscii());
+//    }
 }
 
 void Document::on_pushButton_clicked()
@@ -346,8 +381,27 @@ void Document::onIncomingData()
         QString data = socket->readAll();
         if (data.startsWith("doc:")) {
             data.remove(0, 4);
-            // detect line number, then put text at that line.
+            // detect line number, then put text at that position.
             qDebug() << data;
+            QRegExp *ex = new QRegExp("^(\\d+),(\\d+),(\\d+):(.*)");
+            break; // Not testing this yet.
+            if (data.contains(ex) && ex->capturedTexts().length() == 3) { // Does this work? untested, but it should
+                QString pos = ex->cap(1);
+                QString charsRemoved = ex->cap(2);
+                QString charsAdded = ex->cap(3);
+                QString data = ex->cap(4);
+                if (charsRemoved > 0) {
+                    for (int i = 0; i < charsRemoved; i++) {
+                        // Does the charsRemoved indicate characters removed going forward, or back? Needs testing.
+                        editor->textCursor().movePosition(QTextCursor::NextCharacter, QTextCursor::KeepAnchor, charsRemoved);
+                    }
+                }
+                else {
+                    QTextCursor cursor = editor->textCursor();
+                    cursor.setPosition(pos);
+                    cursor.insertText(data);
+                }
+            }
         }
         else {
             ui->chatTextEdit->append(socket->readAll());
