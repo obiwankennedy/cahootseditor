@@ -378,34 +378,34 @@ void Document::onIncomingData()
         }
     }
     else { // We are a participant
-        QString data = socket->readAll();
-        if (data.startsWith("doc:")) {
-            data.remove(0, 4);
-            // detect line number, then put text at that position.
-            qDebug() << data;
-            QRegExp *ex = new QRegExp("^(\\d+),(\\d+),(\\d+):(.*)");
-            break; // Not testing this yet.
-            if (data.contains(ex) && ex->capturedTexts().length() == 3) { // Does this work? untested, but it should
-                QString pos = ex->cap(1);
-                QString charsRemoved = ex->cap(2);
-                QString charsAdded = ex->cap(3);
-                QString data = ex->cap(4);
-                if (charsRemoved > 0) {
-                    for (int i = 0; i < charsRemoved; i++) {
-                        // Does the charsRemoved indicate characters removed going forward, or back? Needs testing.
-                        editor->textCursor().movePosition(QTextCursor::NextCharacter, QTextCursor::KeepAnchor, charsRemoved);
-                    }
-                }
-                else {
-                    QTextCursor cursor = editor->textCursor();
-                    cursor.setPosition(pos);
-                    cursor.insertText(data);
-                }
-            }
-        }
-        else {
-            ui->chatTextEdit->append(socket->readAll());
-        }
+//        QString data = socket->readAll();
+//        if (data.startsWith("doc:")) {
+//            data.remove(0, 4);
+//            // detect line number, then put text at that position.
+//            qDebug() << data;
+//            QRegExp *ex = new QRegExp("^(\\d+),(\\d+),(\\d+):(.*)");
+//            break; // Not testing this yet.
+//            if (data.contains(ex) && ex->capturedTexts().length() == 3) { // Does this work? untested, but it should
+//                QString pos = ex->cap(1);
+//                QString charsRemoved = ex->cap(2);
+//                QString charsAdded = ex->cap(3);
+//                QString data = ex->cap(4);
+//                if (charsRemoved > 0) {
+//                    for (int i = 0; i < charsRemoved; i++) {
+//                        // Does the charsRemoved indicate characters removed going forward, or back? Needs testing.
+//                        editor->textCursor().movePosition(QTextCursor::NextCharacter, QTextCursor::KeepAnchor, charsRemoved);
+//                    }
+//                }
+//                else {
+//                    QTextCursor cursor = editor->textCursor();
+//                    cursor.setPosition(pos);
+//                    cursor.insertText(data);
+//                }
+//            }
+//        }
+//        else {
+//            ui->chatTextEdit->append(socket->readAll());
+//        }
     }
 }
 
