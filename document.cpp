@@ -30,7 +30,7 @@ Document::Document(QWidget *parent) :
     connect(editor, SIGNAL(undoAvailable(bool)), this, SIGNAL(undoAvailable(bool)));
     connect(editor, SIGNAL(redoAvailable(bool)), this, SIGNAL(redoAvailable(bool)));
 
-    connect(editor, SIGNAL(blockCountChanged(int)), this, SLOT(onTextChanged(int)));
+//    connect(editor, SIGNAL(blockCountChanged(int)), this, SLOT(onTextChanged(int)));
     connect(editor->document(), SIGNAL(contentsChange(int,int,int)), this, SLOT(onTextChange(int,int,int)));
     connect(ui->lineEdit, SIGNAL(returnPressed()), this, SLOT(on_pushButton_clicked()));
 
@@ -289,22 +289,6 @@ void Document::setModified(bool b)
     editor->document()->setModified(b);
 }
 
-void Document::onTextChanged(int line)
-{
-    QTextBlock block = editor->textCursor().block().previous();
-    QString data = block.text();
-    qDebug() << data;
-
-//    if (isOwner) {
-//        for (int i = 0; i < clientList.size(); i++) {
-//            clientList.at(i)->write(QString("doc:%1:%2").arg(line).arg(data).toAscii());
-//        }
-//    }
-//    else {
-//        socket->write(QString("doc:%1:%2").arg(line).arg(data).toAscii());
-//    }
-}
-
 void Document::onTextChange(int pos, int charsRemoved, int charsAdded)
 {
     QString data;
@@ -313,21 +297,28 @@ void Document::onTextChange(int pos, int charsRemoved, int charsAdded)
 
     }
     else {
-        QTextCursor *cursor = new QTextCursor(editor->document());
-        cursor->setPosition(pos, QTextCursor::MoveAnchor);
-        cursor->movePosition(QTextCursor::NextCharacter, QTextCursor::KeepAnchor, charsAdded);
-        data = cursor->selection().toPlainText();
+        QTextCursor cursor = QTextCursor(editor->document());
+        cursor.setPosition(pos, QTextCursor::MoveAnchor);
+        cursor.movePosition(QTextCursor::NextCharacter, QTextCursor::KeepAnchor, charsAdded);
+        data = cursor.selection().toPlainText();
     }
-    qDebug() << data;
+    qDebug() << "text to send: " << data;
 
     if (isOwner) {
+        QString toSend = QString("doc:%1,%2,%3:%4").arg(pos).arg(charsRemoved).arg(charsAdded).arg(data);
+
+        QRegExp rx = QRegExp("(\\d+)");
+        QStringList list;
+        int posInStr = 0;
+
+        while ((posInStr = rx.indexIn(toSend, posInStr)) != -1) {
+            list << rx.cap(1);
+            posInStr += rx.matchedLength();
+        }
+        qDebug() << list;
+
         for (int i = 0; i < clientList.size(); i++) {
-            QString toSend = QString("doc:%1,%2,%3:%4").arg(pos).arg(charsRemoved).arg(charsAdded).arg(data);
             clientList.at(i)->write(toSend.toAscii());
-//            QRegExp *exp = new QRegExp("^(\\d+),(\\d+),(\\d+):(.*)");
-//            if (toSend.contains(exp)) {
-//                qDebug() << exp->cap(0);
-//            }
         }
     }
 //    else {
@@ -374,7 +365,7 @@ void Document::onIncomingData()
                     if (data.startsWith("doc:")) {
                         data.remove(0, 4);
                         // detect line number, then put text at that line.
-                        qDebug() << data;
+                        qDebug() << "incoming data (owner): " << data;
                     }
                     else {
                         ui->chatTextEdit->append(QString("%1: %2").arg(socketToNameMap.value(sender(), "Unknown")).arg(data));
@@ -390,34 +381,34 @@ void Document::onIncomingData()
         }
     }
     else { // We are a participant
-//        QString data = socket->readAll();
-//        if (data.startsWith("doc:")) {
-//            data.remove(0, 4);
-//            // detect line number, then put text at that position.
-//            qDebug() << data;
-//            QRegExp *ex = new QRegExp("^(\\d+),(\\d+),(\\d+):(.*)");
-//            break; // Not testing this yet.
-//            if (data.contains(ex) && ex->capturedTexts().length() == 3) { // Does this work? untested, but it should
-//                QString pos = ex->cap(1);
-//                QString charsRemoved = ex->cap(2);
-//                QString charsAdded = ex->cap(3);
-//                QString data = ex->cap(4);
-//                if (charsRemoved > 0) {
-//                    for (int i = 0; i < charsRemoved; i++) {
-//                        // Does the charsRemoved indicate characters removed going forward, or back? Needs testing.
-//                        editor->textCursor().movePosition(QTextCursor::NextCharacter, QTextCursor::KeepAnchor, charsRemoved);
-//                    }
-//                }
-//                else {
-//                    QTextCursor cursor = editor->textCursor();
-//                    cursor.setPosition(pos);
-//                    cursor.insertText(data);
-//                }
-//            }
-//        }
-//        else {
-//            ui->chatTextEdit->append(socket->readAll());
-//        }
+        QString data = socket->readAll();
+        if (data.startsWith("doc:")) {
+            data.remove(0, 4);
+            // detect line number, then put text at that position.
+            qDebug() << "incoming data (participant): " << data;
+            QRegExp ex = QRegExp("^(\\d+),(\\d+),(\\d+):(.*)");
+            return; // not testing this yet
+            if (data.contains(ex) && ex.capturedTexts().length() == 3) { // Does this work? untested, but it should
+                QString pos = ex.cap(1);
+                QString charsRemoved = ex.cap(2);
+                QString charsAdded = ex.cap(3);
+                QString data = ex.cap(4);
+                if (charsRemoved > 0) {
+                    for (int i = 0; i < charsRemoved.toInt(); i++) {
+                        // Does the charsRemoved indicate characters removed going forward, or back? Needs testing.
+                        editor->textCursor().movePosition(QTextCursor::NextCharacter, QTextCursor::KeepAnchor, charsRemoved.toInt());
+                    }
+                }
+                else {
+                    QTextCursor cursor = editor->textCursor();
+                    cursor.setPosition(pos.toInt());
+                    cursor.insertText(data);
+                }
+            }
+        }
+        else {
+            ui->chatTextEdit->append(socket->readAll());
+        }
     }
 }
 
