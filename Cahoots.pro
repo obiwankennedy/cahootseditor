@@ -6,6 +6,11 @@ TARGET = Cahoots
 TEMPLATE = app
 CONFIG += x86 \
     ppc
+
+# Mac icon/plist
+ICON = images/icon.icns
+QMAKE_INFO_PLIST = app.plist
+
 SOURCES += main.cpp \
     mainwindow.cpp \
     document.cpp \
