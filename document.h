@@ -46,6 +46,7 @@ public:
 
     // Find functions
     void findNext(QString str);
+    void findPrev(QString str);
 
     QString getPlainText();
     void setPlainText(QString text);

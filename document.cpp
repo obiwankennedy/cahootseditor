@@ -255,6 +255,13 @@ bool Document::isParticipantsHidden()
 void Document::findNext(QString str)
 {
     editor->find(str, QTextDocument::FindWholeWords);
+    editor->setFocus();
+}
+
+void Document::findPrev(QString str)
+{
+    editor->document()->find(str, QTextDocument::FindBackward);
+    editor->setFocus();
 }
 
 QString Document::getPlainText()

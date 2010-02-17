@@ -30,5 +30,12 @@ void FindDialog::on_pushButton_findNext_clicked()
 {
     QString searchString = ui->textEdit_find->toPlainText();
     emit findDialogFindNext(searchString);
-//    document->textEdit->find(searchString, QTextDocument::FindWholeWords);
 }
+
+
+void FindDialog::on_pushButton_findPrev_clicked()
+{
+    QString searchString = ui->textEdit_find->toPlainText();
+    emit findDialogFindPrev(searchString);
+}
+

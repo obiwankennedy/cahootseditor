@@ -21,9 +21,11 @@ private:
 
 private slots:
     void on_pushButton_findNext_clicked();
+    void on_pushButton_findPrev_clicked();
 
 signals:
     void findDialogFindNext(QString str);
+    void findDialogFindPrev(QString str);
 };
 
 #endif // FINDDIALOG_H

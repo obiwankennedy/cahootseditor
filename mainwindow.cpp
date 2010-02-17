@@ -25,6 +25,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     findDialog = new FindDialog(this);
     connect(findDialog, SIGNAL(findDialogFindNext(QString)), this, SLOT(findNextTriggered(QString)));
+    connect(findDialog, SIGNAL(findDialogFindPrev(QString)), this, SLOT(findPrevTriggered(QString)));
 
     Document *document = new Document(ui->tab);
     QGridLayout *tabLayout = new QGridLayout;
@@ -449,6 +450,12 @@ void MainWindow::findNextTriggered(QString str)
 {
     tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->findNext(str);
 }
+
+void MainWindow::findPrevTriggered(QString str)
+{
+    tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->findPrev(str);
+}
+
 
 void MainWindow::connectToDocument(QStringList *list)
 {
