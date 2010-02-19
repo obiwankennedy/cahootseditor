@@ -34,6 +34,7 @@ Document::Document(QWidget *parent) :
     connect(editor, SIGNAL(redoAvailable(bool)), this, SIGNAL(redoAvailable(bool)));
 
 //    connect(editor, SIGNAL(blockCountChanged(int)), this, SLOT(onTextChanged(int)));
+    connect(editor->document(), SIGNAL(contentsChange(int,int,int)), this, SLOT(onTextChange(int,int,int)));
     connect(ui->lineEdit, SIGNAL(returnPressed()), this, SLOT(on_pushButton_clicked()));
 
     server = new QTcpServer(this);
@@ -291,35 +292,54 @@ void Document::setModified(bool b)
     editor->document()->setModified(b);
 }
 
+void Document::previewAsHtml()
+{
+    QString text = editor->toPlainText();
+    QWebView *preview = new QWebView();
+    preview->setHtml(text);
+    preview->show();
+}
+
 void Document::ownerIncomingData(QString data)
 {
-    bool haveNewParticipant = false;
-
-    if (socketToNameMap.value(sender()) == "") {
-        socketToNameMap.insert(sender(), data);
-        haveNewParticipant = true;
+    return;
+    QString toSend;
+    if (data.startsWith("doc:")) {
+        qDebug() << "odata: " << data;
+        toSend = data;
+        data.remove(0, 4);
+        // detect line number, then put text at that line.
+        QRegExp rx = QRegExp("^(\\d+),(\\d+),(\\d+):(.*)");
+        if (data.contains(rx)) {
+            int pos = rx.cap(1).toInt();
+            int charsRemoved = rx.cap(2).toInt();
+            int charsAdded = rx.cap(3).toInt();
+            QString data = rx.cap(4);
+            if (charsRemoved > 0) {
+                for (int i = 0; i < charsRemoved; i++) {
+                    // Does the charsRemoved indicate characters removed going forward, or back? Needs testing.
+                    QTextCursor cursor = editor->textCursor();
+                    cursor.setPosition(pos);
+                    cursor.movePosition(QTextCursor::NextCharacter, QTextCursor::KeepAnchor, charsRemoved);
+                    cursor.removeSelectedText();
+                }
+            }
+            else if (charsAdded > 0){
+                QTextCursor cursor = editor->textCursor();
+                cursor.setPosition(pos);
+                cursor.insertText(data.toAscii());
+            }
+        }
     }
     else {
-        if (data.startsWith("doc:")) {
-            data.remove(0, 4);
-            // detect line number, then put text at that line.
-            qDebug() << "incoming data (owner): " << data;
-            data.remove(0, 4);
-            QRegExp rx = QRegExp("^(\\d+),(\\d+),(\\d+):(.*)");
-            if (data.contains(rx)) {
-                qDebug() << rx.cap(4);
-
-            }
-
-        }
-        else {
-            ui->chatTextEdit->append(QString("%1: %2").arg(socketToNameMap.value(sender(), "Unknown")).arg(data));
-        }
+        toSend = QString("%1: %2").arg(socketToNameMap.value(sender(), "Unknown")).arg(data);
+        ui->chatTextEdit->append(toSend);
     }
     // Distribute data to all the other participants
+
     for (int i = 0; i < clientList.size(); i++) {
-        if (clientList.at(i) != sender() && !haveNewParticipant) {
-            clientList.at(i)->write(QString("%1: %2").arg(socketToNameMap.value(sender(), "Unknown")).arg(data).toAscii());
+        if (clientList.at(i) != sender()) {
+            clientList.at(i)->write(toSend.toAscii());
         }
     }
 
@@ -328,15 +348,15 @@ void Document::ownerIncomingData(QString data)
 void Document::participantIncomingData(QString data)
 {
     if (data.startsWith("doc:")) {
+        qDebug() << "pdata: " << data;
         data.remove(0, 4);
         // detect line number, then put text at that position.
-        qDebug() << "incoming data (participant): " << data;
-        QRegExp ex = QRegExp("^(\\d+),(\\d+),(\\d+):(.*)");
-        if (data.contains(ex)) {
-            int pos = ex.cap(1).toInt();
-            int charsRemoved = ex.cap(2).toInt();
-            int charsAdded = ex.cap(3).toInt();
-            QString data = ex.cap(4);
+        QRegExp rx = QRegExp("^(\\d+),(\\d+),(\\d+):(.*)");
+        if (data.contains(rx)) {
+            int pos = rx.cap(1).toInt();
+            int charsRemoved = rx.cap(2).toInt();
+            int charsAdded = rx.cap(3).toInt();
+            QString data = rx.cap(4);
             if (charsRemoved > 0) {
                 for (int i = 0; i < charsRemoved; i++) {
                     // Does the charsRemoved indicate characters removed going forward, or back? Needs testing.
@@ -360,25 +380,13 @@ void Document::participantIncomingData(QString data)
 
 }
 
-void Document::previewAsHtml()
-{
-    QString text = editor->toPlainText();
-    QWebView *preview = new QWebView();
-    preview->setHtml(text);
-    preview->show();
-}
-
 void Document::onTextChange(int pos, int charsRemoved, int charsAdded)
 {
-    if (charsRemoved == 0 && charsAdded == 0) {
-        return;
-    }
     QString data;
-
     if (charsRemoved > 0) {
-
+        data = "";
     }
-    else {
+    else if (charsAdded > 0) {
         QTextCursor cursor = QTextCursor(editor->document());
         cursor.setPosition(pos, QTextCursor::MoveAnchor);
         cursor.movePosition(QTextCursor::NextCharacter, QTextCursor::KeepAnchor, charsAdded);
@@ -420,20 +428,16 @@ void Document::onIncomingData()
 {
     QString data;
     if (isOwner) {
-        data = static_cast<QTcpSocket>(sender()).readAll(); // test?!
-        ownerIncomingData(data);
-
-//        // We know we have incoming data, so iterate through our current participants to find the
-//        // correct sender, and then read the data.
-//        for (int i = 0; i < clientList.size(); i++) {
-//            if (sender() == clientList.at(i)) {
-//
-//                // sender() is the sender of the signal that calls this function
-//                // so we use it to figure out which connection has new data for us
-////                data = clientList.at(i)->readAll();
-//                ownerIncomingData(data);
-//            }
-//        }
+        // We know we have incoming data, so iterate through our current participants to find the
+        // correct sender, and then read the data.
+        for (int i = 0; i < clientList.size(); i++) {
+            if (sender() == clientList.at(i)) {
+                // sender() is the sender of the signal that calls this function
+                // so we use it to figure out which connection has new data for us
+                data = clientList.at(i)->readAll();
+                ownerIncomingData(data);
+            }
+        }
     }
     else { // We are a participant
         data = socket->readAll();

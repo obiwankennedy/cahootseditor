@@ -54,6 +54,8 @@ public:
 
     void setModified(bool b);
 
+    void previewAsHtml();
+
     // This tells us if we're the host/owner of the document, and affects how we talk with participants
     bool isOwner;
     QString curFile;
