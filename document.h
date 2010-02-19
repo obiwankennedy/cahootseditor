@@ -75,6 +75,9 @@ private:
 
     bool newParticipant;
 
+    void ownerIncomingData(QString data);
+    void participantIncomingData(QString data);
+
 private slots:
     // The elephant in the room. Handles collaborative editing.
     void onTextChange(int pos, int charsRemoved, int charsAdded);
