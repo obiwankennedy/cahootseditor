@@ -4,6 +4,7 @@
 QT += network
 TARGET = Cahoots
 TEMPLATE = app
+QT += webkit
 CONFIG += x86 \
     ppc
 

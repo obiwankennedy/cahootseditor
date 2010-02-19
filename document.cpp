@@ -3,6 +3,7 @@
 
 #include "utilities.h"
 
+#include <QDialog>
 #include <QKeyEvent>
 #include <QTextCursor>
 #include <QRegExp>
@@ -11,6 +12,8 @@
 #include <QTextEdit>
 #include <QTextBlock>
 #include <QFontMetrics>
+#include <QWebView>
+#include <QLayout>
 
 #include <QTextDocumentFragment>
 
@@ -31,7 +34,6 @@ Document::Document(QWidget *parent) :
     connect(editor, SIGNAL(redoAvailable(bool)), this, SIGNAL(redoAvailable(bool)));
 
 //    connect(editor, SIGNAL(blockCountChanged(int)), this, SLOT(onTextChanged(int)));
-    connect(editor->document(), SIGNAL(contentsChange(int,int,int)), this, SLOT(onTextChange(int,int,int)));
     connect(ui->lineEdit, SIGNAL(returnPressed()), this, SLOT(on_pushButton_clicked()));
 
     server = new QTcpServer(this);
@@ -289,6 +291,14 @@ void Document::setModified(bool b)
     editor->document()->setModified(b);
 }
 
+void Document::previewAsHtml()
+{
+    QString text = editor->toPlainText();
+    QWebView *preview = new QWebView();
+    preview->setHtml(text);
+    preview->show();
+}
+
 void Document::onTextChange(int pos, int charsRemoved, int charsAdded)
 {
     QString data;
@@ -427,13 +437,3 @@ void Document::onNewConnection()
 //        socket->write(myName.toAscii());
     }
 }
-
-
-
-
-
-
-
-
-
-

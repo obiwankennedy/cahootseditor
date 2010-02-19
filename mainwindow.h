@@ -65,6 +65,7 @@ private slots:
 
     void on_actionTools_Announce_Document_triggered();
     void on_actionTools_Connect_to_Document_triggered();
+    void on_actionTools_Preview_as_Html_triggered();
 
     void on_actionText_Shift_Left_triggered();
     void on_actionText_Shift_Right_triggered();

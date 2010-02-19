@@ -382,6 +382,11 @@ void MainWindow::on_actionTools_Connect_to_Document_triggered()
     connectDialog->setName(myName);
 }
 
+void MainWindow::on_actionTools_Preview_as_Html_triggered()
+{
+    tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->previewAsHtml();
+}
+
 void MainWindow::on_actionText_Shift_Left_triggered()
 {
     tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->shiftLeft();

@@ -24,9 +24,6 @@
     <property name="margin">
      <number>0</number>
     </property>
-    <property name="spacing">
-     <number>6</number>
-    </property>
     <item row="0" column="0">
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
@@ -59,7 +56,7 @@
      <x>0</x>
      <y>0</y>
      <width>720</width>
-     <height>25</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -116,7 +113,7 @@
     <property name="title">
      <string>Tools</string>
     </property>
-    <addaction name="actionTools_Preview_as_HTML"/>
+    <addaction name="actionTools_Preview_as_Html"/>
     <addaction name="separator"/>
     <addaction name="actionTools_Announce_Document"/>
     <addaction name="actionTools_Connect_to_Document"/>
@@ -344,7 +341,7 @@
     <string>Ctrl+/</string>
    </property>
   </action>
-  <action name="actionTools_Preview_as_HTML">
+  <action name="actionTools_Preview_as_Html">
    <property name="text">
     <string>Preview as HTML</string>
    </property>
@@ -382,6 +379,11 @@
   <action name="actionTools_Connect_to_Document">
    <property name="text">
     <string>Connect to Document...</string>
+   </property>
+  </action>
+  <action name="actionAuto_Format">
+   <property name="text">
+    <string>Auto Format</string>
    </property>
   </action>
  </widget>
