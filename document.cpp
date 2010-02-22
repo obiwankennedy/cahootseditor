@@ -302,7 +302,6 @@ void Document::previewAsHtml()
 
 void Document::ownerIncomingData(QString data)
 {
-    return;
     QString toSend;
     if (data.startsWith("doc:")) {
         qDebug() << "odata: " << data;
@@ -382,6 +381,7 @@ void Document::participantIncomingData(QString data)
 
 void Document::onTextChange(int pos, int charsRemoved, int charsAdded)
 {
+
     QString data;
     if (charsRemoved > 0) {
         data = "";
@@ -426,6 +426,8 @@ void Document::on_pushButton_clicked()
 
 void Document::onIncomingData()
 {
+    // disconnect the signal that fires when the contents of the editor change so we don't echo
+    disconnect(editor->document(), SIGNAL(contentsChange(int,int,int)), this, SLOT(onTextChange(int,int,int)));
     QString data;
     if (isOwner) {
         // We know we have incoming data, so iterate through our current participants to find the
@@ -443,6 +445,8 @@ void Document::onIncomingData()
         data = socket->readAll();
         participantIncomingData(data);
     }
+    // reconnect the signal that fires when the contents of the editor change so we continue to send new text
+    connect(editor->document(), SIGNAL(contentsChange(int,int,int)), this, SLOT(onTextChange(int,int,int)));
 }
 
 void Document::onNewConnection()
