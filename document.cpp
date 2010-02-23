@@ -26,6 +26,8 @@ Document::Document(QWidget *parent) :
     delete ui->frame;
     editor = new CodeEditor(this);
     editor->setFont(QFont("Monaco", 11));
+    QFontMetrics fm(editor->font());
+    editor->setTabStopWidth(fm.averageCharWidth() * 4);
     ui->codeChatSplitter->insertWidget(0, editor);
 
     cppHighlighter = new CppHighlighter(editor->document());
@@ -45,12 +47,9 @@ Document::Document(QWidget *parent) :
 
     ui->connectInfoLabel->hide();
 
-//    qApp->installEventFilter(this);
-
     myName = "Owner"; // temporary
 
     isOwner = true; // We are the document owner, unless we're connecting to someone elses document
-
 }
 
 Document::~Document()
@@ -60,6 +59,7 @@ Document::~Document()
 
 void Document::connectToDocument(QStringList *list)
 {
+#warning check this better.
     isOwner = false;
     if (list->size() == 3) { // More thorough checking is needed to ensure the contents are usable.
         myName = list->at(0);
@@ -69,9 +69,10 @@ void Document::connectToDocument(QStringList *list)
         socket->connectToHost(QHostAddress(address), port);
         connect(socket, SIGNAL(readyRead()), this, SLOT(onIncomingData()));
         setChatHidden(false);
-//        setParticipantsHidden(false);
+        setParticipantsHidden(false);
         ui->connectInfoLabel->show();
-        ui->connectInfoLabel->setText(QString("%1:%1").arg(list->at(1)).arg(list->at(2)));
+        ui->connectInfoLabel->setText(QString("%1:%2").arg(address).arg(portString));
+        delete list;
     }
 }
 
@@ -100,11 +101,6 @@ void Document::paste()
     editor->paste();
 }
 
-void Document::find()
-{
-
-}
-
 void Document::setParticipantsHidden(bool b)
 {
     if (b) {
@@ -128,6 +124,7 @@ void Document::setChatHidden(bool b)
 
 void Document::shiftLeft()
 {
+#warning "this doesn't work nicely with collab editing because of the cursor position"
     QTextCursor cursor = editor->textCursor();
     if (cursor.hasSelection()) {
         int start = cursor.selectionStart();
@@ -177,6 +174,7 @@ void Document::shiftLeft()
 
 void Document::shiftRight()
 {
+#warning "this doesn't work nicely with collab editing because of the cursor position"
     QTextCursor cursor = editor->textCursor();
     int end = cursor.selectionEnd();
     int start = cursor.selectionStart();
@@ -214,7 +212,7 @@ void Document::unCommentSelection()
 void Document::announceDocument()
 {
     setChatHidden(false);
-//    setParticipantsHidden(false);
+    setParticipantsHidden(false);
 
     connect(server, SIGNAL(newConnection()), this, SLOT(onNewConnection()));
     server->listen(QHostAddress::Any, 0); // Port is chosen automatically, listening on all NICs
@@ -254,13 +252,13 @@ bool Document::isParticipantsHidden()
 
 void Document::findNext(QString str)
 {
-    editor->find(str, QTextDocument::FindWholeWords);
+    editor->document()->find(str, editor->textCursor(), QTextDocument::FindWholeWords);
     editor->setFocus();
 }
 
 void Document::findPrev(QString str)
 {
-    editor->document()->find(str, QTextDocument::FindBackward);
+    editor->document()->find(str, editor->textCursor(), QTextDocument::FindBackward | QTextDocument::FindWholeWords);
     editor->setFocus();
 }
 
@@ -345,13 +343,17 @@ void Document::participantIncomingData(QString data)
         }
     }
     else {
-        ui->chatTextEdit->append(socket->readAll());
+        qDebug() << data;
+        ui->chatTextEdit->append(data);
     }
 
 }
 
 void Document::onTextChange(int pos, int charsRemoved, int charsAdded)
 {
+    if (!isOwner && socket->state() != QAbstractSocket::ConnectedState) {
+        return;
+    }
 
     QString data;
     if (charsRemoved > 0 && charsAdded == 0) {
@@ -418,12 +420,28 @@ void Document::onIncomingData()
 
 void Document::onNewConnection()
 {
-    qDebug() << "New connection.";
     if (isOwner) {
         clientList.append(server->nextPendingConnection());
         connect(clientList.last(), SIGNAL(readyRead()), this, SLOT(onIncomingData()));
+        connect(socket, SIGNAL(stateChanged(QAbstractSocket::SocketState)), this, SLOT(socketStateChanged(QAbstractSocket::SocketState)));
     }
     else {
         connect(socket, SIGNAL(readyRead()), this, SLOT(onIncomingData()));
+    }
+}
+
+void Document::socketStateChanged(QAbstractSocket::SocketState state)
+{
+#warning "this isn't firing right now, so documents aren't populating for new users"
+    qDebug() << state;
+    if (state == QAbstractSocket::ConnectedState) {
+        qDebug() << "Connection established.";
+        for (int i = 0; i < clientList.size(); i++) {
+            if (sender() == clientList.at(i)) {
+                // sender() is the sender of the signal that calls this slot
+                clientList.at(i)->write(QString("doc:%1,%2,%3:%4")
+                                        .arg(0).arg(0).arg(editor->document()->characterCount()).arg(editor->toPlainText()).toAscii());
+            }
+        }
     }
 }

@@ -108,6 +108,7 @@
     <addaction name="actionText_Shift_Left"/>
     <addaction name="actionText_Shift_Right"/>
     <addaction name="actionText_Comment_Line"/>
+    <addaction name="actionText_Auto_Format_Block"/>
    </widget>
    <widget class="QMenu" name="menuTools">
     <property name="title">
@@ -365,6 +366,9 @@
    <property name="text">
     <string>Announce Document</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+A</string>
+   </property>
   </action>
   <action name="actionWindow_Hide_Show_Participants">
    <property name="text">
@@ -380,10 +384,13 @@
    <property name="text">
     <string>Connect to Document...</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+C</string>
+   </property>
   </action>
-  <action name="actionAuto_Format">
+  <action name="actionText_Auto_Format_Block">
    <property name="text">
-    <string>Auto Format</string>
+    <string>Auto Format Block</string>
    </property>
   </action>
  </widget>

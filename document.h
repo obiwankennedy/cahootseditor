@@ -26,7 +26,6 @@ public:
     void cut();
     void copy();
     void paste();
-    void find();
     void setParticipantsHidden(bool b);
     void setChatHidden(bool b);
     void shiftLeft();
@@ -77,6 +76,7 @@ private:
     void ownerIncomingData(QString data);
     void participantIncomingData(QString data);
 
+
 private slots:
     // The elephant in the room. Handles collaborative editing.
     void onTextChange(int pos, int charsRemoved, int charsAdded);
@@ -84,6 +84,7 @@ private slots:
     void on_pushButton_clicked();
     void onIncomingData();
     void onNewConnection();
+    void socketStateChanged(QAbstractSocket::SocketState state);
 
 signals:
     void redoAvailable(bool);
