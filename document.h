@@ -69,13 +69,10 @@ private:
     QTcpSocket *socket;
 
     QList<QTcpSocket *> clientList;
-    QMap<QObject*, QString> socketToNameMap;
 
     CppHighlighter *cppHighlighter;
 
     CodeEditor *editor;
-
-    bool newParticipant;
 
     void ownerIncomingData(QString data);
     void participantIncomingData(QString data);

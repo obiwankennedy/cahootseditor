@@ -22,6 +22,8 @@ public:
     void lineNumberAreaPaintEvent(QPaintEvent *event);
     int lineNumberAreaWidth();
 
+    void collabTextChange(int pos, int charsRemoved, int charsAdded, QString data);
+
 protected:
     void resizeEvent(QResizeEvent *event);
 

@@ -33,7 +33,6 @@ Document::Document(QWidget *parent) :
     connect(editor, SIGNAL(undoAvailable(bool)), this, SIGNAL(undoAvailable(bool)));
     connect(editor, SIGNAL(redoAvailable(bool)), this, SIGNAL(redoAvailable(bool)));
 
-//    connect(editor, SIGNAL(blockCountChanged(int)), this, SLOT(onTextChanged(int)));
     connect(editor->document(), SIGNAL(contentsChange(int,int,int)), this, SLOT(onTextChange(int,int,int)));
     connect(ui->lineEdit, SIGNAL(returnPressed()), this, SLOT(on_pushButton_clicked()));
 
@@ -45,8 +44,6 @@ Document::Document(QWidget *parent) :
     setParticipantsHidden(true);
 
     ui->connectInfoLabel->hide();
-
-    newParticipant = true;
 
 //    qApp->installEventFilter(this);
 
@@ -72,9 +69,9 @@ void Document::connectToDocument(QStringList *list)
         socket->connectToHost(QHostAddress(address), port);
         connect(socket, SIGNAL(readyRead()), this, SLOT(onIncomingData()));
         setChatHidden(false);
-        setParticipantsHidden(false);
+//        setParticipantsHidden(false);
         ui->connectInfoLabel->show();
-        ui->connectInfoLabel->setText(QString("%1:%1").arg(address).arg(port));
+        ui->connectInfoLabel->setText(QString("%1:%1").arg(list->at(1)).arg(list->at(2)));
     }
 }
 
@@ -217,7 +214,7 @@ void Document::unCommentSelection()
 void Document::announceDocument()
 {
     setChatHidden(false);
-    setParticipantsHidden(false);
+//    setParticipantsHidden(false);
 
     connect(server, SIGNAL(newConnection()), this, SLOT(onNewConnection()));
     server->listen(QHostAddress::Any, 0); // Port is chosen automatically, listening on all NICs
@@ -314,24 +311,12 @@ void Document::ownerIncomingData(QString data)
             int charsRemoved = rx.cap(2).toInt();
             int charsAdded = rx.cap(3).toInt();
             QString data = rx.cap(4);
-            if (charsRemoved > 0) {
-                for (int i = 0; i < charsRemoved; i++) {
-                    // Does the charsRemoved indicate characters removed going forward, or back? Needs testing.
-                    QTextCursor cursor = editor->textCursor();
-                    cursor.setPosition(pos);
-                    cursor.movePosition(QTextCursor::NextCharacter, QTextCursor::KeepAnchor, charsRemoved);
-                    cursor.removeSelectedText();
-                }
-            }
-            else if (charsAdded > 0){
-                QTextCursor cursor = editor->textCursor();
-                cursor.setPosition(pos);
-                cursor.insertText(data.toAscii());
-            }
+            editor->collabTextChange(pos, charsRemoved, charsAdded, data);
         }
     }
     else {
-        toSend = QString("%1: %2").arg(socketToNameMap.value(sender(), "Unknown")).arg(data);
+        qDebug() << "person: " << data;
+        toSend = QString("Someone: %2").arg(data);
         ui->chatTextEdit->append(toSend);
     }
     // Distribute data to all the other participants
@@ -356,21 +341,7 @@ void Document::participantIncomingData(QString data)
             int charsRemoved = rx.cap(2).toInt();
             int charsAdded = rx.cap(3).toInt();
             QString data = rx.cap(4);
-            if (charsRemoved > 0) {
-                for (int i = 0; i < charsRemoved; i++) {
-                    // Does the charsRemoved indicate characters removed going forward, or back? Needs testing.
-                    QTextCursor cursor = editor->textCursor();
-                    cursor.setPosition(pos);
-                    cursor.movePosition(QTextCursor::NextCharacter, QTextCursor::KeepAnchor, charsRemoved);
-                    cursor.removeSelectedText();
-                }
-            }
-            else if (charsAdded > 0){
-                QTextCursor cursor = editor->textCursor();
-                cursor.setPosition(pos);
-                cursor.insertText(data.toAscii());
-                qDebug() << data;
-            }
+            editor->collabTextChange(pos, charsRemoved, charsAdded, data);
         }
     }
     else {
@@ -383,7 +354,7 @@ void Document::onTextChange(int pos, int charsRemoved, int charsAdded)
 {
 
     QString data;
-    if (charsRemoved > 0) {
+    if (charsRemoved > 0 && charsAdded == 0) {
         data = "";
     }
     else if (charsAdded > 0) {
@@ -395,11 +366,9 @@ void Document::onTextChange(int pos, int charsRemoved, int charsAdded)
 
     if (isOwner) {
         QString toSend = QString("doc:%1,%2,%3:%4").arg(pos).arg(charsRemoved).arg(charsAdded).arg(data);
-
         for (int i = 0; i < clientList.size(); i++) {
             clientList.at(i)->write(toSend.toAscii());
         }
-
     }
     else {
         socket->write(QString("doc:%1,%2,%3:%4").arg(pos).arg(charsRemoved).arg(charsAdded).arg(data).toAscii());
@@ -430,12 +399,10 @@ void Document::onIncomingData()
     disconnect(editor->document(), SIGNAL(contentsChange(int,int,int)), this, SLOT(onTextChange(int,int,int)));
     QString data;
     if (isOwner) {
-        // We know we have incoming data, so iterate through our current participants to find the
-        // correct sender, and then read the data.
+        // We know we have incoming data, so iterate through our current participants to find the correct sender
         for (int i = 0; i < clientList.size(); i++) {
             if (sender() == clientList.at(i)) {
-                // sender() is the sender of the signal that calls this function
-                // so we use it to figure out which connection has new data for us
+                // sender() is the sender of the signal that calls this slot
                 data = clientList.at(i)->readAll();
                 ownerIncomingData(data);
             }
@@ -454,13 +421,9 @@ void Document::onNewConnection()
     qDebug() << "New connection.";
     if (isOwner) {
         clientList.append(server->nextPendingConnection());
-        socketToNameMap.insert(clientList.last(), QString("Person %1").arg(clientList.size())); // Empty entry for this connection, to be filled in.
         connect(clientList.last(), SIGNAL(readyRead()), this, SLOT(onIncomingData()));
-        ui->noPermissionsListWidget->insertItem(0, QString("Person %1").arg(clientList.size()));
-        clientList.last()->write(myName.toAscii());
     }
     else {
         connect(socket, SIGNAL(readyRead()), this, SLOT(onIncomingData()));
-//        socket->write(myName.toAscii());
     }
 }
