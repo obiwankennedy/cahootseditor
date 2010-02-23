@@ -138,9 +138,8 @@ void Document::shiftLeft()
             QString line = cursor.selectedText();
             cursor.movePosition(QTextCursor::StartOfLine, QTextCursor::MoveAnchor);
             if (line.startsWith("    ")) {
-                for (int i = 0; i < 4; i++) {
-                    cursor.deleteChar();
-                }
+                cursor.movePosition(QTextCursor::NextCharacter, QTextCursor::KeepAnchor, 4);
+                cursor.removeSelectedText();
                 end -= 4;
             }
             else if (line.startsWith("\t")) {
@@ -162,9 +161,8 @@ void Document::shiftLeft()
         QString line = cursor.selectedText();
         cursor.movePosition(QTextCursor::StartOfLine, QTextCursor::MoveAnchor);
         if (line.startsWith("    ")) {
-            for (int i = 0; i < 4; i++) {
-                cursor.deleteChar();
-            }
+            cursor.movePosition(QTextCursor::NextCharacter, QTextCursor::KeepAnchor, 4);
+            cursor.removeSelectedText();
         }
         else if (line.startsWith("\t")) {
             cursor.deleteChar();
