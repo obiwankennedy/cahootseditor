@@ -7,14 +7,14 @@ CppHighlighter::CppHighlighter(QTextDocument *parent)
 
 
 //    functionFormat.setFontItalic(true);
-    functionFormat.setFontWeight(QFont::Bold);
-    functionFormat.setForeground(Qt::darkMagenta);
+//    functionFormat.setFontWeight(QFont::Bold);
+    functionFormat.setForeground(Qt::darkYellow);
     rule.pattern = QRegExp("\\b[A-Za-z0-9_]+(?=[\\s]*\\()");
     rule.format = functionFormat;
     highlightingRules.append(rule);
 
 //    declarationFormat.setFontItalic(true);
-    declarationFormat.setForeground(Qt::darkBlue);
+    declarationFormat.setForeground(Qt::darkYellow);
     QStringList declarationPatterns;
 // This is a temporary bunch of rules until I sort them into declarations and keywords
     declarationPatterns  << "\\band\\b" << "\\band_eq\\b" << "\\basm\\b" << "\\bauto\\b" << "\\bbitand\\b"
@@ -40,7 +40,7 @@ CppHighlighter::CppHighlighter(QTextDocument *parent)
     }
 
     keywordFormat.setForeground(Qt::darkBlue);
-    keywordFormat.setFontWeight(QFont::Bold);
+//    keywordFormat.setFontWeight(QFont::Bold);
     QStringList keywordPatterns;
     keywordPatterns << "\\bwhile\\b" << "\\bfor\\b" << "\\bswitch\\b"
             << "\\bif\\b" << "\\bdo\\b" << "\\bnew\\b"
@@ -51,7 +51,7 @@ CppHighlighter::CppHighlighter(QTextDocument *parent)
         highlightingRules.append(rule);
     }
 
-    classFormat.setFontWeight(QFont::Bold);
+//    classFormat.setFontWeight(QFont::Bold);
     classFormat.setForeground(Qt::darkMagenta);
     rule.pattern = QRegExp("\\bQ[A-Za-z]+\\b");
     rule.format = classFormat;
