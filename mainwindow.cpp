@@ -273,32 +273,34 @@ bool MainWindow::on_actionFile_Save_As_triggered()
 }
 
 bool MainWindow::on_actionFile_Save_A_Copy_As_triggered()
-        // This needs some cleanup: because we can getPlainText of the document we're working on, making a new
-        // document is overkill. Just need to do a "Save As" type deal with the contents without modifying the curFile.
-#warning: Needs a new mechanic for saving a copy
 {
-    bool isCopySaved = false;
+    QString fileName = QFileDialog::getSaveFileName(
+            this,
+            "Save A Copy As...",
+            tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->curFile.isEmpty() ?
+                QDir::homePath() + "/untitled.txt" :
+                tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->curFile,
+            "Text (*.txt)");
+    if (fileName.isEmpty())
+        return false;
 
-    int index = ui->tabWidget->addTab(new QWidget(), "untitled.txt");
-    int originalIndex = ui->tabWidget->currentIndex();
-    Document *document = new Document(ui->tabWidget->widget(index));
-    QGridLayout *tabLayout = new QGridLayout;
-    tabLayout->addWidget(document);
-    tabLayout->setContentsMargins(0,0,0,0);
-    ui->tabWidget->widget(index)->setLayout(tabLayout);
+    QFile file(fileName);
+    if (!file.open(QFile::WriteOnly | QFile::Text)) {
+        QMessageBox::warning(this, tr("Application"),
+                             tr("Cannot write file %1:\n%2.")
+                             .arg(fileName)
+                             .arg(file.errorString()));
+        return false;
+    }
 
-    tabWidgetToDocumentMap.insert(ui->tabWidget->widget(index), document);
-    QString copyData = tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->getPlainText();
-    tabWidgetToDocumentMap.value(ui->tabWidget->widget(index))->setPlainText(copyData);
+    QTextStream out(&file);
+    out.setCodec(QTextCodec::codecForName("ISO 8859-1"));
+    QApplication::setOverrideCursor(Qt::WaitCursor);
+    out << tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->getPlainText();
+    QApplication::restoreOverrideCursor();
 
-    ui->tabWidget->setCurrentIndex(index);
-
-    isCopySaved = on_actionFile_Save_As_triggered();
-    on_actionFile_Close_triggered();
-    ui->tabWidget->setCurrentIndex(originalIndex);
-
-    return isCopySaved;
-
+    statusBar()->showMessage("File saved as a copy", 4000);
+    return true;
 }
 
 bool MainWindow::on_actionFile_Save_All_triggered()

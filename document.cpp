@@ -124,7 +124,6 @@ void Document::setChatHidden(bool b)
 
 void Document::shiftLeft()
 {
-#warning "this doesn't work nicely with collab editing because of the cursor position"
     QTextCursor cursor = editor->textCursor();
     if (cursor.hasSelection()) {
         int start = cursor.selectionStart();
@@ -172,7 +171,6 @@ void Document::shiftLeft()
 
 void Document::shiftRight()
 {
-#warning "this doesn't work nicely with collab editing because of the cursor position"
     QTextCursor cursor = editor->textCursor();
     int end = cursor.selectionEnd();
     int start = cursor.selectionStart();
