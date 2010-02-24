@@ -4,6 +4,8 @@
 #include <QtGui/QWidget>
 #include "highlighters/cpphighlighter.h"
 #include "codeeditor.h"
+#include "participantspane.h"
+#include "chatpane.h"
 
 #include <QtNetwork>
 #include <QTcpServer>
@@ -55,6 +57,9 @@ public:
 
     void previewAsHtml();
 
+    void splitEditor();
+    bool isEditorSplit();
+
     // This tells us if we're the host/owner of the document, and affects how we talk with participants
     bool isOwner;
     QString curFile;
@@ -72,6 +77,11 @@ private:
     CppHighlighter *cppHighlighter;
 
     CodeEditor *editor;
+    CodeEditor *bottomEditor;
+
+    ParticipantsPane *participantPane;
+
+    ChatPane *chatPane;
 
     void ownerIncomingData(QString data);
     void participantIncomingData(QString data);
@@ -81,7 +91,7 @@ private slots:
     // The elephant in the room. Handles collaborative editing.
     void onTextChange(int pos, int charsRemoved, int charsAdded);
 
-    void on_pushButton_clicked();
+    void onChatSend(QString str);
     void onIncomingData();
     void onNewConnection();
     void socketStateChanged(QAbstractSocket::SocketState state);

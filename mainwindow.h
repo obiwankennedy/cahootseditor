@@ -73,6 +73,7 @@ private slots:
 
     void on_actionWindow_Hide_Show_Participants_triggered();
     void on_actionWindow_Hide_Show_Chat_triggered();
+    void on_actionWindow_Split_triggered();
 
     void setUndoability(bool b);
     void setRedoability(bool b);

@@ -11,7 +11,6 @@ CONFIG += x86 \
 # Mac icon/plist
 ICON = images/icon.icns
 QMAKE_INFO_PLIST = app.plist
-
 SOURCES += main.cpp \
     mainwindow.cpp \
     document.cpp \
@@ -20,7 +19,9 @@ SOURCES += main.cpp \
     finddialog.cpp \
     preferencesdialog.cpp \
     utilities.cpp \
-    codeeditor.cpp
+    codeeditor.cpp \
+    participantspane.cpp \
+    chatpane.cpp
 HEADERS += mainwindow.h \
     document.h \
     highlighters/cpphighlighter.h \
@@ -28,12 +29,16 @@ HEADERS += mainwindow.h \
     finddialog.h \
     preferencesdialog.h \
     utilities.h \
-    codeeditor.h
+    codeeditor.h \
+    participantspane.h \
+    chatpane.h
 FORMS += mainwindow.ui \
     document.ui \
     connecttodocument.ui \
     finddialog.ui \
-    preferencesdialog.ui
+    preferencesdialog.ui \
+    participantspane.ui \
+    chatpane.ui
 RESOURCES += cahootsresc.qrc \
     highlighters.qrc
 OTHER_FILES += highlighters/xml.plist \

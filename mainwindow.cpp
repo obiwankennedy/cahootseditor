@@ -425,6 +425,12 @@ void MainWindow::on_actionWindow_Hide_Show_Chat_triggered()
     }
 }
 
+void MainWindow::on_actionWindow_Split_triggered()
+{
+    tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->splitEditor();
+    ui->actionWindow_Split->setDisabled(true);
+}
+
 void MainWindow::setUndoability(bool b)
 {
     ui->actionEdit_Undo->setEnabled(b);
@@ -439,6 +445,7 @@ void MainWindow::documentChanged(int index)
 {
     ui->actionEdit_Undo->setEnabled(tabWidgetToDocumentMap.value(ui->tabWidget->widget(index))->isUndoable());
     ui->actionEdit_Redo->setEnabled(tabWidgetToDocumentMap.value(ui->tabWidget->widget(index))->isRedoable());
+    ui->actionWindow_Split->setDisabled(tabWidgetToDocumentMap.value(ui->tabWidget->widget(index))->isEditorSplit());
 }
 
 void MainWindow::tabCloseClicked(int index)

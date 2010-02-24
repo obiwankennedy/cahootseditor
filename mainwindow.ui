@@ -125,6 +125,7 @@
     </property>
     <addaction name="actionWindow_Hide_Show_Participants"/>
     <addaction name="actionWindow_Hide_Show_Chat"/>
+    <addaction name="actionWindow_Split"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
@@ -391,6 +392,11 @@
   <action name="actionText_Auto_Format_Block">
    <property name="text">
     <string>Auto Format Block</string>
+   </property>
+  </action>
+  <action name="actionWindow_Split">
+   <property name="text">
+    <string>Split</string>
    </property>
   </action>
  </widget>

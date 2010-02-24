@@ -23,20 +23,30 @@ Document::Document(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    delete ui->frame;
+    ui->bottomEditorFrame->hide();
+
+    delete ui->editorFrame;
     editor = new CodeEditor(this);
     editor->setFont(QFont("Monaco", 11));
     QFontMetrics fm(editor->font());
     editor->setTabStopWidth(fm.averageCharWidth() * 4);
-    ui->codeChatSplitter->insertWidget(0, editor);
+    ui->editorSplitter->insertWidget(0, editor);
 
     cppHighlighter = new CppHighlighter(editor->document());
+
+    delete ui->participantFrame;
+    participantPane = new ParticipantsPane();
+    ui->participantSplitter->insertWidget(1, participantPane);
+
+    delete ui->chatFrame;
+    chatPane = new ChatPane();
+    ui->codeChatSplitter->insertWidget(1, chatPane);
 
     connect(editor, SIGNAL(undoAvailable(bool)), this, SIGNAL(undoAvailable(bool)));
     connect(editor, SIGNAL(redoAvailable(bool)), this, SIGNAL(redoAvailable(bool)));
 
     connect(editor->document(), SIGNAL(contentsChange(int,int,int)), this, SLOT(onTextChange(int,int,int)));
-    connect(ui->lineEdit, SIGNAL(returnPressed()), this, SLOT(on_pushButton_clicked()));
+    connect(chatPane, SIGNAL(returnPressed(QString)), this, SLOT(onChatSend(QString)));
 
     server = new QTcpServer(this);
     socket = new QTcpSocket(this);
@@ -45,7 +55,6 @@ Document::Document(QWidget *parent) :
     setChatHidden(true);
     setParticipantsHidden(true);
 
-    ui->connectInfoLabel->hide();
 
     myName = "Owner"; // temporary
 
@@ -59,7 +68,7 @@ Document::~Document()
 
 void Document::connectToDocument(QStringList *list)
 {
-#warning check this better.
+#warning "check this better."
     isOwner = false;
     if (list->size() == 3) { // More thorough checking is needed to ensure the contents are usable.
         myName = list->at(0);
@@ -70,8 +79,7 @@ void Document::connectToDocument(QStringList *list)
         connect(socket, SIGNAL(readyRead()), this, SLOT(onIncomingData()));
         setChatHidden(false);
         setParticipantsHidden(false);
-        ui->connectInfoLabel->show();
-        ui->connectInfoLabel->setText(QString("%1:%2").arg(address).arg(portString));
+        participantPane->setConnectInfo(QString("%1:%2").arg(address).arg(portString));
         delete list;
     }
 }
@@ -104,10 +112,10 @@ void Document::paste()
 void Document::setParticipantsHidden(bool b)
 {
     if (b) {
-        ui->mainSplitter->widget(1)->hide();
+        ui->participantSplitter->widget(1)->hide();
     }
     else {
-        ui->mainSplitter->widget(1)->show();
+        ui->participantSplitter->widget(1)->show();
     }
 }
 
@@ -124,80 +132,12 @@ void Document::setChatHidden(bool b)
 
 void Document::shiftLeft()
 {
-    QTextCursor cursor = editor->textCursor();
-    if (cursor.hasSelection()) {
-        int start = cursor.selectionStart();
-        int end = cursor.selectionEnd();
-        cursor.setPosition(start);
-        int i = cursor.position();
-        cursor.beginEditBlock();
-        while ( i < end) {
-            cursor.movePosition(QTextCursor::StartOfLine);
-            cursor.movePosition(QTextCursor::EndOfLine, QTextCursor::KeepAnchor);
-            QString line = cursor.selectedText();
-            cursor.movePosition(QTextCursor::StartOfLine, QTextCursor::MoveAnchor);
-            if (line.startsWith("    ")) {
-                cursor.movePosition(QTextCursor::NextCharacter, QTextCursor::KeepAnchor, 4);
-                cursor.removeSelectedText();
-                end -= 4;
-            }
-            else if (line.startsWith("\t")) {
-                cursor.deleteChar();
-            }
-            cursor.movePosition(QTextCursor::EndOfLine);
-            if (cursor.atEnd()) {
-                break;
-            } else {
-                cursor.movePosition(QTextCursor::StartOfLine);
-                cursor.movePosition(QTextCursor::Down);
-                i = cursor.position();
-            }
-        }
-        cursor.endEditBlock();
-    } else {
-        cursor.movePosition(QTextCursor::StartOfLine);
-        cursor.movePosition(QTextCursor::EndOfLine, QTextCursor::KeepAnchor);
-        QString line = cursor.selectedText();
-        cursor.movePosition(QTextCursor::StartOfLine, QTextCursor::MoveAnchor);
-        if (line.startsWith("    ")) {
-            cursor.movePosition(QTextCursor::NextCharacter, QTextCursor::KeepAnchor, 4);
-            cursor.removeSelectedText();
-        }
-        else if (line.startsWith("\t")) {
-            cursor.deleteChar();
-        }
-    }
+    Utilities::shiftLeft(editor);
 }
 
 void Document::shiftRight()
 {
-    QTextCursor cursor = editor->textCursor();
-    int end = cursor.selectionEnd();
-    int start = cursor.selectionStart();
-    if (cursor.hasSelection()) {
-        cursor.setPosition(start);
-        int i = cursor.position();
-        cursor.beginEditBlock();
-        while (i < end) {
-            cursor.insertText("    ");
-            end += 4;
-            cursor.movePosition(QTextCursor::EndOfLine);
-            if (cursor.atEnd()) {
-                break;
-            } else {
-                cursor.movePosition(QTextCursor::StartOfLine);
-                cursor.movePosition(QTextCursor::Down);
-                i = cursor.position();
-            }
-        }
-        cursor.endEditBlock();
-    } else {
-        cursor.movePosition(QTextCursor::StartOfLine);
-        cursor.insertText("    ");
-    }
-    cursor.setPosition(start);
-    cursor.setPosition(end, QTextCursor::KeepAnchor);
-    editor->setTextCursor(cursor);
+    Utilities::shiftRight(editor);
 }
 
 void Document::unCommentSelection()
@@ -212,13 +152,11 @@ void Document::announceDocument()
 
     connect(server, SIGNAL(newConnection()), this, SLOT(onNewConnection()));
     server->listen(QHostAddress::Any, 0); // Port is chosen automatically, listening on all NICs
-    ui->chatTextEdit->setText("Listening...");
-
-    ui->connectInfoLabel->show();
     QString port = QString::number(server->serverPort(), 10);
-    ui->connectInfoLabel->setText(port);
 
-    ui->readWriteListWidget->insertItem(0, myName);
+    chatPane->appendChatMessage("Listening on port " + port);
+
+    participantPane->setConnectInfo(port);
 }
 
 bool Document::isUndoable()
@@ -243,7 +181,7 @@ bool Document::isChatHidden()
 
 bool Document::isParticipantsHidden()
 {
-    return ui->mainSplitter->widget(1)->isHidden();
+    return ui->participantSplitter->widget(1)->isHidden();
 }
 
 void Document::findNext(QString str)
@@ -291,11 +229,34 @@ void Document::previewAsHtml()
     preview->show();
 }
 
+void Document::splitEditor()
+{
+    if (isEditorSplit()) {
+        return;
+    }
+    else {
+        delete ui->bottomEditorFrame;
+        bottomEditor = new CodeEditor(this);
+        bottomEditor->setFont(editor->font());
+        QFontMetrics fm(editor->font());
+        bottomEditor->setTabStopWidth(fm.averageCharWidth() * 4);
+        ui->editorSplitter->insertWidget(1, bottomEditor);
+        bottomEditor->document()->deleteLater();
+        bottomEditor->setDocument(editor->document());
+    }
+}
+
+bool Document::isEditorSplit()
+{
+    return false;
+#warning "to do"
+}
+
 void Document::ownerIncomingData(QString data)
 {
+    qDebug() << "odata: " << data;
     QString toSend;
     if (data.startsWith("doc:")) {
-        qDebug() << "odata: " << data;
         toSend = data;
         data.remove(0, 4);
         // detect line number, then put text at that line.
@@ -309,9 +270,8 @@ void Document::ownerIncomingData(QString data)
         }
     }
     else {
-        qDebug() << "person: " << data;
         toSend = QString("Someone: %2").arg(data);
-        ui->chatTextEdit->append(toSend);
+        chatPane->appendChatMessage(toSend);
     }
     // Distribute data to all the other participants
 
@@ -325,8 +285,8 @@ void Document::ownerIncomingData(QString data)
 
 void Document::participantIncomingData(QString data)
 {
+    qDebug() << "pdata: " << data;
     if (data.startsWith("doc:")) {
-        qDebug() << "pdata: " << data;
         data.remove(0, 4);
         // detect line number, then put text at that position.
         QRegExp rx = QRegExp("^(\\d+),(\\d+),(\\d+):(.*)");
@@ -339,8 +299,7 @@ void Document::participantIncomingData(QString data)
         }
     }
     else {
-        qDebug() << data;
-        ui->chatTextEdit->append(data);
+        chatPane->appendChatMessage(data);
     }
 
 }
@@ -373,22 +332,17 @@ void Document::onTextChange(int pos, int charsRemoved, int charsAdded)
     }
 }
 
-void Document::on_pushButton_clicked()
+void Document::onChatSend(QString str)
 {
-    QString string = ui->lineEdit->text();
-    if (string == "") {
-        return;
-    }
     if (isOwner) {
         for (int i = 0; i < clientList.size(); i++) {
-            clientList.at(i)->write(QString(myName + ": ").toAscii() + string.toAscii());
+            clientList.at(i)->write(QString(myName + ": ").toAscii() + str.toAscii());
         }
     }
     else {
-        socket->write(string.toAscii());
+        socket->write(str.toAscii());
     }
-    ui->chatTextEdit->append(myName + ": " + string);
-    ui->lineEdit->clear();
+    chatPane->appendChatMessage(myName + ": " + str);
 }
 
 void Document::onIncomingData()

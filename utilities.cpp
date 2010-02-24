@@ -129,3 +129,82 @@ void Utilities::unCommentSelection(CodeEditor *edit)
 
     cursor.endEditBlock();
 }
+
+void Utilities::shiftLeft(CodeEditor *editor)
+{
+    QTextCursor cursor = editor->textCursor();
+    if (cursor.hasSelection()) {
+        int start = cursor.selectionStart();
+        int end = cursor.selectionEnd();
+        cursor.setPosition(start);
+        int i = cursor.position();
+        cursor.beginEditBlock();
+        while ( i < end) {
+            cursor.movePosition(QTextCursor::StartOfLine);
+            cursor.movePosition(QTextCursor::EndOfLine, QTextCursor::KeepAnchor);
+            QString line = cursor.selectedText();
+            cursor.movePosition(QTextCursor::StartOfLine, QTextCursor::MoveAnchor);
+            if (line.startsWith("    ")) {
+                cursor.movePosition(QTextCursor::NextCharacter, QTextCursor::KeepAnchor, 4);
+                cursor.removeSelectedText();
+                end -= 4;
+            }
+            else if (line.startsWith("\t")) {
+                cursor.deleteChar();
+            }
+            cursor.movePosition(QTextCursor::EndOfLine);
+            if (cursor.atEnd()) {
+                break;
+            } else {
+                cursor.movePosition(QTextCursor::StartOfLine);
+                cursor.movePosition(QTextCursor::Down);
+                i = cursor.position();
+            }
+        }
+        cursor.endEditBlock();
+    } else {
+        cursor.movePosition(QTextCursor::StartOfLine);
+        cursor.movePosition(QTextCursor::EndOfLine, QTextCursor::KeepAnchor);
+        QString line = cursor.selectedText();
+        cursor.movePosition(QTextCursor::StartOfLine, QTextCursor::MoveAnchor);
+        if (line.startsWith("    ")) {
+            cursor.movePosition(QTextCursor::NextCharacter, QTextCursor::KeepAnchor, 4);
+            cursor.removeSelectedText();
+        }
+        else if (line.startsWith("\t")) {
+            cursor.deleteChar();
+        }
+    }
+
+}
+
+void Utilities::shiftRight(CodeEditor *editor)
+{
+    QTextCursor cursor = editor->textCursor();
+    int end = cursor.selectionEnd();
+    int start = cursor.selectionStart();
+    if (cursor.hasSelection()) {
+        cursor.setPosition(start);
+        int i = cursor.position();
+        cursor.beginEditBlock();
+        while (i < end) {
+            cursor.insertText("    ");
+            end += 4;
+            cursor.movePosition(QTextCursor::EndOfLine);
+            if (cursor.atEnd()) {
+                break;
+            } else {
+                cursor.movePosition(QTextCursor::StartOfLine);
+                cursor.movePosition(QTextCursor::Down);
+                i = cursor.position();
+            }
+        }
+        cursor.endEditBlock();
+    } else {
+        cursor.movePosition(QTextCursor::StartOfLine);
+        cursor.insertText("    ");
+    }
+    cursor.setPosition(start);
+    cursor.setPosition(end, QTextCursor::KeepAnchor);
+    editor->setTextCursor(cursor);
+}
