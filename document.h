@@ -7,6 +7,8 @@
 #include "participantspane.h"
 #include "chatpane.h"
 
+#include "client.h"
+
 #include <QtNetwork>
 #include <QTcpServer>
 #include <QTcpSocket>
@@ -60,7 +62,8 @@ public:
     void splitEditor();
     bool isEditorSplit();
 
-    // This tells us if we're the host/owner of the document, and affects how we talk with participants
+    // This tells us if we're the host/owner of the document,
+    // and affects how we talk with participants
     bool isOwner;
     QString curFile;
     
@@ -71,6 +74,7 @@ private:
 
     QTcpServer *server;
     QTcpSocket *socket;
+    Client *client;
 
     QList<QTcpSocket *> clientList;
 

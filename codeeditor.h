@@ -24,6 +24,10 @@ public:
 
     void collabTextChange(int pos, int charsRemoved, int charsAdded, QString data);
 
+    void unCommentSelection();
+    void shiftLeft();
+    void shiftRight();
+
 protected:
     void resizeEvent(QResizeEvent *event);
 

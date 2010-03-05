@@ -2,6 +2,7 @@
 #include "ui_participantspane.h"
 
 #include <QTime>
+#include <QHostAddress>
 
 ParticipantsPane::ParticipantsPane(QWidget *parent) :
     QWidget(parent),
@@ -14,6 +15,8 @@ ParticipantsPane::ParticipantsPane(QWidget *parent) :
     connect(ui->npTableWidget, SIGNAL(itemClicked(QTableWidgetItem*)), this, SLOT(focusChanged(QTableWidgetItem *)));
 
     ui->connectInfoLabel->hide();
+
+    participantList.append(new Participant());
 
     ui->rwTableWidget->setColumnCount(2);
     ui->rwTableWidget->setRowCount(1);

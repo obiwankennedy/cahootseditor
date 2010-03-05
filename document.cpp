@@ -1,8 +1,6 @@
 #include "document.h"
 #include "ui_document.h"
 
-#include "utilities.h"
-
 #include <QDialog>
 #include <QKeyEvent>
 #include <QTextCursor>
@@ -50,6 +48,7 @@ Document::Document(QWidget *parent) :
 
     server = new QTcpServer(this);
     socket = new QTcpSocket(this);
+//    client = new Client();
 
     // Hide the panels that only matter if we're using the collaborative portion of the app
     setChatHidden(true);
@@ -76,7 +75,9 @@ void Document::connectToDocument(QStringList *list)
         QString portString = list->at(2);
         int port = portString.toInt();
         socket->connectToHost(QHostAddress(address), port);
+//        client->socket->connectToHost(QHostAddress(address), port);
         connect(socket, SIGNAL(readyRead()), this, SLOT(onIncomingData()));
+//        connect(client->socket, SIGNAL(readyRead()), this, SLOT(onIncomingData()));
         setChatHidden(false);
         setParticipantsHidden(false);
         participantPane->setConnectInfo(QString("%1:%2").arg(address).arg(portString));
@@ -132,17 +133,17 @@ void Document::setChatHidden(bool b)
 
 void Document::shiftLeft()
 {
-    Utilities::shiftLeft(editor);
+    editor->shiftLeft();
 }
 
 void Document::shiftRight()
 {
-    Utilities::shiftRight(editor);
+    editor->shiftRight();
 }
 
 void Document::unCommentSelection()
 {
-    Utilities::unCommentSelection(editor);
+    editor->unCommentSelection();
 }
 
 void Document::announceDocument()
@@ -280,7 +281,6 @@ void Document::ownerIncomingData(QString data)
             clientList.at(i)->write(toSend.toAscii());
         }
     }
-
 }
 
 void Document::participantIncomingData(QString data)

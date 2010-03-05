@@ -40,6 +40,8 @@ public:
     QString nickName() const;
     bool hasConnection(const QHostAddress &senderIp, int senderPort = -1) const;
 
+    QTcpSocket *socket;
+
 protected:
     void timerEvent(QTimerEvent *timerEvent);
 
@@ -59,8 +61,6 @@ private slots:
     void sendGreetingMessage();
 
 private:
-    QTcpSocket *socket;
-
     void closeConnection();
 
     int readDataIntoBuffer(int maxSize = MaxBufferSize);

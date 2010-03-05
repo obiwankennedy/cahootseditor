@@ -39,7 +39,6 @@ void Client::sendMessage(const QString &message)
     if (socket->write(data) == data.size()) {
         // potential debug
     }
-
 }
 
 QString Client::nickName() const

@@ -3,10 +3,17 @@
 
 #include <QWidget>
 #include <QTableWidgetItem>
+#include <QHostAddress>
 
 namespace Ui {
     class ParticipantsPane;
 }
+
+struct Participant {
+    QString name;
+    QHostAddress address;
+    QColor color;
+};
 
 class ParticipantsPane : public QWidget {
     Q_OBJECT
@@ -17,6 +24,8 @@ public:
     void setConnectInfo(QString str);
 
     void insertParticipant(QString name);
+
+    QList<Participant*> participantList;
 
 private:
     Ui::ParticipantsPane *ui;

@@ -18,7 +18,6 @@ SOURCES += main.cpp \
     connecttodocument.cpp \
     finddialog.cpp \
     preferencesdialog.cpp \
-    utilities.cpp \
     codeeditor.cpp \
     participantspane.cpp \
     chatpane.cpp \
@@ -29,7 +28,6 @@ HEADERS += mainwindow.h \
     connecttodocument.h \
     finddialog.h \
     preferencesdialog.h \
-    utilities.h \
     codeeditor.h \
     participantspane.h \
     chatpane.h \
