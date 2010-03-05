@@ -2,6 +2,7 @@
 #define PARTICIPANTSPANE_H
 
 #include <QWidget>
+#include <QTableWidgetItem>
 
 namespace Ui {
     class ParticipantsPane;
@@ -15,8 +16,16 @@ public:
 
     void setConnectInfo(QString str);
 
+    void insertParticipant(QString name);
+
 private:
     Ui::ParticipantsPane *ui;
+
+private slots:
+    void focusChanged(QTableWidgetItem *item);
+    void on_promotePushButton_clicked();
+    void on_demotePushButton_clicked();
+
 };
 
 #endif // PARTICIPANTSPANE_H
