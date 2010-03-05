@@ -374,6 +374,7 @@ void Document::onNewConnection()
         clientList.append(server->nextPendingConnection());
         connect(clientList.last(), SIGNAL(readyRead()), this, SLOT(onIncomingData()));
         connect(socket, SIGNAL(stateChanged(QAbstractSocket::SocketState)), this, SLOT(socketStateChanged(QAbstractSocket::SocketState)));
+        participantPane->insertParticipant("Newbie");
     }
     else {
         connect(socket, SIGNAL(readyRead()), this, SLOT(onIncomingData()));

@@ -10,8 +10,8 @@ ParticipantsPane::ParticipantsPane(QWidget *parent) :
     ui->setupUi(this);
 
     connect(ui->rwTableWidget, SIGNAL(itemClicked(QTableWidgetItem*)), this, SLOT(focusChanged(QTableWidgetItem *)));
-    connect(ui->roTableWidget, SIGNAL(itemClicked(QTableWidgetItem*)), this, SLOT(focusChanged()));
-    connect(ui->npTableWidget, SIGNAL(itemClicked(QTableWidgetItem*)), this, SLOT(focusChanged()));
+    connect(ui->roTableWidget, SIGNAL(itemClicked(QTableWidgetItem*)), this, SLOT(focusChanged(QTableWidgetItem *)));
+    connect(ui->npTableWidget, SIGNAL(itemClicked(QTableWidgetItem*)), this, SLOT(focusChanged(QTableWidgetItem *)));
 
     ui->connectInfoLabel->hide();
 
@@ -42,7 +42,8 @@ void ParticipantsPane::insertParticipant(QString name)
     QTime midnight(0, 0, 0);
     qsrand(midnight.secsTo(QTime::currentTime()));
     ui->npTableWidget->setItem(ui->npTableWidget->rowCount() - 1, 1, new QTableWidgetItem(""));
-    ui->npTableWidget->item(ui->npTableWidget->rowCount() - 1, 1)->setBackgroundColor(QColor(qrand() % 255, qrand() % 255, qrand() % 255));
+
+    ui->npTableWidget->item(ui->npTableWidget->rowCount() - 1, 1)->setBackgroundColor(QColor(qrand() % 255, qrand() % 255, qrand() % 255).lighter(150));
 }
 
 void ParticipantsPane::focusChanged(QTableWidgetItem *item)

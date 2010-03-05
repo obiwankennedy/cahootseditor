@@ -21,7 +21,8 @@ SOURCES += main.cpp \
     utilities.cpp \
     codeeditor.cpp \
     participantspane.cpp \
-    chatpane.cpp
+    chatpane.cpp \
+    client.cpp
 HEADERS += mainwindow.h \
     document.h \
     highlighters/cpphighlighter.h \
@@ -31,7 +32,8 @@ HEADERS += mainwindow.h \
     utilities.h \
     codeeditor.h \
     participantspane.h \
-    chatpane.h
+    chatpane.h \
+    client.h
 FORMS += mainwindow.ui \
     document.ui \
     connecttodocument.ui \
