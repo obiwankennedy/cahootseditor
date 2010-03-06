@@ -46,6 +46,7 @@ Document::Document(QWidget *parent) :
     connect(editor->document(), SIGNAL(contentsChange(int,int,int)), this, SLOT(onTextChange(int,int,int)));
     connect(chatPane, SIGNAL(returnPressed(QString)), this, SLOT(onChatSend(QString)));
 
+
     server = new QTcpServer(this);
     socket = new QTcpSocket(this);
 //    client = new Client();
@@ -82,6 +83,7 @@ void Document::connectToDocument(QStringList *list)
         setParticipantsHidden(false);
         participantPane->setConnectInfo(QString("%1:%2").arg(address).arg(portString));
         delete list;
+        connect(socket, SIGNAL(disconnected()), this, SLOT(disconnected()));
     }
 }
 
@@ -185,15 +187,14 @@ bool Document::isParticipantsHidden()
     return ui->participantSplitter->widget(1)->isHidden();
 }
 
-void Document::findNext(QString str)
+void Document::findNext(QString str, bool ignoreCase, bool wrapAround)
 {
-    editor->document()->find(str, editor->textCursor(), QTextDocument::FindWholeWords);
-    editor->setFocus();
+    editor->document()->find(str, editor->textCursor());
 }
 
-void Document::findPrev(QString str)
+void Document::findPrev(QString str, bool ignoreCase, bool wrapAround)
 {
-    editor->document()->find(str, editor->textCursor(), QTextDocument::FindBackward | QTextDocument::FindWholeWords);
+    editor->document()->find(str, editor->textCursor());
     editor->setFocus();
 }
 
@@ -396,3 +397,16 @@ void Document::socketStateChanged(QAbstractSocket::SocketState state)
         }
     }
 }
+
+void Document::disconnected()
+{
+    qDebug() << "Disconnected";
+    participantPane->removeAllParticipants();
+
+}
+
+
+
+
+
+

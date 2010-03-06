@@ -25,17 +25,16 @@ void FindDialog::changeEvent(QEvent *e)
     }
 }
 
-
-void FindDialog::on_pushButton_findNext_clicked()
+void FindDialog::on_findNextPushButton_clicked()
 {
-    QString searchString = ui->textEdit_find->toPlainText();
-    emit findDialogFindNext(searchString);
+    QString searchString = ui->findTextEdit->toPlainText();
+    emit findDialogFindNext(searchString, ui->ignoreCaseCheckBox->isChecked(), ui->wrapAroundCheckBox->isChecked());
 }
 
 
-void FindDialog::on_pushButton_findPrev_clicked()
+void FindDialog::on_findPreviousPushButton_clicked()
 {
-    QString searchString = ui->textEdit_find->toPlainText();
-    emit findDialogFindPrev(searchString);
+    QString searchString = ui->findTextEdit->toPlainText();
+    emit findDialogFindPrev(searchString, ui->ignoreCaseCheckBox->isChecked(), ui->wrapAroundCheckBox->isChecked());
 }
 

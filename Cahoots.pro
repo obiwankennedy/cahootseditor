@@ -21,7 +21,8 @@ SOURCES += main.cpp \
     codeeditor.cpp \
     participantspane.cpp \
     chatpane.cpp \
-    client.cpp
+    client.cpp \
+    findtoolbar.cpp
 HEADERS += mainwindow.h \
     document.h \
     highlighters/cpphighlighter.h \
@@ -31,14 +32,16 @@ HEADERS += mainwindow.h \
     codeeditor.h \
     participantspane.h \
     chatpane.h \
-    client.h
+    client.h \
+    findtoolbar.h
 FORMS += mainwindow.ui \
     document.ui \
     connecttodocument.ui \
     finddialog.ui \
     preferencesdialog.ui \
     participantspane.ui \
-    chatpane.ui
+    chatpane.ui \
+    findtoolbar.ui
 RESOURCES += cahootsresc.qrc \
     highlighters.qrc
 OTHER_FILES += highlighters/xml.plist \

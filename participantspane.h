@@ -25,6 +25,9 @@ public:
 
     void insertParticipant(QString name);
 
+    // For when we disconnect
+    void removeAllParticipants();
+
     QList<Participant*> participantList;
 
 private:

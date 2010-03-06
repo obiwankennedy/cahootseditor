@@ -16,13 +16,14 @@ ParticipantsPane::ParticipantsPane(QWidget *parent) :
 
     ui->connectInfoLabel->hide();
 
-    participantList.append(new Participant());
+//    participantList.append(new Participant());
 
     ui->rwTableWidget->setColumnCount(2);
     ui->rwTableWidget->setRowCount(1);
     ui->rwTableWidget->setItem(0, 0, new QTableWidgetItem("Owner"));
     ui->rwTableWidget->setItem(0, 1, new QTableWidgetItem(""));
     ui->rwTableWidget->item(0, 1)->setBackgroundColor(Qt::red);
+    ui->rwTableWidget->resizeColumnToContents(0);
 }
 
 ParticipantsPane::~ParticipantsPane()
@@ -47,6 +48,14 @@ void ParticipantsPane::insertParticipant(QString name)
     ui->npTableWidget->setItem(ui->npTableWidget->rowCount() - 1, 1, new QTableWidgetItem(""));
 
     ui->npTableWidget->item(ui->npTableWidget->rowCount() - 1, 1)->setBackgroundColor(QColor(qrand() % 255, qrand() % 255, qrand() % 255).lighter(150));
+    ui->npTableWidget->resizeColumnToContents(0);
+}
+
+void ParticipantsPane::removeAllParticipants()
+{
+    ui->rwTableWidget->clear();
+    ui->roTableWidget->clear();
+    ui->npTableWidget->clear();
 }
 
 void ParticipantsPane::focusChanged(QTableWidgetItem *item)

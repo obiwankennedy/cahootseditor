@@ -20,12 +20,12 @@ private:
     Ui::FindDialog *ui;
 
 private slots:
-    void on_pushButton_findNext_clicked();
-    void on_pushButton_findPrev_clicked();
+    void on_findNextPushButton_clicked();
+    void on_findPreviousPushButton_clicked();
 
 signals:
-    void findDialogFindNext(QString str);
-    void findDialogFindPrev(QString str);
+    void findDialogFindNext(QString str, bool ignoreCase, bool wrapAround);
+    void findDialogFindPrev(QString str, bool ignoreCase, bool wrapAround);
 };
 
 #endif // FINDDIALOG_H

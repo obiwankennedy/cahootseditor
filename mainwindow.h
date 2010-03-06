@@ -81,8 +81,8 @@ private slots:
     void documentChanged(int index);
     void tabCloseClicked(int index);
 
-    void findNextTriggered(QString str);
-    void findPrevTriggered(QString str);
+    void findNextTriggered(QString str, bool ignoreCase, bool wrapAround);
+    void findPrevTriggered(QString str, bool ignoreCase, bool wrapAround);
 
     void connectToDocument(QStringList *list);
     //void viewChanged();

@@ -48,8 +48,8 @@ public:
     bool isParticipantsHidden();
 
     // Find functions
-    void findNext(QString str);
-    void findPrev(QString str);
+    void findNext(QString str, bool ignoreCase, bool wrapAround);
+    void findPrev(QString str, bool ignoreCase, bool wrapAround);
 
     QString getPlainText();
     void setPlainText(QString text);
@@ -90,7 +90,6 @@ private:
     void ownerIncomingData(QString data);
     void participantIncomingData(QString data);
 
-
 private slots:
     // The elephant in the room. Handles collaborative editing.
     void onTextChange(int pos, int charsRemoved, int charsAdded);
@@ -99,6 +98,8 @@ private slots:
     void onIncomingData();
     void onNewConnection();
     void socketStateChanged(QAbstractSocket::SocketState state);
+
+    void disconnected();
 
 signals:
     void redoAvailable(bool);

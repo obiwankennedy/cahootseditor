@@ -24,8 +24,8 @@ MainWindow::MainWindow(QWidget *parent)
     connect(connectDialog, SIGNAL(connectToDocumentClicked(QStringList*)), this, SLOT(connectToDocument(QStringList*)));
 
     findDialog = new FindDialog(this);
-    connect(findDialog, SIGNAL(findDialogFindNext(QString)), this, SLOT(findNextTriggered(QString)));
-    connect(findDialog, SIGNAL(findDialogFindPrev(QString)), this, SLOT(findPrevTriggered(QString)));
+    connect(findDialog, SIGNAL(findDialogFindNext(QString,bool,bool)), this, SLOT(findNextTriggered(QString,bool,bool)));
+    connect(findDialog, SIGNAL(findDialogFindPrev(QString,bool,bool)), this, SLOT(findPrevTriggered(QString,bool,bool)));
 
     Document *document = new Document(ui->tab);
     QGridLayout *tabLayout = new QGridLayout;
@@ -460,16 +460,15 @@ void MainWindow::tabCloseClicked(int index)
     }
 }
 
-void MainWindow::findNextTriggered(QString str)
+void MainWindow::findNextTriggered(QString str, bool ignoreCase, bool wrapAround)
 {
-    tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->findNext(str);
+    tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->findNext(str, ignoreCase, wrapAround);
 }
 
-void MainWindow::findPrevTriggered(QString str)
+void MainWindow::findPrevTriggered(QString str, bool ignoreCase, bool wrapAround)
 {
-    tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->findPrev(str);
+    tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->findPrev(str, ignoreCase, wrapAround);
 }
-
 
 void MainWindow::connectToDocument(QStringList *list)
 {
