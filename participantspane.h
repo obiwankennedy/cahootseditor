@@ -2,7 +2,7 @@
 #define PARTICIPANTSPANE_H
 
 #include <QWidget>
-#include <QTableWidgetItem>
+#include <QTreeWidgetItem>
 #include <QHostAddress>
 
 namespace Ui {
@@ -33,8 +33,16 @@ public:
 private:
     Ui::ParticipantsPane *ui;
 
+    enum Row {
+        ReadWrite = 0,
+        ReadOnly = 1,
+        Waiting = 2,
+
+        Owner = 1,
+    };
+
 private slots:
-    void focusChanged(QTableWidgetItem *item);
+    void focusChanged(QTreeWidgetItem *item, int column);
     void on_promotePushButton_clicked();
     void on_demotePushButton_clicked();
 

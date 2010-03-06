@@ -23,6 +23,8 @@ Document::Document(QWidget *parent) :
 
     ui->bottomEditorFrame->hide();
 
+    isAlreadySplit = false;
+
     delete ui->editorFrame;
     editor = new CodeEditor(this);
     editor->setFont(QFont("Monaco", 11));
@@ -189,11 +191,15 @@ bool Document::isParticipantsHidden()
 
 void Document::findNext(QString str, bool ignoreCase, bool wrapAround)
 {
+    (void)ignoreCase;
+    (void)wrapAround;
     editor->document()->find(str, editor->textCursor());
 }
 
 void Document::findPrev(QString str, bool ignoreCase, bool wrapAround)
 {
+    (void)ignoreCase;
+    (void)wrapAround;
     editor->document()->find(str, editor->textCursor());
     editor->setFocus();
 }
@@ -237,6 +243,7 @@ void Document::splitEditor()
         return;
     }
     else {
+        isAlreadySplit = true;
         delete ui->bottomEditorFrame;
         bottomEditor = new CodeEditor(this);
         bottomEditor->setFont(editor->font());
@@ -250,8 +257,7 @@ void Document::splitEditor()
 
 bool Document::isEditorSplit()
 {
-    return false;
-#warning "to do"
+    return isAlreadySplit;
 }
 
 void Document::ownerIncomingData(QString data)

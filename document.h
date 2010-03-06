@@ -82,6 +82,7 @@ private:
 
     CodeEditor *editor;
     CodeEditor *bottomEditor;
+    bool isAlreadySplit;
 
     ParticipantsPane *participantPane;
 
