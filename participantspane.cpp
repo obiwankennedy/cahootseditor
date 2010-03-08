@@ -29,6 +29,12 @@ ParticipantsPane::~ParticipantsPane()
     delete ui;
 }
 
+void ParticipantsPane::setOwnership(bool isOwner)
+{
+    ui->promotePushButton->setShown(isOwner);
+    ui->demotePushButton->setShown(isOwner);
+}
+
 void ParticipantsPane::setConnectInfo(QString str)
 {
     ui->connectInfoLabel->show();

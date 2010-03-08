@@ -59,6 +59,7 @@ Document::Document(QWidget *parent) :
 
     myName = "Owner"; // temporary
 
+    isAlreadyAnnounced = false;
     isOwner = true; // We are the document owner, unless we're connecting to someone elses document
 }
 
@@ -80,6 +81,8 @@ void Document::connectToDocument(QStringList *list)
 //        client->socket->connectToHost(QHostAddress(address), port);
         connect(socket, SIGNAL(readyRead()), this, SLOT(onIncomingData()));
 //        connect(client->socket, SIGNAL(readyRead()), this, SLOT(onIncomingData()));
+        participantPane->setOwnership(isOwner);
+        isAlreadyAnnounced = true;
         setChatHidden(false);
         setParticipantsHidden(false);
         participantPane->setConnectInfo(QString("%1:%2").arg(address).arg(portString));
@@ -151,6 +154,8 @@ void Document::unCommentSelection()
 
 void Document::announceDocument()
 {
+    isAlreadyAnnounced = true;
+    participantPane->setOwnership(isOwner);
     setChatHidden(false);
     setParticipantsHidden(false);
 
@@ -257,6 +262,11 @@ void Document::splitEditor()
 bool Document::isEditorSplit()
 {
     return isAlreadySplit;
+}
+
+bool Document::isAnnounced()
+{
+    return isAlreadyAnnounced;
 }
 
 void Document::ownerIncomingData(QString data)

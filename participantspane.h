@@ -25,6 +25,8 @@ public:
     ParticipantsPane(QWidget *parent = 0);
     ~ParticipantsPane();
 
+    void setOwnership(bool isOwner);
+
     void setConnectInfo(QString str);
 
     void insertParticipant(QString name, QTcpSocket *socket);

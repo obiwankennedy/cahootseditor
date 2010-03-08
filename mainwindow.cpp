@@ -213,6 +213,7 @@ void MainWindow::on_actionFile_New_triggered()
     connect(document, SIGNAL(redoAvailable(bool)), this, SLOT(setRedoability(bool)));
     
     ui->tabWidget->setCurrentIndex(index);
+    ui->actionTools_Announce_Document->setEnabled(true);
 }
 
 void MainWindow::on_actionFile_Open_triggered()
@@ -238,10 +239,11 @@ void MainWindow::on_actionFile_Open_triggered()
         connect(document, SIGNAL(undoAvailable(bool)), this, SLOT(setUndoability(bool)));
         connect(document, SIGNAL(redoAvailable(bool)), this, SLOT(setRedoability(bool)));
 
-
         ui->tabWidget->setCurrentIndex(index);
 
         openPath = QFileInfo(fileName).path();
+
+        ui->actionTools_Announce_Document->setEnabled(true);
     }
 }
 
@@ -375,6 +377,7 @@ void MainWindow::on_actionView_Line_Wrap_triggered()
 void MainWindow::on_actionTools_Announce_Document_triggered()
 {
     tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->announceDocument();
+    ui->actionTools_Announce_Document->setEnabled(false);
 }
 
 void MainWindow::on_actionTools_Connect_to_Document_triggered()
@@ -446,6 +449,7 @@ void MainWindow::documentChanged(int index)
     ui->actionEdit_Undo->setEnabled(tabWidgetToDocumentMap.value(ui->tabWidget->widget(index))->isUndoable());
     ui->actionEdit_Redo->setEnabled(tabWidgetToDocumentMap.value(ui->tabWidget->widget(index))->isRedoable());
     ui->actionWindow_Split->setDisabled(tabWidgetToDocumentMap.value(ui->tabWidget->widget(index))->isEditorSplit());
+    ui->actionTools_Announce_Document->setDisabled(tabWidgetToDocumentMap.value(ui->tabWidget->widget(index))->isAnnounced());
 }
 
 void MainWindow::tabCloseClicked(int index)

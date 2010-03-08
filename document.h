@@ -61,6 +61,7 @@ public:
 
     void splitEditor();
     bool isEditorSplit();
+    bool isAnnounced();
 
     // This tells us if we're the host/owner of the document,
     // and affects how we talk with participants
@@ -83,6 +84,7 @@ private:
     CodeEditor *editor;
     CodeEditor *bottomEditor;
     bool isAlreadySplit;
+    bool isAlreadyAnnounced;
 
     ParticipantsPane *participantPane;
 
