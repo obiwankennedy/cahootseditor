@@ -8,6 +8,12 @@ namespace Ui {
     class ConnectToDocument;
 }
 
+struct ConnectInfo {
+    QString name;
+    QString address;
+    QString port;
+};
+
 class ConnectToDocument : public QDialog {
     Q_OBJECT
 public:
@@ -16,17 +22,20 @@ public:
 
     void setName(QString name);
 
-    QStringList previousInfo; //Global list to store previous names; addresses; ports
-    void initializeCombobox(QStringList list);
+    QStringList previousInfo; // Public list to store previous names; addresses; ports
 
 private:
-
     Ui::ConnectToDocument *ui;
 
     QRegExpValidator* addressValidator;
     QRegExpValidator* portValidator;
 
+    ConnectInfo *info;
+
     void addInfo();
+
+    void readSettings();
+    void writeSettings();
 
 private slots:
     void dialogAccepted();

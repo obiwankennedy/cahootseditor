@@ -1,21 +1,18 @@
 #include "connecttodocument.h"
 #include "ui_connecttodocument.h"
 
-#include<QDebug>
-
-struct connectInfo{
-    QString name;
-    QString address;
-    QString port;
-};
-    connectInfo *info = new connectInfo;
+#include <QDebug>
+#include <QSettings>
 
 ConnectToDocument::ConnectToDocument(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::ConnectToDocument)
 {
-
     ui->setupUi(this);
+
+    readSettings();
+
+    info = new ConnectInfo;
 
     connect(ui->buttonBox, SIGNAL(accepted()), this, SLOT(dialogAccepted()));
 
@@ -30,6 +27,8 @@ ConnectToDocument::ConnectToDocument(QWidget *parent) :
 
 ConnectToDocument::~ConnectToDocument()
 {
+    writeSettings();
+
     delete ui;
 }
 
@@ -40,11 +39,12 @@ void ConnectToDocument::setName(QString name)
 
 void ConnectToDocument::addInfo()
 {
+    qDebug() << "Adding info to dialog...";
     if (ui->previousDocsComboBox->currentText() == "New...") {
         info->name = ui->usernameLineEdit->text();
         info->address = ui->addressLineEdit->text();
         info->port = ui->portLineEdit->text();
-        QString newItem = QString("%1; %2; %3").arg(info->name).arg(info->address).arg(info->port);
+        QString newItem = QString("%1@%2:%3").arg(info->name).arg(info->address).arg(info->port);
         ui->previousDocsComboBox->addItem(newItem);
     }
     for (int i = 1; i < ui->previousDocsComboBox->count(); i++) {
@@ -52,12 +52,41 @@ void ConnectToDocument::addInfo()
     }
 }
 
-void ConnectToDocument::initializeCombobox(QStringList list)
+void ConnectToDocument::readSettings()
 {
-    for (int i = 0; i < list.size(); i++) {
-        ui->previousDocsComboBox->addItem(list.value(i));
-    }
+    QSettings settings("Cahoots", "Connect Dialog");
+
 }
+
+void ConnectToDocument::writeSettings()
+{
+
+}
+
+// Example for the above
+//void MainWindow::readSettings()
+//{
+//    QSettings settings("Cahoots", "MainWindow");
+//    QDesktopWidget *desktop = QApplication::desktop();
+//    int width = static_cast<int>(desktop->width() * 0.80);
+//    int height = static_cast<int>(desktop->height() * 0.70);
+//    int screenWidth = desktop->width();
+//    int screenHeight = desktop->height();
+//    QPoint pos = settings.value("pos", QPoint((screenWidth - width) / 2, (screenHeight - height) / 2)).toPoint();
+//    QSize size = settings.value("size", QSize(width, height)).toSize();
+//    resize(size);
+//    move(pos);
+//
+//    myName = settings.value("name", "Owner").toString();
+//}
+//
+//void MainWindow::writeSettings()
+//{
+//    QSettings settings("Cahoots", "MainWindow");
+//    settings.setValue("pos", pos());
+//    settings.setValue("size", size());
+//    settings.setValue("name", myName);
+//}
 
 void ConnectToDocument::dialogAccepted()
 {
