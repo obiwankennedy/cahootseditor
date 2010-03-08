@@ -17,21 +17,19 @@ CppHighlighter::CppHighlighter(QTextDocument *parent)
     declarationFormat.setForeground(Qt::darkYellow);
     QStringList declarationPatterns;
 // This is a temporary bunch of rules until I sort them into declarations and keywords
-    declarationPatterns  << "\\band\\b" << "\\band_eq\\b" << "\\basm\\b" << "\\bauto\\b" << "\\bbitand\\b"
-            << "\\bbitor\\b" << "\\bbool\\b" << "\\bbreak\\b" << "\\bcase\\b" << "\\bcatch\\b" << "\\bchar\\b"
-            << "\\bclass\\b" << "\\bcompl\\b" << "\\bconst\\b" << "\\bconst_cast\\b" << "\\bcontinue\\b" << "\\bdefault\\b"
-            << "\\bdelete\\b" << "\\bdo\\b" << "\\bdouble\\b" << "\\bdynamic_cast\\b" << "\\belse\\b" << "\\benum\\b"
-            << "\\bexplicit\\b" << "\\bexport\\b" << "\\bextern\\b" << "\\bfalse\\b" << "\\bfloat\\b" << "\\bfor\\b"
-            << "\\bfriend\\b" << "\\bgoto\\b" << "\\bif\\b" << "\\binline\\b" << "\\bint\\b" << "\\blong\\b"
-            << "\\bmutable\\b" << "\\bnamespace\\b" << "\\bnew\\b" << "\\bnot\\b" << "\\bnot_eq\\b"
-            << "\\boperator\\b" << "\\bor\\b" << "\\bor_eq\\b" << "\\bprivate\\b" << "\\bprotected\\b"
-            << "\\bpublic\\b" << "\\bregister\\b" << "\\breinterpret_cast\\b" << "\\breturn\\b" << "\\bshort\\b"
-            << "\\bsigned\\b" << "\\bsizeof\\b" << "\\bstatic\\b" << "\\bstatic_cast\\b" << "\\bstruct\\b"
-            << "\\bswitch\\b" << "\\btemplate\\b" << "\\bthis\\b" << "\\bthrow\\b" << "\\btrue\\b"
-            << "\\btry\\b" << "\\btypedef\\b" << "\\btypeid\\b" << "\\btypename\\b" "\\bunion\\b"
-            << "\\bunsigned\\b" << "\\busing\\b" << "\\bvirtual\\b" << "\\bvoid\\b" << "\\bvolatile\\b"
-            << "\\bwchar_t\\b" << "\\bwhile\\b" << "\\bxor\\b" << "\\bxor_eq\\b";
-            // << "\\b#include\\b";
+    declarationPatterns << "\\bint\\b" << "\\blong\\b" << "\\bbool\\b" << "\\bchar\\b" << "\\bconst\\b"
+            << "\\bconst_cast\\b" << "\\bfloat\\b" << "\\breinterpret_cast\\b" << "\\bshort\\b" << "\\basm\\b"
+            << "\\bdynamic_cast\\b" << "\\bauto\\b" << "\\bbreak\\b" << "\\bcase\\b" << "\\bcatch\\b"
+            << "\\bclass\\b" << "\\bcontinue\\b" << "\\bdefault\\b" << "\\bdelete\\b" << "\\bdo\\b"
+            << "\\bdouble\\b" << "\\belse\\b" << "\\benum\\b" << "\\bexplicit\\b" << "\\bexport\\b"
+            << "\\bextern\\b" << "\\bfalse\\b"  << "\\bfor\\b" << "\\bfriend\\b" << "\\bgoto\\b"
+            << "\\bif\\b" << "\\binline\\b" << "\\bmutable\\b" << "\\bnamespace\\b" << "\\bnew\\b"
+            << "\\boperator\\b" << "\\bprivate\\b" << "\\bprotected\\b" << "\\bpublic\\b" << "\\bregister\\b"
+            << "\\breturn\\b" << "\\bsigned\\b" << "\\bsizeof\\b" << "\\bstatic\\b" << "\\bstatic_cast\\b"
+            << "\\bstruct\\b" << "\\bswitch\\b" << "\\btemplate\\b" << "\\bthis\\b" << "\\bthrow\\b"
+            << "\\btrue\\b" << "\\btry\\b" << "\\btypedef\\b" << "\\btypeid\\b" << "\\btypename\\b"
+            << "\\bunion\\b" << "\\bunsigned\\b" << "\\busing\\b" << "\\bvirtual\\b" << "\\bvoid\\b"
+            << "\\bvolatile\\b" << "\\bwhile\\b";
 
     foreach (const QString &pattern, declarationPatterns) {
         rule.pattern = QRegExp(pattern);
