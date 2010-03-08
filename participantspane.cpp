@@ -22,7 +22,6 @@ ParticipantsPane::ParticipantsPane(QWidget *parent) :
     roItem = ui->treeWidget->topLevelItem(1);
     waitItem = ui->treeWidget->topLevelItem(2);
     owner = rwItem->child(0);
-
 }
 
 ParticipantsPane::~ParticipantsPane()
@@ -36,7 +35,7 @@ void ParticipantsPane::setConnectInfo(QString str)
     ui->connectInfoLabel->setText(str);
 }
 
-void ParticipantsPane::insertParticipant(QString name)
+void ParticipantsPane::insertParticipant(QString name, QTcpSocket *socket)
 {
     Participant *participant = new Participant;
     participantList.append(participant);
@@ -50,6 +49,7 @@ void ParticipantsPane::insertParticipant(QString name)
     participant->item->setBackgroundColor(1, participant->color);
 
     participant->permissions = Waiting;
+    participant->socket = socket;
 }
 
 void ParticipantsPane::removeAllParticipants()
@@ -65,6 +65,27 @@ void ParticipantsPane::removeAllParticipants()
             waitItem->removeChild(participantList.at(i)->item);
         }
     }
+}
+
+void ParticipantsPane::removeParticipant(QTcpSocket *socket)
+{
+    for (int i = 0; i < participantList.size(); i++) {
+        if (socket == participantList.at(i)->socket) {
+            if (participantList.at(i)->permissions == ReadWrite) {
+                rwItem->removeChild(participantList.at(i)->item);
+            }
+            else if (participantList.at(i)->permissions == ReadOnly) {
+                roItem->removeChild(participantList.at(i)->item);
+            }
+            else if (participantList.at(i)->permissions == Waiting) {
+                waitItem->removeChild(participantList.at(i)->item);
+            }
+            delete participantList.at(i);
+            participantList.removeAt(i);
+            return;
+        }
+    }
+
 }
 
 void ParticipantsPane::onCurrentItemChanged(QTreeWidgetItem *item, QTreeWidgetItem *)
@@ -108,6 +129,7 @@ void ParticipantsPane::on_promotePushButton_clicked()
                 roItem->insertChild(0, participantList.at(i)->item);
                 participantList.at(i)->permissions = ReadOnly;
             }
+            return;
         }
     }
 }
@@ -133,6 +155,7 @@ void ParticipantsPane::on_demotePushButton_clicked()
                 // Instead, disable the demote button.
                 ui->demotePushButton->setEnabled(false);
             }
+            return;
         }
     }
 }

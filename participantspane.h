@@ -27,10 +27,11 @@ public:
 
     void setConnectInfo(QString str);
 
-    void insertParticipant(QString name);
+    void insertParticipant(QString name, QTcpSocket *socket);
 
     // For when we disconnect
     void removeAllParticipants();
+    void removeParticipant(QTcpSocket *socket);
 
     QList<Participant*> participantList;
 

@@ -380,7 +380,8 @@ void Document::onNewConnection()
         clientList.append(server->nextPendingConnection());
         connect(clientList.last(), SIGNAL(readyRead()), this, SLOT(onIncomingData()));
         connect(socket, SIGNAL(stateChanged(QAbstractSocket::SocketState)), this, SLOT(socketStateChanged(QAbstractSocket::SocketState)));
-        participantPane->insertParticipant("Newbie");
+        participantPane->insertParticipant("Newbie", clientList.last());
+        connect(clientList.last(), SIGNAL(disconnected()), this, SLOT(disconnected()));
     }
     else {
         connect(socket, SIGNAL(readyRead()), this, SLOT(onIncomingData()));
@@ -406,8 +407,21 @@ void Document::socketStateChanged(QAbstractSocket::SocketState state)
 void Document::disconnected()
 {
     qDebug() << "Disconnected";
-    participantPane->removeAllParticipants();
-
+    if (isOwner) {
+        QTcpSocket *socket = qobject_cast<QTcpSocket *>(sender());
+        participantPane->removeParticipant(socket);
+        for (int i = 0; i < clientList.size(); i++) {
+            if (socket == clientList.at(i)) {
+                clientList.removeAt(i);
+                return;
+            }
+        }
+    }
+    else {
+        participantPane->removeAllParticipants();
+        chatPane->hide();
+        participantPane->hide();
+    }
 }
 
 
