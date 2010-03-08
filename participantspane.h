@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <QTreeWidgetItem>
 #include <QHostAddress>
+#include <QTcpSocket>
 
 namespace Ui {
     class ParticipantsPane;
@@ -13,6 +14,9 @@ struct Participant {
     QString name;
     QHostAddress address;
     QColor color;
+    QTreeWidgetItem *item;
+    int permissions;
+    QTcpSocket *socket;
 };
 
 class ParticipantsPane : public QWidget {
@@ -34,15 +38,20 @@ private:
     Ui::ParticipantsPane *ui;
 
     enum Row {
-        ReadWrite = 0,
+        ReadWrite = 2,
         ReadOnly = 1,
-        Waiting = 2,
+        Waiting = 0,
 
         Owner = 1,
     };
 
+    QTreeWidgetItem *rwItem;
+    QTreeWidgetItem *roItem;
+    QTreeWidgetItem *waitItem;
+    QTreeWidgetItem *owner;
+
 private slots:
-    void focusChanged(QTreeWidgetItem *item, int column);
+    void onCurrentItemChanged(QTreeWidgetItem *item, QTreeWidgetItem *);
     void on_promotePushButton_clicked();
     void on_demotePushButton_clicked();
 

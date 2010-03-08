@@ -11,15 +11,17 @@ ParticipantsPane::ParticipantsPane(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    connect(ui->treeWidget, SIGNAL(itemChanged(QTreeWidgetItem*,int)), this, SLOT(focusChanged(QTreeWidgetItem*,int)));
+    connect(ui->treeWidget, SIGNAL(currentItemChanged(QTreeWidgetItem*,QTreeWidgetItem*)), this, SLOT(onCurrentItemChanged(QTreeWidgetItem*,QTreeWidgetItem*)));
 
     ui->connectInfoLabel->hide();
     ui->treeWidget->resizeColumnToContents(0);
     ui->treeWidget->resizeColumnToContents(1);
     ui->treeWidget->expandAll();
 
-//    participantList.append(new Participant());
-
+    rwItem = ui->treeWidget->topLevelItem(0);
+    roItem = ui->treeWidget->topLevelItem(1);
+    waitItem = ui->treeWidget->topLevelItem(2);
+    owner = rwItem->child(0);
 
 }
 
@@ -36,62 +38,108 @@ void ParticipantsPane::setConnectInfo(QString str)
 
 void ParticipantsPane::insertParticipant(QString name)
 {
-    QTime midnight(0, 0, 0);
-    qsrand(midnight.secsTo(QTime::currentTime()));
-//    QTreeWidgetItem *item = ui->treeWidget->addTopLevelItem(new QTreeWidgetItem(name,));
+    Participant *participant = new Participant;
+    participantList.append(participant);
 
-//    ui->npTableWidget->setItem(ui->npTableWidget->rowCount() - 1, 1, new QTableWidgetItem(""));
-//
-//    ui->npTableWidget->item(ui->npTableWidget->rowCount() - 1, 1)->setBackgroundColor(QColor(qrand() % 255, qrand() % 255, qrand() % 255).lighter(150));
+    participant->color = QColor::fromHsv(qrand() % 256, 190, 190);
+    participant->color = participant->color.lighter(150);
+    participant->name = name;
+    participant->item = new QTreeWidgetItem(waitItem);
 
+    participant->item->setText(0, name);
+    participant->item->setBackgroundColor(1, participant->color);
+
+    participant->permissions = Waiting;
 }
 
 void ParticipantsPane::removeAllParticipants()
 {
-
+    for (int i = 0; i < participantList.size(); i++) {
+        if (participantList.at(i)->permissions == ReadWrite) {
+            rwItem->removeChild(participantList.at(i)->item);
+        }
+        else if (participantList.at(i)->permissions == ReadOnly) {
+            roItem->removeChild(participantList.at(i)->item);
+        }
+        else if (participantList.at(i)->permissions == Waiting) {
+            waitItem->removeChild(participantList.at(i)->item);
+        }
+    }
 }
 
-void ParticipantsPane::focusChanged(QTreeWidgetItem *item, int column)
+void ParticipantsPane::onCurrentItemChanged(QTreeWidgetItem *item, QTreeWidgetItem *)
 {    
-    // Is this a subcategory?
-    if (column == 1) {
-        return; // we want to pop up a color picker if the color row is clicked, unimplemented
+    if (item->parent() == rwItem) {
+        if (owner == item) { // if it's the owner, can't demote
+            ui->demotePushButton->setDisabled(true);
+        } else {
+            ui->demotePushButton->setDisabled(false);
+        }
+        ui->promotePushButton->setDisabled(true);
     }
-    bool isChildItem = item->parent().isValid();
-    // Parent row (if it has a parent, -1 else)
-    int parentRow = m_ui->helpTreeWidget->currentIndex().parent().row();
-    // Row (if it has a parent, this is the child row)
-    int row = m_ui->helpTreeWidget->currentIndex().row();
-
-    if (isChildItem) {
-        if (parentRow == ReadWrite) {
-            if (row == Owner) {
-                ui->demotePushButton->setEnabled(false);
-                ui->promotePushButton->setEnabled(false);
-            }
-            else {
-                ui->demotePushButton->setEnabled(true);
-                ui->promotePushButton->setEnabled(false);
-            }
-        }
-        else if (parentRow == ReadOnly) {
-            ui->demotePushButton->setEnabled(true);
-            ui->promotePushButton->setEnabled(true);
-        }
-        else if (parentRow == Waiting) {
-            ui->demotePushButton->setEnabled(false);
-            ui->promotePushButton->setEnabled(true);
-        }
+    else if (item->parent() == roItem) {
+        ui->demotePushButton->setDisabled(false);
+        ui->promotePushButton->setDisabled(false);
+    }
+    else if (item->parent() == waitItem) {
+        ui->demotePushButton->setDisabled(true);
+        ui->promotePushButton->setDisabled(false);
     }
 }
 
 void ParticipantsPane::on_promotePushButton_clicked()
 {
-    ui->treeWidget->selectedItems();
+    QList<QTreeWidgetItem*> selectedItems = ui->treeWidget->selectedItems();
+    // find the currently selected item in the participants list
+    for (int i = 0; i < participantList.size(); i++) {
+        if (selectedItems.at(0) == participantList.at(i)->item) {
+            if (participantList.at(i)->permissions == ReadWrite) {
+                // This should not happen, but we won't crash.
+                // Instead, disable the promote button.
+                ui->promotePushButton->setEnabled(false);
+            }
+            else if (participantList.at(i)->permissions == ReadOnly) {
+                roItem->removeChild(participantList.at(i)->item);
+                rwItem->insertChild(0, participantList.at(i)->item);
+                participantList.at(i)->permissions = ReadWrite;
+            }
+            else if (participantList.at(i)->permissions == Waiting) {
+                waitItem->removeChild(participantList.at(i)->item);
+                roItem->insertChild(0, participantList.at(i)->item);
+                participantList.at(i)->permissions = ReadOnly;
+            }
+        }
+    }
 }
 
 void ParticipantsPane::on_demotePushButton_clicked()
 {
-
+    QList<QTreeWidgetItem*> selectedItems = ui->treeWidget->selectedItems();
+    // find the currently selected item in the participants list
+    for (int i = 0; i < participantList.size(); i++) {
+        if (selectedItems.at(0) == participantList.at(i)->item) {
+            if (participantList.at(i)->permissions == ReadWrite) {
+                rwItem->removeChild(participantList.at(i)->item);
+                roItem->insertChild(0, participantList.at(i)->item);
+                participantList.at(i)->permissions = ReadOnly;
+            }
+            else if (participantList.at(i)->permissions == ReadOnly) {
+                roItem->removeChild(participantList.at(i)->item);
+                waitItem->insertChild(0, participantList.at(i)->item);
+                participantList.at(i)->permissions = Waiting;
+            }
+            else if (participantList.at(i)->permissions == Waiting) {
+                // This should not happen, but we won't crash.
+                // Instead, disable the demote button.
+                ui->demotePushButton->setEnabled(false);
+            }
+        }
+    }
 }
+
+
+
+
+
+
 

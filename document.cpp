@@ -48,7 +48,6 @@ Document::Document(QWidget *parent) :
     connect(editor->document(), SIGNAL(contentsChange(int,int,int)), this, SLOT(onTextChange(int,int,int)));
     connect(chatPane, SIGNAL(returnPressed(QString)), this, SLOT(onChatSend(QString)));
 
-
     server = new QTcpServer(this);
     socket = new QTcpSocket(this);
 //    client = new Client();
