@@ -269,7 +269,7 @@ bool Document::isAnnounced()
     return isAlreadyAnnounced;
 }
 
-void Document::ownerIncomingData(QString data)
+void Document::ownerIncomingData(QString data, QTcpSocket *sender)
 {
     qDebug() << "odata: " << data;
     QString toSend;
@@ -293,7 +293,7 @@ void Document::ownerIncomingData(QString data)
     // Distribute data to all the other participants
 
     for (int i = 0; i < clientList.size(); i++) {
-        if (clientList.at(i) != sender()) {
+        if (clientList.at(i) != sender && participantPane->canRead(clientList.at(i))) {
             clientList.at(i)->write(toSend.toAscii());
         }
     }
@@ -340,7 +340,9 @@ void Document::onTextChange(int pos, int charsRemoved, int charsAdded)
     if (isOwner) {
         QString toSend = QString("doc:%1,%2,%3:%4").arg(pos).arg(charsRemoved).arg(charsAdded).arg(data);
         for (int i = 0; i < clientList.size(); i++) {
-            clientList.at(i)->write(toSend.toAscii());
+            if (participantPane->canRead(clientList.at(i))) {
+                clientList.at(i)->write(toSend.toAscii());
+            }
         }
     }
     else {
@@ -368,12 +370,10 @@ void Document::onIncomingData()
     QString data;
     if (isOwner) {
         // We know we have incoming data, so iterate through our current participants to find the correct sender
-        for (int i = 0; i < clientList.size(); i++) {
-            if (sender() == clientList.at(i)) {
-                // sender() is the sender of the signal that calls this slot
-                data = clientList.at(i)->readAll();
-                ownerIncomingData(data);
-            }
+        QTcpSocket *sock = qobject_cast<QTcpSocket *>(sender());
+        data = sock->readAll();
+        if (participantPane->canWrite(sock)) {
+            ownerIncomingData(data, sock);
         }
     }
     else { // We are a participant

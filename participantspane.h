@@ -35,7 +35,11 @@ public:
     void removeAllParticipants();
     void removeParticipant(QTcpSocket *socket);
 
+    bool canWrite(QTcpSocket *socket);
+    bool canRead(QTcpSocket *socket);
+
     QList<Participant*> participantList;
+    QMap<QTcpSocket *, Participant *> participantMap;
 
 private:
     Ui::ParticipantsPane *ui;

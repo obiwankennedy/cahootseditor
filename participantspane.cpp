@@ -45,6 +45,7 @@ void ParticipantsPane::insertParticipant(QString name, QTcpSocket *socket)
 {
     Participant *participant = new Participant;
     participantList.append(participant);
+    participantMap.insert(socket, participant);
 
     participant->color = QColor::fromHsv(qrand() % 256, 190, 190);
     participant->color = participant->color.lighter(150);
@@ -71,6 +72,11 @@ void ParticipantsPane::removeAllParticipants()
             waitItem->removeChild(participantList.at(i)->item);
         }
     }
+    for (int i = 0; i < participantList.size(); i++) {
+        delete participantList.at(i);
+    }
+    participantList.clear();
+    participantMap.clear();
 }
 
 void ParticipantsPane::removeParticipant(QTcpSocket *socket)
@@ -88,10 +94,20 @@ void ParticipantsPane::removeParticipant(QTcpSocket *socket)
             }
             delete participantList.at(i);
             participantList.removeAt(i);
+            participantMap.remove(socket);
             return;
         }
     }
+}
 
+bool ParticipantsPane::canWrite(QTcpSocket *socket)
+{
+    return participantMap.value(socket)->permissions == ReadWrite;
+}
+
+bool ParticipantsPane::canRead(QTcpSocket *socket)
+{
+    return participantMap.value(socket)->permissions == ReadOnly || participantMap.value(socket)->permissions == ReadWrite;
 }
 
 void ParticipantsPane::onCurrentItemChanged(QTreeWidgetItem *item, QTreeWidgetItem *)

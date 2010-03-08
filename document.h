@@ -90,7 +90,7 @@ private:
 
     ChatPane *chatPane;
 
-    void ownerIncomingData(QString data);
+    void ownerIncomingData(QString data, QTcpSocket *sender);
     void participantIncomingData(QString data);
 
 private slots:
