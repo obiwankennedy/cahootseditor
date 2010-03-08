@@ -62,6 +62,8 @@ private slots:
     void on_promotePushButton_clicked();
     void on_demotePushButton_clicked();
 
+signals:
+    void memberCanNowRead(QTcpSocket *);
 };
 
 #endif // PARTICIPANTSPANE_H

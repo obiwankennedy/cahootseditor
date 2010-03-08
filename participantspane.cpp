@@ -134,6 +134,10 @@ void ParticipantsPane::on_promotePushButton_clicked()
 {
     QList<QTreeWidgetItem*> selectedItems = ui->treeWidget->selectedItems();
     // find the currently selected item in the participants list
+
+    if (selectedItems.size == 0) {
+        return;
+    }
     for (int i = 0; i < participantList.size(); i++) {
         if (selectedItems.at(0) == participantList.at(i)->item) {
             if (participantList.at(i)->permissions == ReadWrite) {
@@ -145,6 +149,7 @@ void ParticipantsPane::on_promotePushButton_clicked()
                 roItem->removeChild(participantList.at(i)->item);
                 rwItem->insertChild(0, participantList.at(i)->item);
                 participantList.at(i)->permissions = ReadWrite;
+                emit memberCanNowRead(participantList.at(i)->socket);
             }
             else if (participantList.at(i)->permissions == Waiting) {
                 waitItem->removeChild(participantList.at(i)->item);
@@ -160,6 +165,10 @@ void ParticipantsPane::on_demotePushButton_clicked()
 {
     QList<QTreeWidgetItem*> selectedItems = ui->treeWidget->selectedItems();
     // find the currently selected item in the participants list
+
+    if (selectedItems.size == 0) {
+        return;
+    }
     for (int i = 0; i < participantList.size(); i++) {
         if (selectedItems.at(0) == participantList.at(i)->item) {
             if (participantList.at(i)->permissions == ReadWrite) {

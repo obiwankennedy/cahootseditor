@@ -100,6 +100,8 @@ private slots:
     void onNewConnection();
     void socketStateChanged(QAbstractSocket::SocketState state);
 
+    void populateDocumentForUser(QTcpSocket *socket);
+
     void disconnected();
 
 signals:

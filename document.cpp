@@ -48,6 +48,8 @@ Document::Document(QWidget *parent) :
     connect(editor->document(), SIGNAL(contentsChange(int,int,int)), this, SLOT(onTextChange(int,int,int)));
     connect(chatPane, SIGNAL(returnPressed(QString)), this, SLOT(onChatSend(QString)));
 
+    connect(participantPane, SIGNAL(memberCanNowRead(QTcpSocket*)), this, SLOT(populateDocumentForUser(QTcpSocket*)));
+
     server = new QTcpServer(this);
     socket = new QTcpSocket(this);
 //    client = new Client();
@@ -446,6 +448,12 @@ void Document::socketStateChanged(QAbstractSocket::SocketState state)
             }
         }
     }
+}
+
+void Document::populateDocumentForUser(QTcpSocket *socket)
+{
+    qDebug() << "Sending entire document";
+    socket->write(QString("doc:%1,%2,%3:%4").arg(0).arg(0).arg(editor->document()->characterCount()).arg(editor->toPlainText()).toAscii());
 }
 
 void Document::disconnected()
