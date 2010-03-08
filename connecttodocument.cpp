@@ -23,6 +23,8 @@ ConnectToDocument::ConnectToDocument(QWidget *parent) :
     QRegExp portRx("\\b[0-9]{0,9}\\b");
     portValidator = new QRegExpValidator(portRx, 0);
     ui->portLineEdit->setValidator(portValidator);
+
+    ui->previousDocsComboBox->setMaxVisibleItems(5);
 }
 
 ConnectToDocument::~ConnectToDocument()
@@ -55,12 +57,24 @@ void ConnectToDocument::addInfo()
 void ConnectToDocument::readSettings()
 {
     QSettings settings("Cahoots", "Connect Dialog");
-
+    int size = settings.beginReadArray("infos");
+    for (int i = 0; i < size; i++) {
+        settings.setArrayIndex(i);
+        StoreInfo storeInfo;
+        storeInfo.allInfo = settings.value("allInfo").toString();
+        ui->previousDocsComboBox->addItem(storeInfo.allInfo);
+    }
+    settings.endArray();
 }
 
 void ConnectToDocument::writeSettings()
 {
-
+    QSettings settings("Cahoots", "Connect Dialog");
+    for (int i = 0; i < previousInfo.size(); i++) {
+        settings.setArrayIndex(i);
+        settings.setValue("allInfo", previousInfo.value(i));
+    }
+    settings.endArray();
 }
 
 // Example for the above
@@ -90,11 +104,11 @@ void ConnectToDocument::writeSettings()
 
 void ConnectToDocument::dialogAccepted()
 {
+    addInfo();
     QStringList *list = new QStringList();
     list->append(info->name);
     list->append(info->address);
     list->append(info->port);
-    addInfo();
     emit connectToDocumentClicked(list);
 }
 
@@ -108,9 +122,10 @@ void ConnectToDocument::on_previousDocsComboBox_currentIndexChanged()
         QString namePart;
         QString addressPart;
         QString portPart;
-        namePart = allInfo.section(";", 0, 0);
-        addressPart = allInfo.section(";", 1, 1);
-        portPart = allInfo.section(";", -1);
+        namePart = allInfo.section("@", 0, 0);
+        QRegExp addressRx("@|:");
+        addressPart = allInfo.section(addressRx, 1, 1);
+        portPart = allInfo.section(":", -1);
         info->name = namePart;
         info->address = addressPart;
         info->port = portPart;
