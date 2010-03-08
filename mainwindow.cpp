@@ -40,6 +40,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     readSettings();
     openPath = QDir::homePath();
+
+//    connectDialog->initializeCombobox(previousInfo);
 }
 
 MainWindow::~MainWindow()
@@ -383,6 +385,10 @@ void MainWindow::on_actionTools_Announce_Document_triggered()
 void MainWindow::on_actionTools_Connect_to_Document_triggered()
 {
     // Create our dialog and show it. When they user clicks "okay", we'll emit a signal to the mainwindow, and pass that to the document.
+    for (int i = 0; i < connectDialog->previousInfo.size(); i++) {
+        previousInfo.value(i) = connectDialog->previousInfo.value(i);
+    }
+    connectDialog->initializeCombobox(previousInfo);
     connectDialog->show();
     connectDialog->setName(myName);
 }

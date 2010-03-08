@@ -43,6 +43,8 @@ private:
 
     QString getSystem();
 
+    QStringList previousInfo;
+
 private slots:
     void on_actionFile_New_triggered();
     void on_actionFile_Open_triggered();
