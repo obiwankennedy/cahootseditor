@@ -15,6 +15,8 @@ public:
 
     void appendChatMessage(QString str);
 
+    bool hasFocus() const;
+
     void undo();
     void redo();
 

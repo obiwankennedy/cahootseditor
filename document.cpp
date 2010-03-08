@@ -116,6 +116,9 @@ void Document::cut()
     if (editor->hasFocus()) {
         editor->cut();
     }
+    else if (participantPane->hasFocus()){
+        // do nothing
+    }
     else if (chatPane->hasFocus()) {
         chatPane->cut();
     }
@@ -126,6 +129,9 @@ void Document::copy()
     if (editor->hasFocus()) {
         editor->copy();
     }
+    else if (participantPane->hasFocus()){
+        // do nothing
+    }
     else if (chatPane->hasFocus()) {
         chatPane->copy();
     }
@@ -135,6 +141,9 @@ void Document::paste()
 {
     if (editor->hasFocus()) {
         editor->paste();
+    }
+    else if (participantPane->hasFocus()){
+        // do nothing
     }
     else if (chatPane->hasFocus()) {
         chatPane->paste();

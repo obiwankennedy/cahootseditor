@@ -1,6 +1,8 @@
 #include "chatpane.h"
 #include "ui_chatpane.h"
 
+#include <QDebug>
+
 ChatPane::ChatPane(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::ChatPane)
@@ -18,6 +20,10 @@ void ChatPane::appendChatMessage(QString str)
     ui->textBrowser->append(str);
 }
 
+bool ChatPane::hasFocus() const
+{
+    return ui->lineEdit->hasFocus() || ui->textBrowser->textCursor().hasSelection();
+}
 void ChatPane::undo()
 {
     if (ui->lineEdit->hasFocus()) {
@@ -52,9 +58,10 @@ void ChatPane::cut()
 void ChatPane::copy()
 {
     if (ui->lineEdit->hasFocus()) {
+        qDebug() << "lineEdit has focus";
         ui->lineEdit->copy();
     }
-    else if (ui->textBrowser->hasFocus()) {
+    else {
         ui->textBrowser->copy();
     }
 }
