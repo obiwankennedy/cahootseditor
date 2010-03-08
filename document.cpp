@@ -326,9 +326,10 @@ void Document::ownerIncomingData(QString data, QTcpSocket *sender)
     }
     // Distribute data to all the other participants
 
-    for (int i = 0; i < clientList.size(); i++) {
-        if (clientList.at(i) != sender && participantPane->canRead(clientList.at(i))) {
-            clientList.at(i)->write(toSend.toAscii());
+    for (int i = 0; i < participantPane->participantList.size(); i++) {
+        if (participantPane->participantList.at(i)->socket != sender &&
+            participantPane->canRead(participantPane->participantList.at(i)->socket)) {
+            participantPane->participantList.at(i)->socket->write(toSend.toAscii());
         }
     }
 }
@@ -373,9 +374,9 @@ void Document::onTextChange(int pos, int charsRemoved, int charsAdded)
 
     if (isOwner) {
         QString toSend = QString("doc:%1,%2,%3:%4").arg(pos).arg(charsRemoved).arg(charsAdded).arg(data);
-        for (int i = 0; i < clientList.size(); i++) {
-            if (participantPane->canRead(clientList.at(i))) {
-                clientList.at(i)->write(toSend.toAscii());
+        for (int i = 0; i < participantPane->participantList.size(); i++) {
+            if (participantPane->canRead(participantPane->participantList.at(i)->socket)) {
+                participantPane->participantList.at(i)->socket->write(toSend.toAscii());
             }
         }
     }
@@ -387,8 +388,8 @@ void Document::onTextChange(int pos, int charsRemoved, int charsAdded)
 void Document::onChatSend(QString str)
 {
     if (isOwner) {
-        for (int i = 0; i < clientList.size(); i++) {
-            clientList.at(i)->write(QString(myName + ": ").toAscii() + str.toAscii());
+        for (int i = 0; i < participantPane->participantList.size(); i++) {
+            participantPane->participantList.at(i)->socket->write(QString(myName + ": ").toAscii() + str.toAscii());
         }
     }
     else {
@@ -421,11 +422,10 @@ void Document::onIncomingData()
 void Document::onNewConnection()
 {
     if (isOwner) {
-        clientList.append(server->nextPendingConnection());
-        connect(clientList.last(), SIGNAL(readyRead()), this, SLOT(onIncomingData()));
+        participantPane->insertParticipant("Newbie", server->nextPendingConnection());
+        connect(participantPane->participantList.last()->socket, SIGNAL(readyRead()), this, SLOT(onIncomingData()));
         connect(socket, SIGNAL(stateChanged(QAbstractSocket::SocketState)), this, SLOT(socketStateChanged(QAbstractSocket::SocketState)));
-        participantPane->insertParticipant("Newbie", clientList.last());
-        connect(clientList.last(), SIGNAL(disconnected()), this, SLOT(disconnected()));
+        connect(participantPane->participantList.last()->socket, SIGNAL(disconnected()), this, SLOT(disconnected()));
     }
     else {
         connect(socket, SIGNAL(readyRead()), this, SLOT(onIncomingData()));
@@ -438,10 +438,10 @@ void Document::socketStateChanged(QAbstractSocket::SocketState state)
     qDebug() << state;
     if (state == QAbstractSocket::ConnectedState) {
         qDebug() << "Connection established.";
-        for (int i = 0; i < clientList.size(); i++) {
-            if (sender() == clientList.at(i)) {
+        for (int i = 0; i < participantPane->participantList.size(); i++) {
+            if (sender() == participantPane->participantList.at(i)->socket) {
                 // sender() is the sender of the signal that calls this slot
-                clientList.at(i)->write(QString("doc:%1,%2,%3:%4")
+                participantPane->participantList.at(i)->socket->write(QString("doc:%1,%2,%3:%4")
                                         .arg(0).arg(0).arg(editor->document()->characterCount()).arg(editor->toPlainText()).toAscii());
             }
         }
@@ -454,9 +454,9 @@ void Document::disconnected()
     if (isOwner) {
         QTcpSocket *socket = qobject_cast<QTcpSocket *>(sender());
         participantPane->removeParticipant(socket);
-        for (int i = 0; i < clientList.size(); i++) {
-            if (socket == clientList.at(i)) {
-                clientList.removeAt(i);
+        for (int i = 0; i < participantPane->participantList.size(); i++) {
+            if (socket == participantPane->participantList.at(i)->socket) {
+                participantPane->participantList.removeAt(i);
                 return;
             }
         }

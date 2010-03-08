@@ -77,8 +77,6 @@ private:
     QTcpSocket *socket;
     Client *client;
 
-    QList<QTcpSocket *> clientList;
-
     CppHighlighter *cppHighlighter;
 
     CodeEditor *editor;
