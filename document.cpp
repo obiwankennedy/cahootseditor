@@ -93,27 +93,52 @@ void Document::connectToDocument(QStringList *list)
 
 void Document::undo()
 {
-    editor->undo();
+    if (editor->hasFocus()) {
+        editor->undo();
+    }
+    else if (chatPane->hasFocus()) {
+        chatPane->undo();
+    }
 }
 
 void Document::redo()
 {
-    editor->redo();
+    if (editor->hasFocus()) {
+        editor->redo();
+    }
+    else if (chatPane->hasFocus()) {
+        chatPane->redo();
+    }
 }
 
 void Document::cut()
 {
-    editor->cut();
+    if (editor->hasFocus()) {
+        editor->cut();
+    }
+    else if (chatPane->hasFocus()) {
+        chatPane->cut();
+    }
 }
 
 void Document::copy()
 {
-    editor->copy();
+    if (editor->hasFocus()) {
+        editor->copy();
+    }
+    else if (chatPane->hasFocus()) {
+        chatPane->copy();
+    }
 }
 
 void Document::paste()
 {
-    editor->paste();
+    if (editor->hasFocus()) {
+        editor->paste();
+    }
+    else if (chatPane->hasFocus()) {
+        chatPane->paste();
+    }
 }
 
 void Document::setParticipantsHidden(bool b)

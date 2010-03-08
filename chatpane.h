@@ -15,6 +15,13 @@ public:
 
     void appendChatMessage(QString str);
 
+    void undo();
+    void redo();
+
+    void cut();
+    void copy();
+    void paste();
+
 private:
     Ui::ChatPane *ui;
 
