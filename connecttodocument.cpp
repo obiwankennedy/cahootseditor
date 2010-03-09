@@ -10,6 +10,10 @@ ConnectToDocument::ConnectToDocument(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    ui->previousDocsComboBox->setEditable(true);
+    ui->previousDocsComboBox->setMaxVisibleItems(5);
+    ui->previousDocsComboBox->setFixedWidth(150);
+
     readSettings();
 
     info = new ConnectInfo;
@@ -23,8 +27,6 @@ ConnectToDocument::ConnectToDocument(QWidget *parent) :
     QRegExp portRx("\\b[0-9]{0,9}\\b");
     portValidator = new QRegExpValidator(portRx, 0);
     ui->portLineEdit->setValidator(portValidator);
-
-    ui->previousDocsComboBox->setMaxVisibleItems(5);
 }
 
 ConnectToDocument::~ConnectToDocument()
@@ -41,66 +43,40 @@ void ConnectToDocument::setName(QString name)
 
 void ConnectToDocument::addInfo()
 {
-    qDebug() << "Adding info to dialog...";
     if (ui->previousDocsComboBox->currentText() == "New...") {
         info->name = ui->usernameLineEdit->text();
         info->address = ui->addressLineEdit->text();
         info->port = ui->portLineEdit->text();
         QString newItem = QString("%1@%2:%3").arg(info->name).arg(info->address).arg(info->port);
-        ui->previousDocsComboBox->addItem(newItem);
-    }
-    for (int i = 1; i < ui->previousDocsComboBox->count(); i++) {
-        previousInfo.value(i) = ui->previousDocsComboBox->itemText(i);
+        if (!previousInfo.contains(newItem)) {
+            ui->previousDocsComboBox->addItem(newItem);
+            previousInfo.append(newItem);
+        }
     }
 }
 
 void ConnectToDocument::readSettings()
 {
-//    QSettings settings("Cahoots", "Connect Dialog");
-//    int size = settings.beginReadArray("infos");
-//    for (int i = 0; i < size; i++) {
-//        settings.setArrayIndex(i);
-//        StoreInfo storeInfo;
-//        storeInfo.allInfo = settings.value("allInfo").toString();
-//        ui->previousDocsComboBox->addItem(storeInfo.allInfo);
-//    }
-//    settings.endArray();
+    QSettings settings("Cahoots", "Connect Dialog");
+    int arraySize = settings.beginReadArray("infoArray");
+    for (int i = 0; i < arraySize; ++i) {
+        settings.setArrayIndex(i);
+        previousInfo.append(settings.value("allInfo").toString());
+        ui->previousDocsComboBox->addItem(previousInfo.value(i));
+    }
+    settings.endArray();
 }
 
 void ConnectToDocument::writeSettings()
 {
-//    QSettings settings("Cahoots", "Connect Dialog");
-//    for (int i = 0; i < previousInfo.size(); i++) {
-//        settings.setArrayIndex(i);
-//        settings.setValue("allInfo", previousInfo.value(i));
-//    }
-//    settings.endArray();
+    QSettings settings("Cahoots", "Connect Dialog");
+    settings.beginWriteArray("infoArray");
+    for (int i = 0; i < previousInfo.size(); ++i) {
+        settings.setArrayIndex(i);
+        settings.setValue("allInfo", previousInfo.value(i));
+    }
+    settings.endArray();
 }
-
-// Example for the above
-//void MainWindow::readSettings()
-//{
-//    QSettings settings("Cahoots", "MainWindow");
-//    QDesktopWidget *desktop = QApplication::desktop();
-//    int width = static_cast<int>(desktop->width() * 0.80);
-//    int height = static_cast<int>(desktop->height() * 0.70);
-//    int screenWidth = desktop->width();
-//    int screenHeight = desktop->height();
-//    QPoint pos = settings.value("pos", QPoint((screenWidth - width) / 2, (screenHeight - height) / 2)).toPoint();
-//    QSize size = settings.value("size", QSize(width, height)).toSize();
-//    resize(size);
-//    move(pos);
-//
-//    myName = settings.value("name", "Owner").toString();
-//}
-//
-//void MainWindow::writeSettings()
-//{
-//    QSettings settings("Cahoots", "MainWindow");
-//    settings.setValue("pos", pos());
-//    settings.setValue("size", size());
-//    settings.setValue("name", myName);
-//}
 
 void ConnectToDocument::dialogAccepted()
 {
@@ -134,4 +110,3 @@ void ConnectToDocument::on_previousDocsComboBox_currentIndexChanged()
         ui->portLineEdit->setText(info->port);
     }
 }
-
