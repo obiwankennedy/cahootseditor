@@ -5,6 +5,7 @@
 #include "document.h"
 #include "connecttodocument.h"
 #include "finddialog.h"
+#include "findtoolbar.h"
 
 namespace Ui
 {
@@ -28,6 +29,7 @@ private:
     QString openPath;
     ConnectToDocument *connectDialog;
     FindDialog *findDialog;
+    FindToolBar *findToolbar;
 
     bool save(int index);
     bool maybeSave(int index);
@@ -81,6 +83,7 @@ private slots:
     void documentChanged(int index);
     void tabCloseClicked(int index);
 
+    void findAllTriggered(QString str);
     void findNextTriggered(QString str, bool ignoreCase, bool wrapAround);
     void findPrevTriggered(QString str, bool ignoreCase, bool wrapAround);
 

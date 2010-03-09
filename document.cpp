@@ -64,8 +64,6 @@ Document::Document(QWidget *parent) :
 
     isAlreadyAnnounced = false;
     isOwner = true; // We are the document owner, unless we're connecting to someone elses document
-
-    isFirstTime = true; // find utility to help wrap around the document
 }
 
 Document::~Document()
@@ -233,44 +231,28 @@ void Document::findAll(QString searchString, bool ignoreCase)
 
     bool found = false;
 
-    if (isFirstTime == false) {
-        document->undo();
-    }
+    QTextCursor cursor(editor->document());
+    cursor.select(QTextCursor::Document);
+    QTextCharFormat format;
+    format.setBackground(Qt::white);
+    cursor.mergeCharFormat(format);
 
-    if (searchString == "") {
-        QMessageBox::information(this, tr("Empty Search Field"),
-                "The search field is empty. Please enter a word and click Find.");
-    }
-    else {
+    QTextCursor highlightCursor(document);
 
-        QTextCursor highlightCursor(document);
-        QTextCursor cursor(document);
+    QTextCharFormat plainFormat(highlightCursor.charFormat());
+    QTextCharFormat colorFormat = plainFormat;
+    colorFormat.setBackground(Qt::yellow);
 
-        cursor.beginEditBlock();
+    while (!highlightCursor.isNull() && !highlightCursor.atEnd()) {
+        highlightCursor = document->find(searchString, highlightCursor); //, QTextDocument::FindWholeWords);
 
-        QTextCharFormat plainFormat(highlightCursor.charFormat());
-        QTextCharFormat colorFormat = plainFormat;
-        colorFormat.setBackground(Qt::yellow);
-
-        while (!highlightCursor.isNull() && !highlightCursor.atEnd()) {
-            highlightCursor = document->find(searchString, highlightCursor, QTextDocument::FindWholeWords);
-
-            if (!highlightCursor.isNull()) {
-                found = true;
-                highlightCursor.movePosition(QTextCursor::WordRight, QTextCursor::KeepAnchor);
-                highlightCursor.mergeCharFormat(colorFormat);
-            }
-        }
-
-        cursor.endEditBlock();
-        isFirstTime = false;
-
-        if (found == false) {
-            QMessageBox::information(this, tr("Word Not Found"),
-                "Sorry, the word cannot be found.");
+        if (!highlightCursor.isNull()) {
+            found = true;
+            highlightCursor.movePosition(QTextCursor::WordRight,
+                                         QTextCursor::KeepAnchor);
+            highlightCursor.mergeCharFormat(colorFormat);
         }
     }
-
 }
 
 void Document::findNext(QString searchString, bool ignoreCase, bool wrapAround)

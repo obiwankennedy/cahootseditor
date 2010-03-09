@@ -7,10 +7,15 @@ FindToolBar::FindToolBar(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    connect(ui->lineEdit, SIGNAL(textEdited(QString)), this, SIGNAL(findNext(QString)));
+    connect(ui->lineEdit, SIGNAL(returnPressed()), this, SLOT(returnPressed()));
 }
 
 FindToolBar::~FindToolBar()
 {
     delete ui;
+}
+
+void FindToolBar::returnPressed()
+{
+    emit findAll(ui->lineEdit->text());
 }

@@ -33,6 +33,10 @@ MainWindow::MainWindow(QWidget *parent)
     tabLayout->setContentsMargins(0,0,0,0);
     ui->tabWidget->widget(0)->setLayout(tabLayout);
 
+    findToolbar = new FindToolBar(this);
+    ui->mainToolBar->addWidget(findToolbar);
+    connect(findToolbar, SIGNAL(findAll(QString)), this, SLOT(findAllTriggered(QString)));
+
     tabWidgetToDocumentMap.insert(ui->tabWidget->currentWidget(), document);
 
     connect(document, SIGNAL(undoAvailable(bool)), this, SLOT(setUndoability(bool)));
@@ -40,8 +44,6 @@ MainWindow::MainWindow(QWidget *parent)
 
     readSettings();
     openPath = QDir::homePath();
-
-//    connectDialog->initializeCombobox(previousInfo);
 }
 
 MainWindow::~MainWindow()
@@ -464,6 +466,11 @@ void MainWindow::tabCloseClicked(int index)
         tabWidgetToDocumentMap.remove(ui->tabWidget->widget(index));
         ui->tabWidget->removeTab(index);
     }
+}
+
+void MainWindow::findAllTriggered(QString str)
+{
+    tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->findAll(str, true);
 }
 
 void MainWindow::findNextTriggered(QString str, bool ignoreCase, bool wrapAround)

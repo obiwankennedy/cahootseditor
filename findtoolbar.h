@@ -16,8 +16,11 @@ public:
 private:
     Ui::FindToolBar *ui;
 
+private slots:
+    void returnPressed();
+
 signals:
-    void findNext(QString);
+    void findAll(QString);
 };
 
 #endif // FINDTOOLBAR_H
