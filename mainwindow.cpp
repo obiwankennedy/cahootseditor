@@ -468,13 +468,11 @@ void MainWindow::tabCloseClicked(int index)
 
 void MainWindow::findNextTriggered(QString str, bool ignoreCase, bool wrapAround)
 {
-    findDialog->hide(); // temporary
     tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->findNext(str, ignoreCase, wrapAround);
 }
 
 void MainWindow::findPrevTriggered(QString str, bool ignoreCase, bool wrapAround)
 {
-    findDialog->hide(); // temporary
     tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->findPrev(str, ignoreCase, wrapAround);
 }
 

@@ -12,6 +12,7 @@
 #include <QFontMetrics>
 #include <QWebView>
 #include <QLayout>
+#include <QMessageBox>
 
 #include <QTextDocumentFragment>
 
@@ -63,6 +64,8 @@ Document::Document(QWidget *parent) :
 
     isAlreadyAnnounced = false;
     isOwner = true; // We are the document owner, unless we're connecting to someone elses document
+
+    isFirstTime = true; // find utility to help wrap around the document
 }
 
 Document::~Document()
@@ -72,25 +75,20 @@ Document::~Document()
 
 void Document::connectToDocument(QStringList *list)
 {
-#warning "check this better."
     isOwner = false;
-    if (list->size() == 3) { // More thorough checking is needed to ensure the contents are usable.
-        myName = list->at(0);
-        QString address = list->at(1);
-        QString portString = list->at(2);
-        int port = portString.toInt();
-        socket->connectToHost(QHostAddress(address), port);
-//        client->socket->connectToHost(QHostAddress(address), port);
-        connect(socket, SIGNAL(readyRead()), this, SLOT(onIncomingData()));
-//        connect(client->socket, SIGNAL(readyRead()), this, SLOT(onIncomingData()));
-        participantPane->setOwnership(isOwner);
-        isAlreadyAnnounced = true;
-        setChatHidden(false);
-        setParticipantsHidden(false);
-        participantPane->setConnectInfo(QString("%1:%2").arg(address).arg(portString));
-        delete list;
-        connect(socket, SIGNAL(disconnected()), this, SLOT(disconnected()));
-    }
+    myName = list->at(0);
+    QString address = list->at(1);
+    QString portString = list->at(2);
+    int port = portString.toInt();
+    socket->connectToHost(QHostAddress(address), port);
+    connect(socket, SIGNAL(readyRead()), this, SLOT(onIncomingData()));
+    participantPane->setOwnership(isOwner);
+    isAlreadyAnnounced = true;
+    setChatHidden(false);
+    setParticipantsHidden(false);
+    participantPane->setConnectInfo(QString("%1:%2").arg(address).arg(portString));
+    delete list;
+    connect(socket, SIGNAL(disconnected()), this, SLOT(disconnected()));
 }
 
 void Document::undo()
@@ -229,19 +227,142 @@ bool Document::isParticipantsHidden()
     return ui->participantSplitter->widget(1)->isHidden();
 }
 
-void Document::findNext(QString str, bool ignoreCase, bool wrapAround)
+void Document::findAll(QString searchString, bool ignoreCase)
 {
-    (void)ignoreCase;
-    (void)wrapAround;
-    editor->document()->find(str, editor->textCursor());
+    QTextDocument *document = editor->document();
+
+    bool found = false;
+
+    if (isFirstTime == false) {
+        document->undo();
+    }
+
+    if (searchString == "") {
+        QMessageBox::information(this, tr("Empty Search Field"),
+                "The search field is empty. Please enter a word and click Find.");
+    }
+    else {
+
+        QTextCursor highlightCursor(document);
+        QTextCursor cursor(document);
+
+        cursor.beginEditBlock();
+
+        QTextCharFormat plainFormat(highlightCursor.charFormat());
+        QTextCharFormat colorFormat = plainFormat;
+        colorFormat.setBackground(Qt::yellow);
+
+        while (!highlightCursor.isNull() && !highlightCursor.atEnd()) {
+            highlightCursor = document->find(searchString, highlightCursor, QTextDocument::FindWholeWords);
+
+            if (!highlightCursor.isNull()) {
+                found = true;
+                highlightCursor.movePosition(QTextCursor::WordRight, QTextCursor::KeepAnchor);
+                highlightCursor.mergeCharFormat(colorFormat);
+            }
+        }
+
+        cursor.endEditBlock();
+        isFirstTime = false;
+
+        if (found == false) {
+            QMessageBox::information(this, tr("Word Not Found"),
+                "Sorry, the word cannot be found.");
+        }
+    }
+
 }
 
-void Document::findPrev(QString str, bool ignoreCase, bool wrapAround)
+void Document::findNext(QString searchString, bool ignoreCase, bool wrapAround)
 {
     (void)ignoreCase;
     (void)wrapAround;
-    editor->document()->find(str, editor->textCursor());
-    editor->setFocus();
+
+    // findAll(searchString, ignoreCase);
+
+    QTextDocument *document = editor->document();
+
+    bool found = false;
+
+    if (searchString == "") {
+        // this shouldn't happen, ensure this in the find dialog
+    }
+    else {
+        QTextCursor selectionCursor(document);
+        selectionCursor.setPosition(editor->textCursor().position());
+
+        bool firstLoop = true;
+
+        selectionCursor = document->find(searchString, selectionCursor); //, QTextDocument::FindWholeWords);
+
+        if (!selectionCursor.isNull()) {
+            found = true;
+            selectionCursor.movePosition(QTextCursor::EndOfWord, //WordRight,
+                                         QTextCursor::KeepAnchor);
+            editor->setTextCursor(selectionCursor);
+        }
+        else if (firstLoop) {
+            firstLoop = false;
+            selectionCursor.setPosition(0);
+            selectionCursor = document->find(searchString, selectionCursor); //, QTextDocument::FindWholeWords);
+
+            if (!selectionCursor.isNull()) {
+                found = true;
+                selectionCursor.movePosition(QTextCursor::EndOfWord, //WordRight,
+                                             QTextCursor::KeepAnchor);
+                editor->setTextCursor(selectionCursor);
+            }
+        }
+
+        if (found == false) {
+            emit notFound();
+        }
+    }
+}
+
+void Document::findPrev(QString searchString, bool ignoreCase, bool wrapAround)
+{
+    (void)ignoreCase;
+    (void)wrapAround;
+
+    QTextDocument *document = editor->document();
+
+    bool found = false;
+    bool firstLoop = true;
+
+    if (searchString == "") {
+        // this shouldn't happen, ensure this in the find dialog
+    }
+    else {
+        QTextCursor selectionCursor(document);
+
+        selectionCursor.setPosition(editor->textCursor().selectionStart()); // selectionStart returns the position OR the start of the cursor's selection's pos
+
+        selectionCursor = document->find(searchString, selectionCursor, QTextDocument::FindBackward); //, QTextDocument::FindWholeWords);
+
+        if (!selectionCursor.isNull()) {
+            found = true;
+            selectionCursor.movePosition(QTextCursor::EndOfWord, QTextCursor::KeepAnchor);
+            editor->setTextCursor(selectionCursor);
+        }
+        else if (firstLoop) {
+            firstLoop = false;
+
+            QTextCursor looparoundCursor(editor->document()->lastBlock());
+            looparoundCursor.movePosition(QTextCursor::EndOfLine);
+            
+            looparoundCursor = document->find(searchString, looparoundCursor, QTextDocument::FindBackward); //, QTextDocument::FindWholeWords);
+
+            if (!looparoundCursor.isNull()) {
+                found = true;
+                looparoundCursor.movePosition(QTextCursor::EndOfWord, QTextCursor::KeepAnchor);
+                editor->setTextCursor(looparoundCursor);
+            }
+        }
+        if (!found) {
+            emit notFound();
+        }
+    }
 }
 
 QString Document::getPlainText()
@@ -434,22 +555,6 @@ void Document::onNewConnection()
     }
 }
 
-void Document::socketStateChanged(QAbstractSocket::SocketState state)
-{
-#warning "this isn't firing right now, so documents aren't populating for new users"
-    qDebug() << state;
-    if (state == QAbstractSocket::ConnectedState) {
-        qDebug() << "Connection established.";
-        for (int i = 0; i < participantPane->participantList.size(); i++) {
-            if (sender() == participantPane->participantList.at(i)->socket) {
-                // sender() is the sender of the signal that calls this slot
-                participantPane->participantList.at(i)->socket->write(QString("doc:%1,%2,%3:%4")
-                                        .arg(0).arg(0).arg(editor->document()->characterCount()).arg(editor->toPlainText()).toAscii());
-            }
-        }
-    }
-}
-
 void Document::populateDocumentForUser(QTcpSocket *socket)
 {
     qDebug() << "Sending entire document";
@@ -458,7 +563,6 @@ void Document::populateDocumentForUser(QTcpSocket *socket)
 
 void Document::disconnected()
 {
-    qDebug() << "Disconnected";
     if (isOwner) {
         QTcpSocket *socket = qobject_cast<QTcpSocket *>(sender());
         participantPane->removeParticipant(socket);

@@ -34,7 +34,8 @@ HEADERS += mainwindow.h \
     participantspane.h \
     chatpane.h \
     client.h \
-    findtoolbar.h
+    findtoolbar.h \
+    enu.h
 FORMS += mainwindow.ui \
     document.ui \
     connecttodocument.ui \

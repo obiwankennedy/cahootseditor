@@ -48,8 +48,10 @@ public:
     bool isParticipantsHidden();
 
     // Find functions
-    void findNext(QString str, bool ignoreCase, bool wrapAround);
-    void findPrev(QString str, bool ignoreCase, bool wrapAround);
+    void findAll(QString searchString, bool ignoreCase = true);
+    void findNext(QString searchString, bool ignoreCase = true, bool wrapAround = true);
+    void findPrev(QString searchString, bool ignoreCase = true, bool wrapAround = true);
+    bool isFirstTime;
 
     QString getPlainText();
     void setPlainText(QString text);
@@ -98,7 +100,6 @@ private slots:
     void onChatSend(QString str);
     void onIncomingData();
     void onNewConnection();
-    void socketStateChanged(QAbstractSocket::SocketState state);
 
     void populateDocumentForUser(QTcpSocket *socket);
 
@@ -107,6 +108,7 @@ private slots:
 signals:
     void redoAvailable(bool);
     void undoAvailable(bool);
+    void notFound();
 };
 
 #endif // DOCUMENT_H

@@ -135,7 +135,7 @@ void ParticipantsPane::on_promotePushButton_clicked()
     QList<QTreeWidgetItem*> selectedItems = ui->treeWidget->selectedItems();
     // find the currently selected item in the participants list
 
-    if (selectedItems.size == 0) {
+    if (selectedItems.size() == 0) {
         return;
     }
     for (int i = 0; i < participantList.size(); i++) {
@@ -166,7 +166,7 @@ void ParticipantsPane::on_demotePushButton_clicked()
     QList<QTreeWidgetItem*> selectedItems = ui->treeWidget->selectedItems();
     // find the currently selected item in the participants list
 
-    if (selectedItems.size == 0) {
+    if (selectedItems.size() == 0) {
         return;
     }
     for (int i = 0; i < participantList.size(); i++) {

@@ -56,25 +56,25 @@ void ConnectToDocument::addInfo()
 
 void ConnectToDocument::readSettings()
 {
-    QSettings settings("Cahoots", "Connect Dialog");
-    int size = settings.beginReadArray("infos");
-    for (int i = 0; i < size; i++) {
-        settings.setArrayIndex(i);
-        StoreInfo storeInfo;
-        storeInfo.allInfo = settings.value("allInfo").toString();
-        ui->previousDocsComboBox->addItem(storeInfo.allInfo);
-    }
-    settings.endArray();
+//    QSettings settings("Cahoots", "Connect Dialog");
+//    int size = settings.beginReadArray("infos");
+//    for (int i = 0; i < size; i++) {
+//        settings.setArrayIndex(i);
+//        StoreInfo storeInfo;
+//        storeInfo.allInfo = settings.value("allInfo").toString();
+//        ui->previousDocsComboBox->addItem(storeInfo.allInfo);
+//    }
+//    settings.endArray();
 }
 
 void ConnectToDocument::writeSettings()
 {
-    QSettings settings("Cahoots", "Connect Dialog");
-    for (int i = 0; i < previousInfo.size(); i++) {
-        settings.setArrayIndex(i);
-        settings.setValue("allInfo", previousInfo.value(i));
-    }
-    settings.endArray();
+//    QSettings settings("Cahoots", "Connect Dialog");
+//    for (int i = 0; i < previousInfo.size(); i++) {
+//        settings.setArrayIndex(i);
+//        settings.setValue("allInfo", previousInfo.value(i));
+//    }
+//    settings.endArray();
 }
 
 // Example for the above
