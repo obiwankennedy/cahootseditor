@@ -50,7 +50,7 @@ void ConnectToDocument::addInfo()
     if (!previousInfo.contains(newItem)) {
         if (previousInfo.size() > 4) {
             previousInfo.removeFirst();
-            ui->previousDocsComboBox->removeItem(2);
+            ui->previousDocsComboBox->removeItem(1);
         }
         ui->previousDocsComboBox->addItem(newItem);
         previousInfo.append(newItem);
@@ -64,7 +64,6 @@ void ConnectToDocument::readSettings()
     for (int i = 0; i < length; ++i) {
         settings.setArrayIndex(i);
         previousInfo.append(settings.value("allInfo").toString());
-//        ui->previousDocsComboBox->addItem(previousInfo.value(i));
         ui->previousDocsComboBox->addItem(settings.value("allInfo").toString());
     }
     settings.endArray();

@@ -28,6 +28,11 @@ public:
     void shiftLeft();
     void shiftRight();
 
+    // Find functions
+    bool findAll(QString searchString, bool ignoreCase = true);
+    bool findNext(QString searchString, bool ignoreCase = true, bool wrapAround = true);
+    bool findPrev(QString searchString, bool ignoreCase = true, bool wrapAround = true);
+
 protected:
     void resizeEvent(QResizeEvent *event);
 

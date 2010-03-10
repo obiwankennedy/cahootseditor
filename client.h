@@ -18,6 +18,8 @@ class Client : public QObject
     Q_OBJECT
 
 public:
+    Client();
+
     enum ConnectionState {
         WaitingForGreeting,
         ReadingGreeting,
@@ -32,8 +34,6 @@ public:
         UserJoinLeave,
         Undefined
     };
-
-    Client();
 
     void setGreetingMessage(const QString &message);
     void sendMessage(const QString &message);

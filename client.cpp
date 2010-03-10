@@ -31,8 +31,9 @@ void Client::setGreetingMessage(const QString &message)
 
 void Client::sendMessage(const QString &message)
 {
-    if (message.isEmpty())
+    if (message.isEmpty()) {
         return;
+    }
 
     QByteArray msg = message.toUtf8();
     QByteArray data = "MESSAGE " + QByteArray::number(msg.size()) + " " + msg;
@@ -48,8 +49,9 @@ QString Client::nickName() const
 
 bool Client::hasConnection(const QHostAddress &senderIp, int senderPort) const
 {
-    if (socket->peerPort() == senderPort)
+    if (socket->peerPort() == senderPort) {
         return true;
+    }
 
     return false;
 }

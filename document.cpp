@@ -227,123 +227,20 @@ bool Document::isParticipantsHidden()
 
 void Document::findAll(QString searchString, bool ignoreCase)
 {
-    QTextDocument *document = editor->document();
-
-    bool found = false;
-
-    QTextCursor cursor(editor->document());
-    cursor.select(QTextCursor::Document);
-    QTextCharFormat format;
-    format.setBackground(Qt::white);
-    cursor.mergeCharFormat(format);
-
-    QTextCursor highlightCursor(document);
-
-    QTextCharFormat plainFormat(highlightCursor.charFormat());
-    QTextCharFormat colorFormat = plainFormat;
-    colorFormat.setBackground(Qt::yellow);
-
-    while (!highlightCursor.isNull() && !highlightCursor.atEnd()) {
-        highlightCursor = document->find(searchString, highlightCursor); //, QTextDocument::FindWholeWords);
-
-        if (!highlightCursor.isNull()) {
-            found = true;
-            highlightCursor.movePosition(QTextCursor::WordRight,
-                                         QTextCursor::KeepAnchor);
-            highlightCursor.mergeCharFormat(colorFormat);
-        }
-    }
+    editor->findAll(searchString, ignoreCase);
 }
 
 void Document::findNext(QString searchString, bool ignoreCase, bool wrapAround)
 {
-    (void)ignoreCase;
-    (void)wrapAround;
-
-    // findAll(searchString, ignoreCase);
-
-    QTextDocument *document = editor->document();
-
-    bool found = false;
-
-    if (searchString == "") {
-        // this shouldn't happen, ensure this in the find dialog
-    }
-    else {
-        QTextCursor selectionCursor(document);
-        selectionCursor.setPosition(editor->textCursor().position());
-
-        bool firstLoop = true;
-
-        selectionCursor = document->find(searchString, selectionCursor); //, QTextDocument::FindWholeWords);
-
-        if (!selectionCursor.isNull()) {
-            found = true;
-            selectionCursor.movePosition(QTextCursor::EndOfWord, //WordRight,
-                                         QTextCursor::KeepAnchor);
-            editor->setTextCursor(selectionCursor);
-        }
-        else if (firstLoop) {
-            firstLoop = false;
-            selectionCursor.setPosition(0);
-            selectionCursor = document->find(searchString, selectionCursor); //, QTextDocument::FindWholeWords);
-
-            if (!selectionCursor.isNull()) {
-                found = true;
-                selectionCursor.movePosition(QTextCursor::EndOfWord, //WordRight,
-                                             QTextCursor::KeepAnchor);
-                editor->setTextCursor(selectionCursor);
-            }
-        }
-
-        if (found == false) {
-            emit notFound();
-        }
+    if (editor->findNext(searchString, ignoreCase, wrapAround)) {
+        emit notFound();
     }
 }
 
 void Document::findPrev(QString searchString, bool ignoreCase, bool wrapAround)
 {
-    (void)ignoreCase;
-    (void)wrapAround;
-
-    QTextDocument *document = editor->document();
-
-    bool found = false;
-    bool firstLoop = true;
-
-    if (searchString == "") {
-        // this shouldn't happen, ensure this in the find dialog
-    }
-    else {
-        QTextCursor selectionCursor(document);
-
-        selectionCursor.setPosition(editor->textCursor().selectionStart()); // selectionStart returns the position OR the start of the cursor's selection's pos
-
-        selectionCursor = document->find(searchString, selectionCursor, QTextDocument::FindBackward); //, QTextDocument::FindWholeWords);
-
-        if (!selectionCursor.isNull()) {
-            found = true;
-            selectionCursor.movePosition(QTextCursor::EndOfWord, QTextCursor::KeepAnchor);
-            editor->setTextCursor(selectionCursor);
-        }
-        else if (firstLoop) {
-            firstLoop = false;
-
-            QTextCursor looparoundCursor(editor->document()->lastBlock());
-            looparoundCursor.movePosition(QTextCursor::EndOfLine);
-            
-            looparoundCursor = document->find(searchString, looparoundCursor, QTextDocument::FindBackward); //, QTextDocument::FindWholeWords);
-
-            if (!looparoundCursor.isNull()) {
-                found = true;
-                looparoundCursor.movePosition(QTextCursor::EndOfWord, QTextCursor::KeepAnchor);
-                editor->setTextCursor(looparoundCursor);
-            }
-        }
-        if (!found) {
-            emit notFound();
-        }
+    if (editor->findPrev(searchString, ignoreCase, wrapAround)) {
+        emit notFound();
     }
 }
 
