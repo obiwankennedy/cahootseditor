@@ -2,6 +2,10 @@
 #define SERVER_H
 
 #include <QTcpServer>
+#include <QTime>
+#include <QTimer>
+
+static const int MaxBufferSize = 1024000;
 
 class Server : public QTcpServer
 {
@@ -24,10 +28,17 @@ public:
         Undefined
     };
 
+    bool readProtocolHeader();
 
 signals:
 
 public slots:
+
+private:
+    QTimer pingTimer;
+    QTime pongTime;
+    QByteArray buffer;
+    ConnectionState state;
 
 };
 

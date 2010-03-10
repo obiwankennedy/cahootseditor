@@ -53,6 +53,7 @@ bool Client::hasConnection(const QHostAddress &senderIp, int senderPort) const
         return true;
     }
 
+
     return false;
 }
 
@@ -89,15 +90,12 @@ void Client::disconnected()
 
 void Client::readyForUse()
 {
-    if (!socket || hasConnection(socket->peerAddress(), socket->peerPort())) {
+    if (!socket || (socket->state() != QTcpSocket::ConnectedState)) {
         return;
     }
 
     connect(socket, SIGNAL(newMessage(const QString &, const QString &)),
             this, SIGNAL(newMessage(const QString &, const QString &)));
-
-    if (!username.isEmpty())
-        newParticipant(username);
 }
 
 void Client::processReadyRead()
