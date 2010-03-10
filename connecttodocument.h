@@ -8,16 +8,6 @@ namespace Ui {
     class ConnectToDocument;
 }
 
-struct ConnectInfo {
-    QString name;
-    QString address;
-    QString port;
-};
-
-struct StoreInfo {
-    QString allInfo;
-};
-
 class ConnectToDocument : public QDialog {
     Q_OBJECT
 public:
@@ -27,15 +17,13 @@ public:
     void setName(QString name);
 
     QStringList previousInfo; // Public list to store previous names; addresses; ports
-    QList<StoreInfo> infos;
 
 private:
     Ui::ConnectToDocument *ui;
 
+    QRegExpValidator* nameValidator;
     QRegExpValidator* addressValidator;
     QRegExpValidator* portValidator;
-
-    ConnectInfo *info;
 
     void addInfo();
 

@@ -10,15 +10,15 @@ ConnectToDocument::ConnectToDocument(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    ui->previousDocsComboBox->setEditable(true);
-    ui->previousDocsComboBox->setMaxVisibleItems(5);
     ui->previousDocsComboBox->setFixedWidth(150);
 
     readSettings();
 
-    info = new ConnectInfo;
-
     connect(ui->buttonBox, SIGNAL(accepted()), this, SLOT(dialogAccepted()));
+
+    QRegExp nameRx("[a-zA-Z0-9_]*");
+    nameValidator = new QRegExpValidator(nameRx, 0);
+    ui->usernameLineEdit->setValidator(nameValidator);
 
     QRegExp addressRx("\\b(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\b");
     addressValidator = new QRegExpValidator(addressRx, 0);
@@ -43,26 +43,29 @@ void ConnectToDocument::setName(QString name)
 
 void ConnectToDocument::addInfo()
 {
-    if (ui->previousDocsComboBox->currentText() == "New...") {
-        info->name = ui->usernameLineEdit->text();
-        info->address = ui->addressLineEdit->text();
-        info->port = ui->portLineEdit->text();
-        QString newItem = QString("%1@%2:%3").arg(info->name).arg(info->address).arg(info->port);
-        if (!previousInfo.contains(newItem)) {
-            ui->previousDocsComboBox->addItem(newItem);
-            previousInfo.append(newItem);
+    QString newItem = QString("%1@%2:%3")
+                      .arg(ui->usernameLineEdit->text())
+                      .arg(ui->addressLineEdit->text())
+                      .arg(ui->portLineEdit->text());
+    if (!previousInfo.contains(newItem)) {
+        if (previousInfo.size() > 4) {
+            previousInfo.removeFirst();
+            ui->previousDocsComboBox->removeItem(2);
         }
+        ui->previousDocsComboBox->addItem(newItem);
+        previousInfo.append(newItem);
     }
 }
 
 void ConnectToDocument::readSettings()
 {
     QSettings settings("Cahoots", "Connect Dialog");
-    int arraySize = settings.beginReadArray("infoArray");
-    for (int i = 0; i < arraySize; ++i) {
+    int length = settings.beginReadArray("infoList");
+    for (int i = 0; i < length; ++i) {
         settings.setArrayIndex(i);
         previousInfo.append(settings.value("allInfo").toString());
-        ui->previousDocsComboBox->addItem(previousInfo.value(i));
+//        ui->previousDocsComboBox->addItem(previousInfo.value(i));
+        ui->previousDocsComboBox->addItem(settings.value("allInfo").toString());
     }
     settings.endArray();
 }
@@ -70,7 +73,7 @@ void ConnectToDocument::readSettings()
 void ConnectToDocument::writeSettings()
 {
     QSettings settings("Cahoots", "Connect Dialog");
-    settings.beginWriteArray("infoArray");
+    settings.beginWriteArray("infoList");
     for (int i = 0; i < previousInfo.size(); ++i) {
         settings.setArrayIndex(i);
         settings.setValue("allInfo", previousInfo.value(i));
@@ -82,31 +85,21 @@ void ConnectToDocument::dialogAccepted()
 {
     addInfo();
     QStringList *list = new QStringList();
-    list->append(info->name);
-    list->append(info->address);
-    list->append(info->port);
+    list->append(ui->usernameLineEdit->text());
+    list->append(ui->addressLineEdit->text());
+    list->append(ui->portLineEdit->text());
     emit connectToDocumentClicked(list);
 }
 
 void ConnectToDocument::on_previousDocsComboBox_currentIndexChanged()
 {
-    ui->usernameLineEdit->setText("");
-    ui->addressLineEdit->setText("");
-    ui->portLineEdit->setText("");
     if (ui->previousDocsComboBox->currentText() != "New...") {
-        QString allInfo = ui->previousDocsComboBox->currentText();
-        QString namePart;
-        QString addressPart;
-        QString portPart;
-        namePart = allInfo.section("@", 0, 0);
-        QRegExp addressRx("@|:");
-        addressPart = allInfo.section(addressRx, 1, 1);
-        portPart = allInfo.section(":", -1);
-        info->name = namePart;
-        info->address = addressPart;
-        info->port = portPart;
-        ui->usernameLineEdit->setText(info->name);
-        ui->addressLineEdit->setText(info->address);
-        ui->portLineEdit->setText(info->port);
+        QString info = ui->previousDocsComboBox->currentText();
+        QRegExp rx = QRegExp("(\\w+)@([0-9\\.]+):(\\d+)");
+        if (info.contains(rx)) {
+            ui->usernameLineEdit->setText(rx.cap(1).toAscii());
+            ui->addressLineEdit->setText(rx.cap(2).toAscii());
+            ui->portLineEdit->setText(rx.cap(3).toAscii());
+        }
     }
 }
