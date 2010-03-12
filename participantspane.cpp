@@ -11,7 +11,8 @@ ParticipantsPane::ParticipantsPane(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    connect(ui->treeWidget, SIGNAL(currentItemChanged(QTreeWidgetItem*,QTreeWidgetItem*)), this, SLOT(onCurrentItemChanged(QTreeWidgetItem*,QTreeWidgetItem*)));
+    connect(ui->treeWidget, SIGNAL(currentItemChanged(QTreeWidgetItem*,QTreeWidgetItem*)),
+            this, SLOT(onCurrentItemChanged(QTreeWidgetItem*,QTreeWidgetItem*)));
 
     ui->connectInfoLabel->hide();
     ui->treeWidget->resizeColumnToContents(0);
@@ -138,6 +139,9 @@ void ParticipantsPane::on_promotePushButton_clicked()
     if (selectedItems.size() == 0) {
         return;
     }
+    for (int i = 0; i < selectedItems.size(); i++) {
+        selectedItems.at(i)->setSelected(false);
+    }
     for (int i = 0; i < participantList.size(); i++) {
         if (selectedItems.at(0) == participantList.at(i)->item) {
             if (participantList.at(i)->permissions == ReadWrite) {
@@ -149,11 +153,13 @@ void ParticipantsPane::on_promotePushButton_clicked()
                 roItem->removeChild(participantList.at(i)->item);
                 rwItem->insertChild(0, participantList.at(i)->item);
                 participantList.at(i)->permissions = ReadWrite;
+//                participantList.at(i)->item->setSelected(true);
                 emit memberCanNowRead(participantList.at(i)->socket);
             }
             else if (participantList.at(i)->permissions == Waiting) {
                 waitItem->removeChild(participantList.at(i)->item);
                 roItem->insertChild(0, participantList.at(i)->item);
+//                participantList.at(i)->item->setSelected(true);
                 participantList.at(i)->permissions = ReadOnly;
             }
             return;
@@ -169,16 +175,21 @@ void ParticipantsPane::on_demotePushButton_clicked()
     if (selectedItems.size() == 0) {
         return;
     }
+    for (int i = 0; i < selectedItems.size(); i++) {
+        selectedItems.at(i)->setSelected(false);
+    }
     for (int i = 0; i < participantList.size(); i++) {
         if (selectedItems.at(0) == participantList.at(i)->item) {
             if (participantList.at(i)->permissions == ReadWrite) {
                 rwItem->removeChild(participantList.at(i)->item);
                 roItem->insertChild(0, participantList.at(i)->item);
+//                participantList.at(i)->item->setSelected(true);
                 participantList.at(i)->permissions = ReadOnly;
             }
             else if (participantList.at(i)->permissions == ReadOnly) {
                 roItem->removeChild(participantList.at(i)->item);
                 waitItem->insertChild(0, participantList.at(i)->item);
+//                participantList.at(i)->item->setSelected(true);
                 participantList.at(i)->permissions = Waiting;
             }
             else if (participantList.at(i)->permissions == Waiting) {

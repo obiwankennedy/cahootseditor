@@ -79,7 +79,6 @@ void Document::connectToDocument(QStringList *list)
     QString portString = list->at(2);
     int port = portString.toInt();
     socket->connectToHost(QHostAddress(address), port);
-    connect(socket, SIGNAL(readyRead()), this, SLOT(onIncomingData()));
     participantPane->setOwnership(isOwner);
     isAlreadyAnnounced = true;
     setChatHidden(false);
@@ -87,6 +86,7 @@ void Document::connectToDocument(QStringList *list)
     participantPane->setConnectInfo(QString("%1:%2").arg(address).arg(portString));
     delete list;
     connect(socket, SIGNAL(disconnected()), this, SLOT(disconnected()));
+    connect(socket, SIGNAL(readyRead()), this, SLOT(onIncomingData()));
 }
 
 void Document::undo()
@@ -309,11 +309,11 @@ void Document::ownerIncomingData(QString data, QTcpSocket *sender)
 {
     qDebug() << "odata: " << data;
     QString toSend;
-    if (data.startsWith("doc:")) {
+    if (data.startsWith("doc ")) {
         toSend = data;
         data.remove(0, 4);
         // detect line number, then put text at that line.
-        QRegExp rx = QRegExp("^(\\d+),(\\d+),(\\d+):(.*)");
+        QRegExp rx = QRegExp("(\\d+)\\s(\\d+)\\s(\\d+)\\s(.*)");
         if (data.contains(rx)) {
             int pos = rx.cap(1).toInt();
             int charsRemoved = rx.cap(2).toInt();
@@ -331,7 +331,7 @@ void Document::ownerIncomingData(QString data, QTcpSocket *sender)
     for (int i = 0; i < participantPane->participantList.size(); i++) {
         if (participantPane->participantList.at(i)->socket != sender &&
             participantPane->canRead(participantPane->participantList.at(i)->socket)) {
-            participantPane->participantList.at(i)->socket->write(toSend.toAscii());
+            participantPane->participantList.at(i)->socket->write(toSend.toUtf8());
         }
     }
 }
@@ -339,10 +339,10 @@ void Document::ownerIncomingData(QString data, QTcpSocket *sender)
 void Document::participantIncomingData(QString data)
 {
     qDebug() << "pdata: " << data;
-    if (data.startsWith("doc:")) {
+    if (data.startsWith("doc ")) {
         data.remove(0, 4);
         // detect line number, then put text at that position.
-        QRegExp rx = QRegExp("^(\\d+),(\\d+),(\\d+):(.*)");
+        QRegExp rx = QRegExp("(\\d+)\\s(\\d+)\\s(\\d+)\\s(.*)");
         if (data.contains(rx)) {
             int pos = rx.cap(1).toInt();
             int charsRemoved = rx.cap(2).toInt();
@@ -375,15 +375,15 @@ void Document::onTextChange(int pos, int charsRemoved, int charsAdded)
     }
 
     if (isOwner) {
-        QString toSend = QString("doc:%1,%2,%3:%4").arg(pos).arg(charsRemoved).arg(charsAdded).arg(data);
+        QString toSend = QString("doc %1 %2 %3 %4\0").arg(pos).arg(charsRemoved).arg(charsAdded).arg(data);
         for (int i = 0; i < participantPane->participantList.size(); i++) {
             if (participantPane->canRead(participantPane->participantList.at(i)->socket)) {
-                participantPane->participantList.at(i)->socket->write(toSend.toAscii());
+                participantPane->participantList.at(i)->socket->write(toSend.toUtf8());
             }
         }
     }
     else {
-        socket->write(QString("doc:%1,%2,%3:%4").arg(pos).arg(charsRemoved).arg(charsAdded).arg(data).toAscii());
+        socket->write(QString("doc %1 %2 %3 %4\0").arg(pos).arg(charsRemoved).arg(charsAdded).arg(data).toUtf8());
     }
 }
 
@@ -391,11 +391,11 @@ void Document::onChatSend(QString str)
 {
     if (isOwner) {
         for (int i = 0; i < participantPane->participantList.size(); i++) {
-            participantPane->participantList.at(i)->socket->write(QString(myName + ": ").toAscii() + str.toAscii());
+            participantPane->participantList.at(i)->socket->write(QString(myName + ": ").toUtf8() + str.toUtf8());
         }
     }
     else {
-        socket->write(str.toAscii());
+        socket->write(str.toUtf8());
     }
     chatPane->appendChatMessage(myName + ": " + str);
 }
@@ -437,7 +437,7 @@ void Document::onNewConnection()
 void Document::populateDocumentForUser(QTcpSocket *socket)
 {
     qDebug() << "Sending entire document";
-    socket->write(QString("doc:%1,%2,%3:%4").arg(0).arg(0).arg(editor->document()->characterCount()).arg(editor->toPlainText()).toAscii());
+    socket->write(QString("doc %1 %2 %3 %4\0").arg(0).arg(0).arg(editor->document()->characterCount()).arg(editor->toPlainText()).toUtf8());
 }
 
 void Document::disconnected()
