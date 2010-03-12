@@ -329,7 +329,7 @@ void Document::ownerIncomingData(QString data, QTcpSocket *sender, int length)
         toSend = data;
         data.remove(0, 4);
         // detect line number, then put text at that line.
-        QRegExp rx = QRegExp("(\\d+)\\s(\\d+)\\s(\\d+)\\s(.*?)(0)");
+        QRegExp rx = QRegExp("(\\d+)\\s(\\d+)\\s(\\d+)\\s(.*)");
 //        rx.setMinimal(true);
         if (data.contains(rx)) {
             int pos = rx.cap(1).toInt();
@@ -361,12 +361,10 @@ void Document::participantIncomingData(QString data, int length)
     }
     if (data.startsWith("doc:")) {
         data.remove(0, 4);
-        qDebug() << "pdata: " << data;
         // detect line number, then put text at that position.
         QRegExp rx = QRegExp("(\\d+)\\s(\\d+)\\s(\\d+)\\s(.*)");
 //        rx.setMinimal(true); // for use with a terminal character if we have text after .*
         if (data.contains(rx)) {
-            qDebug() << "cap1: " << rx.cap(1) << " cap2: " << rx.cap(2) << " cap3: " << rx.cap(3) << " cap4: " << rx.cap(4);
             int pos = rx.cap(1).toInt();
             int charsRemoved = rx.cap(2).toInt();
             int charsAdded = rx.cap(3).toInt();
@@ -377,7 +375,6 @@ void Document::participantIncomingData(QString data, int length)
     else {
         chatPane->appendChatMessage(data);
     }
-
 }
 
 void Document::onTextChange(int pos, int charsRemoved, int charsAdded)
@@ -401,6 +398,7 @@ void Document::onTextChange(int pos, int charsRemoved, int charsAdded)
 
     if (isOwner) {
         toSend = QString("doc:%1 %2 %3 %4").arg(pos).arg(charsRemoved).arg(charsAdded).arg(data);
+        qDebug() << "toSend: " << toSend;
         for (int i = 0; i < participantPane->participantList.size(); i++) {
             if (participantPane->canRead(participantPane->participantList.at(i)->socket)) {
                 participantPane->participantList.at(i)->socket->write(QString("%1 %2").arg(toSend.length()).arg(toSend).toAscii());
@@ -436,7 +434,7 @@ void Document::onIncomingData()
     disconnect(editor->document(), SIGNAL(contentsChange(int,int,int)), this, SLOT(onTextChange(int,int,int)));
 
     QString data;
-    QRegExp rx = QRegExp("(\\d+)(.*)");
+    QRegExp rx = QRegExp("^(\\d+)*.");
     int length;
     bool ok;
     qint64 availableBytes;
@@ -448,8 +446,7 @@ void Document::onIncomingData()
         data = sock->readAll();
         if (data.contains(rx)) {
             length = rx.cap(1).toInt(&ok);
-            data.remove(rx.cap(1)); // remove digit indicating packet length
-            data.remove(0, 1); // remove leading whitespace
+            data.remove(0, rx.cap(1).length() + 1); // remove digit indicating packet length and whitespace
             if (ok && participantPane->canWrite(sock)) {
                 ownerIncomingData(data, sock, length);
             }
@@ -460,8 +457,7 @@ void Document::onIncomingData()
         data = socket->readAll();
         if (data.contains(rx)) {
             length = rx.cap(1).toInt(&ok);
-            data.remove(rx.cap(1)); // remove digit indicating packet length
-            data.remove(0, 1); // remove leading whitespace
+            data.remove(0, rx.cap(1).length() + 1); // remove digit indicating packet length and whitespace
             if (ok) {
                 participantIncomingData(data, length);
             }
@@ -476,7 +472,6 @@ void Document::onNewConnection()
     if (isOwner) {
         participantPane->insertParticipant("Newbie", server->nextPendingConnection());
         connect(participantPane->participantList.last()->socket, SIGNAL(readyRead()), this, SLOT(onIncomingData()));
-        connect(socket, SIGNAL(stateChanged(QAbstractSocket::SocketState)), this, SLOT(socketStateChanged(QAbstractSocket::SocketState)));
         connect(participantPane->participantList.last()->socket, SIGNAL(disconnected()), this, SLOT(disconnected()));
     }
     else {
