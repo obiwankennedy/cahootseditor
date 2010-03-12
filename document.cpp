@@ -415,7 +415,6 @@ void Document::onIncomingData()
     }
     else { // We are a participant
         data = socket->readAll();
-//        data = socket;
         participantIncomingData(data);
     }
     // reconnect the signal that fires when the contents of the editor change so we continue to send new text
