@@ -8,6 +8,9 @@ QT += webkit
 QT += xml
 CONFIG += x86 \
     ppc
+    
+# Windows RC file
+RC_FILE = cahootsresources.rc
 
 # Mac icon/plist
 ICON = images/icon.icns

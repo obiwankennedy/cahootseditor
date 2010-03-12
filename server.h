@@ -28,7 +28,7 @@ public:
         Undefined
     };
 
-    bool readProtocolHeader();
+    void newConnection(QTcpSocket *socket);
 
 signals:
 
@@ -39,6 +39,8 @@ private:
     QTime pongTime;
     QByteArray buffer;
     ConnectionState state;
+
+    QList<QTcpSocket*> clientList;
 
 };
 
