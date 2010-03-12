@@ -59,7 +59,6 @@ Document::Document(QWidget *parent) :
     setChatHidden(true);
     setParticipantsHidden(true);
 
-
     myName = "Owner"; // temporary
 
     isAlreadyAnnounced = false;
@@ -78,7 +77,7 @@ void Document::connectToDocument(QStringList *list)
     QString address = list->at(1);
     QString portString = list->at(2);
     int port = portString.toInt();
-    socket->connectToHost(QHostAddress(address), port, QTcpSocket::Text);
+    socket->connectToHost(QHostAddress(address), port);
     participantPane->setOwnership(isOwner);
     isAlreadyAnnounced = true;
     setChatHidden(false);
@@ -197,7 +196,20 @@ void Document::announceDocument()
 
     chatPane->appendChatMessage("Listening on port " + port);
 
-    participantPane->setConnectInfo(port);
+    QString ipAddress;
+    QList<QHostAddress> ipAddressesList = QNetworkInterface::allAddresses();
+    // use the first non-localhost IPv4 address
+    for (int i = 0; i < ipAddressesList.size(); ++i) {
+        if (ipAddressesList.at(i) != QHostAddress::LocalHost &&
+            ipAddressesList.at(i).toIPv4Address())
+            ipAddress = ipAddressesList.at(i).toString();
+    }
+    // if we did not find one, use IPv4 localhost
+    if (ipAddress.isEmpty()) {
+        ipAddress = QHostAddress(QHostAddress::LocalHost).toString();
+    }
+
+    participantPane->setConnectInfo(ipAddress + ":" + port);
 }
 
 bool Document::isUndoable()
@@ -290,6 +302,7 @@ void Document::splitEditor()
         QFontMetrics fm(editor->font());
         bottomEditor->setTabStopWidth(fm.averageCharWidth() * 4);
         ui->editorSplitter->insertWidget(1, bottomEditor);
+        // we don't need the default document since we're using the document of the original editor
         bottomEditor->document()->deleteLater();
         bottomEditor->setDocument(editor->document());
     }
@@ -305,20 +318,24 @@ bool Document::isAnnounced()
     return isAlreadyAnnounced;
 }
 
-void Document::ownerIncomingData(QString data, QTcpSocket *sender)
+void Document::ownerIncomingData(QString data, QTcpSocket *sender, int length)
 {
     qDebug() << "odata: " << data;
     QString toSend;
-    if (data.startsWith("doc ")) {
+    if (length != data.length()) {
+        qDebug() << "string data is of incorrect length: data.len = " << data.length() << ", expected length: " << length;
+    }
+    if (data.startsWith("doc:")) {
         toSend = data;
         data.remove(0, 4);
         // detect line number, then put text at that line.
-        QRegExp rx = QRegExp("(\\d+)\\s(\\d+)\\s(\\d+)\\s(.*)");
+        QRegExp rx = QRegExp("(\\d+)\\s(\\d+)\\s(\\d+)\\s(.*?)(0)");
+//        rx.setMinimal(true);
         if (data.contains(rx)) {
             int pos = rx.cap(1).toInt();
             int charsRemoved = rx.cap(2).toInt();
             int charsAdded = rx.cap(3).toInt();
-            QString data = rx.cap(4);
+            data = rx.cap(4);
             editor->collabTextChange(pos, charsRemoved, charsAdded, data);
         }
     }
@@ -326,28 +343,34 @@ void Document::ownerIncomingData(QString data, QTcpSocket *sender)
         toSend = QString("Someone: %2").arg(data);
         chatPane->appendChatMessage(toSend);
     }
-    // Distribute data to all the other participants
 
+    // Distribute data to all the other participants
     for (int i = 0; i < participantPane->participantList.size(); i++) {
         if (participantPane->participantList.at(i)->socket != sender &&
             participantPane->canRead(participantPane->participantList.at(i)->socket)) {
-            participantPane->participantList.at(i)->socket->write(toSend.toUtf8());
+            participantPane->participantList.at(i)->socket->write(QString("%1 %2").arg(toSend.length()).arg(toSend).toAscii());
         }
     }
 }
 
-void Document::participantIncomingData(QString data)
+void Document::participantIncomingData(QString data, int length)
 {
     qDebug() << "pdata: " << data;
-    if (data.startsWith("doc ")) {
+    if (length != data.length()) {
+        qDebug() << "string data is of incorrect length: data.len = " << data.length() << ", expected length: " << length;
+    }
+    if (data.startsWith("doc:")) {
         data.remove(0, 4);
+        qDebug() << "pdata: " << data;
         // detect line number, then put text at that position.
         QRegExp rx = QRegExp("(\\d+)\\s(\\d+)\\s(\\d+)\\s(.*)");
+//        rx.setMinimal(true); // for use with a terminal character if we have text after .*
         if (data.contains(rx)) {
+            qDebug() << "cap1: " << rx.cap(1) << " cap2: " << rx.cap(2) << " cap3: " << rx.cap(3) << " cap4: " << rx.cap(4);
             int pos = rx.cap(1).toInt();
             int charsRemoved = rx.cap(2).toInt();
             int charsAdded = rx.cap(3).toInt();
-            QString data = rx.cap(4);
+            data = rx.cap(4);
             editor->collabTextChange(pos, charsRemoved, charsAdded, data);
         }
     }
@@ -359,6 +382,8 @@ void Document::participantIncomingData(QString data)
 
 void Document::onTextChange(int pos, int charsRemoved, int charsAdded)
 {
+    QString toSend;
+
     if (!isOwner && socket->state() != QAbstractSocket::ConnectedState) {
         return;
     }
@@ -375,47 +400,72 @@ void Document::onTextChange(int pos, int charsRemoved, int charsAdded)
     }
 
     if (isOwner) {
-        QString toSend = QString("doc %1 %2 %3 %4\0").arg(pos).arg(charsRemoved).arg(charsAdded).arg(data);
+        toSend = QString("doc:%1 %2 %3 %4").arg(pos).arg(charsRemoved).arg(charsAdded).arg(data);
         for (int i = 0; i < participantPane->participantList.size(); i++) {
             if (participantPane->canRead(participantPane->participantList.at(i)->socket)) {
-                participantPane->participantList.at(i)->socket->write(toSend.toUtf8());
+                participantPane->participantList.at(i)->socket->write(QString("%1 %2").arg(toSend.length()).arg(toSend).toAscii());
             }
         }
     }
     else {
-        socket->write(QString("doc %1 %2 %3 %4\0").arg(pos).arg(charsRemoved).arg(charsAdded).arg(data).toUtf8());
+        toSend = QString("doc:%1 %2 %3 %4").arg(pos).arg(charsRemoved).arg(charsAdded).arg(data);
+        socket->write(QString("%1 %2").arg(toSend.length()).arg(toSend).toAscii());
     }
 }
 
 void Document::onChatSend(QString str)
 {
+    QString toSend;
+
     if (isOwner) {
+        toSend = QString("%1: %2").arg(myName).arg(str);
         for (int i = 0; i < participantPane->participantList.size(); i++) {
-            participantPane->participantList.at(i)->socket->write(QString(myName + ": ").toUtf8() + str.toUtf8());
+            participantPane->participantList.at(i)->socket->write(QString("%1 %2").arg(toSend.length()).arg(toSend).toAscii());
         }
     }
     else {
-        socket->write(str.toUtf8());
+        toSend = str; // for find/replace, much of this will be rewritten later for better Object Oriented design
+        socket->write(QString("%1 %2").arg(toSend.length()).arg(toSend).toAscii());
     }
-    chatPane->appendChatMessage(myName + ": " + str);
+    chatPane->appendChatMessage(QString("%1: %2").arg(myName).arg(str));
 }
 
 void Document::onIncomingData()
 {
     // disconnect the signal that fires when the contents of the editor change so we don't echo
     disconnect(editor->document(), SIGNAL(contentsChange(int,int,int)), this, SLOT(onTextChange(int,int,int)));
+
     QString data;
+    QRegExp rx = QRegExp("(\\d+)(.*)");
+    int length;
+    bool ok;
+    qint64 availableBytes;
+
     if (isOwner) {
         // We know we have incoming data, so iterate through our current participants to find the correct sender
         QTcpSocket *sock = qobject_cast<QTcpSocket *>(sender());
+        availableBytes = sock->bytesAvailable();
         data = sock->readAll();
-        if (participantPane->canWrite(sock)) {
-            ownerIncomingData(data, sock);
+        if (data.contains(rx)) {
+            length = rx.cap(1).toInt(&ok);
+            data.remove(rx.cap(1)); // remove digit indicating packet length
+            data.remove(0, 1); // remove leading whitespace
+            if (ok && participantPane->canWrite(sock)) {
+                ownerIncomingData(data, sock, length);
+            }
         }
     }
     else { // We are a participant
+        availableBytes = socket->bytesAvailable();
         data = socket->readAll();
-        participantIncomingData(data);
+        if (data.contains(rx)) {
+            length = rx.cap(1).toInt(&ok);
+            data.remove(rx.cap(1)); // remove digit indicating packet length
+            data.remove(0, 1); // remove leading whitespace
+            if (ok) {
+                participantIncomingData(data, length);
+            }
+        }
     }
     // reconnect the signal that fires when the contents of the editor change so we continue to send new text
     connect(editor->document(), SIGNAL(contentsChange(int,int,int)), this, SLOT(onTextChange(int,int,int)));
@@ -437,7 +487,8 @@ void Document::onNewConnection()
 void Document::populateDocumentForUser(QTcpSocket *socket)
 {
     qDebug() << "Sending entire document";
-    socket->write(QString("doc %1 %2 %3 %4\0").arg(0).arg(0).arg(editor->document()->characterCount()).arg(editor->toPlainText()).toUtf8());
+    QString toSend = QString("doc:%1 %2 %3 %4").arg(0).arg(0).arg(editor->document()->characterCount()).arg(editor->toPlainText());
+    socket->write(QString("%1 %2").arg(toSend.length()).arg(toSend).toAscii());
 }
 
 void Document::disconnected()

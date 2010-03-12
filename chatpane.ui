@@ -46,6 +46,9 @@
      <property name="frameShape">
       <enum>QFrame::StyledPanel</enum>
      </property>
+     <property name="textInteractionFlags">
+      <set>Qt::LinksAccessibleByKeyboard|Qt::LinksAccessibleByMouse|Qt::TextBrowserInteraction|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
+     </property>
     </widget>
    </item>
    <item row="1" column="0">

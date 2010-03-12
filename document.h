@@ -78,6 +78,8 @@ private:
     QTcpSocket *socket;
     Client *client;
 
+    QString extraData;
+
     CppHighlighter *cppHighlighter;
 
     CodeEditor *editor;
@@ -89,8 +91,8 @@ private:
 
     ChatPane *chatPane;
 
-    void ownerIncomingData(QString data, QTcpSocket *sender);
-    void participantIncomingData(QString data);
+    void ownerIncomingData(QString data, QTcpSocket *sender, int length = 0);
+    void participantIncomingData(QString data, int length = 0);
 
 private slots:
     // The elephant in the room. Handles collaborative editing.
