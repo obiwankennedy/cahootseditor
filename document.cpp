@@ -13,6 +13,7 @@
 #include <QWebView>
 #include <QLayout>
 #include <QMessageBox>
+#include <QStringList>
 
 #include <QTextDocumentFragment>
 
@@ -322,9 +323,20 @@ void Document::ownerIncomingData(QString data, QTcpSocket *sender, int length)
 {
     qDebug() << "odata: " << data;
     QString toSend;
-    if (length != data.length()) {
-        qDebug() << "string data is of incorrect length: data.len = " << data.length() << ", expected length: " << length;
+
+    bool haveExtra = false;
+    QString rest;
+
+    if (length < data.length()) { // in case incoming data packets were concatenated
+        haveExtra = true;
+        rest = data;
+        rest.remove(0, length);
+        data.remove(length, data.length() - length);
     }
+    else if (length > data.length()) {
+        // we have incomplete data
+    }
+
     if (data.startsWith("doc:")) {
         toSend = data;
         data.remove(0, 4);
@@ -351,13 +363,38 @@ void Document::ownerIncomingData(QString data, QTcpSocket *sender, int length)
             participantPane->participantList.at(i)->socket->write(QString("%1 %2").arg(toSend.length()).arg(toSend).toAscii());
         }
     }
+
+    bool ok;
+
+    if (haveExtra) {
+        QRegExp rx = QRegExp("^(\\d+)*.");
+        if (rest.contains(rx)) {
+            length = rx.cap(1).toInt(&ok);
+            rest.remove(0, rx.cap(1).length() + 1); // remove digit indicating packet length and whitespace
+            if (ok) {
+                ownerIncomingData(rest, sender, length);
+            }
+        }
+    }
+
 }
 
 void Document::participantIncomingData(QString data, int length)
 {
     qDebug() << "pdata: " << data;
-    if (length != data.length()) {
-        qDebug() << "string data is of incorrect length: data.len = " << data.length() << ", expected length: " << length;
+
+    bool haveExtra = false;
+    QString rest;
+
+    if (length < data.length()) { // in case incoming data packets were concatenated
+        haveExtra = true;
+        rest = data;
+        rest.remove(0, length);
+        data.remove(length, data.length() - length);
+        qDebug() << "data: " << data << ", rest: " << rest;
+    }
+    else if (length > data.length()) {
+        // we have incomplete data
     }
     if (data.startsWith("doc:")) {
         data.remove(0, 4);
@@ -374,6 +411,19 @@ void Document::participantIncomingData(QString data, int length)
     }
     else {
         chatPane->appendChatMessage(data);
+    }
+
+    bool ok;
+
+    if (haveExtra) {
+        QRegExp rx = QRegExp("^(\\d+)*.");
+        if (rest.contains(rx)) {
+            length = rx.cap(1).toInt(&ok);
+            rest.remove(0, rx.cap(1).length() + 1); // remove digit indicating packet length and whitespace
+            if (ok) {
+                participantIncomingData(rest, length);
+            }
+        }
     }
 }
 
