@@ -2,12 +2,27 @@
 #include "ui_chatpane.h"
 
 #include <QDebug>
+#include <QKeyEvent>
+#include <QGridLayout>
 
 ChatPane::ChatPane(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::ChatPane)
 {
     ui->setupUi(this);
+
+    QGridLayout *layout = new QGridLayout(this);
+    layout->setContentsMargins(0, 0, 0, 0);
+    layout->setVerticalSpacing(0);
+
+    chatBrowser = new ChatBrowser(this);
+    chatBrowser->setFont(QFont("Lucida Grande", 12));
+
+    layout->addWidget(chatBrowser, 0, 0);
+    layout->addWidget(ui->lineEdit, 1, 0);
+    this->setLayout(layout);
+
+    connect(chatBrowser, SIGNAL(keyPress(QKeyEvent*)), this, SLOT(textBrowserKeyPress(QKeyEvent*)));
 }
 
 ChatPane::~ChatPane()
@@ -17,22 +32,22 @@ ChatPane::~ChatPane()
 
 void ChatPane::appendChatMessage(QString str)
 {
-    ui->textBrowser->append(str);
+    chatBrowser->appendPlainText(str);
 }
 
 bool ChatPane::hasFocus() const
 {
-    return ui->lineEdit->hasFocus() || ui->textBrowser->textCursor().hasSelection();
+    return ui->lineEdit->hasFocus() || chatBrowser->textCursor().hasSelection();
 }
+
 void ChatPane::undo()
 {
     if (ui->lineEdit->hasFocus()) {
         ui->lineEdit->undo();
     }
-    else if (ui->textBrowser->hasFocus()) {
+    else if (chatBrowser->hasFocus()) {
         // do nothing, read only
     }
-
 }
 
 void ChatPane::redo()
@@ -40,7 +55,7 @@ void ChatPane::redo()
     if (ui->lineEdit->hasFocus()) {
         ui->lineEdit->redo();
     }
-    else if (ui->textBrowser->hasFocus()) {
+    else if (chatBrowser->hasFocus()) {
         // do nothing, read only
     }
 }
@@ -50,7 +65,7 @@ void ChatPane::cut()
     if (ui->lineEdit->hasFocus()) {
         ui->lineEdit->cut();
     }
-    else if (ui->textBrowser->hasFocus()) {
+    else if (chatBrowser->hasFocus()) {
         // do nothing, read only
     }
 }
@@ -62,7 +77,7 @@ void ChatPane::copy()
         ui->lineEdit->copy();
     }
     else {
-        ui->textBrowser->copy();
+        chatBrowser->copy();
     }
 }
 
@@ -82,3 +97,8 @@ void ChatPane::on_lineEdit_returnPressed()
     emit returnPressed(sendString);
 }
 
+void ChatPane::textBrowserKeyPress(QKeyEvent *event)
+{
+    ui->lineEdit->setFocus();
+    ui->lineEdit->event(event);
+}

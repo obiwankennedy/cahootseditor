@@ -8,7 +8,7 @@ QT += webkit
 QT += xml
 CONFIG += x86 \
     ppc
-    
+
 # Windows RC file
 RC_FILE = cahootsresources.rc
 
@@ -27,7 +27,8 @@ SOURCES += main.cpp \
     chatpane.cpp \
     client.cpp \
     findtoolbar.cpp \
-    server.cpp
+    server.cpp \
+    chatbrowser.cpp
 HEADERS += mainwindow.h \
     document.h \
     highlighters/cpphighlighter.h \
@@ -40,7 +41,8 @@ HEADERS += mainwindow.h \
     client.h \
     findtoolbar.h \
     enu.h \
-    server.h
+    server.h \
+    chatbrowser.h
 FORMS += mainwindow.ui \
     document.ui \
     connecttodocument.ui \

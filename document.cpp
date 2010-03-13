@@ -33,7 +33,7 @@ Document::Document(QWidget *parent) :
     QFontMetrics fm(editor->font());
     editor->setTabStopWidth(fm.averageCharWidth() * 4);
     ui->editorSplitter->insertWidget(0, editor);
-
+    
     cppHighlighter = new CppHighlighter(editor->document());
 
     delete ui->participantFrame;
@@ -165,6 +165,7 @@ void Document::setChatHidden(bool b)
         ui->codeChatSplitter->widget(1)->hide();
     }
     else {
+        editor->setFocus();
         ui->codeChatSplitter->widget(1)->show();
     }
 }

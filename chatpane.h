@@ -3,6 +3,8 @@
 
 #include <QWidget>
 
+#include "chatbrowser.h"
+
 namespace Ui {
     class ChatPane;
 }
@@ -27,8 +29,12 @@ public:
 private:
     Ui::ChatPane *ui;
 
+    ChatBrowser *chatBrowser;
+
 private slots:
     void on_lineEdit_returnPressed();
+
+    void textBrowserKeyPress(QKeyEvent *event);
 
 signals:
     void returnPressed(QString str);

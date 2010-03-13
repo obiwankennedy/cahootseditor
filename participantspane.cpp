@@ -154,13 +154,13 @@ void ParticipantsPane::on_promotePushButton_clicked()
                 rwItem->insertChild(0, participantList.at(i)->item);
                 participantList.at(i)->permissions = ReadWrite;
 //                participantList.at(i)->item->setSelected(true);
-                emit memberCanNowRead(participantList.at(i)->socket);
             }
             else if (participantList.at(i)->permissions == Waiting) {
                 waitItem->removeChild(participantList.at(i)->item);
                 roItem->insertChild(0, participantList.at(i)->item);
 //                participantList.at(i)->item->setSelected(true);
                 participantList.at(i)->permissions = ReadOnly;
+                emit memberCanNowRead(participantList.at(i)->socket);
             }
             return;
         }
