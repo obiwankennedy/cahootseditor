@@ -29,11 +29,16 @@ public:
 
     void setConnectInfo(QString str);
 
-    void insertParticipant(QString name, QTcpSocket *socket);
+    void insertParticipant(QString name, QTcpSocket *socket = 0);
+
+    void updateName(QString name, QTcpSocket *socket = 0);
 
     // For when we disconnect
     void removeAllParticipants();
+    // This is a function to be used by the owner
     void removeParticipant(QTcpSocket *socket);
+    // This is a function to be used by the participants in removing participants via control messages.
+    void removeParticipant(QString name);
 
     bool canWrite(QTcpSocket *socket);
     bool canRead(QTcpSocket *socket);

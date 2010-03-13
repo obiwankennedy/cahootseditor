@@ -338,18 +338,27 @@ void Document::ownerIncomingData(QString data, QTcpSocket *sender, int length)
         // we have incomplete data
     }
 
+    QRegExp rx;
     if (data.startsWith("doc:")) {
         toSend = data;
         data.remove(0, 4);
         // detect line number, then put text at that line.
-        QRegExp rx = QRegExp("(\\d+)\\s(\\d+)\\s(\\d+)\\s(.*)");
-//        rx.setMinimal(true);
+        rx = QRegExp("(\\d+)\\s(\\d+)\\s(\\d+)\\s(.*)");
         if (data.contains(rx)) {
             int pos = rx.cap(1).toInt();
             int charsRemoved = rx.cap(2).toInt();
             int charsAdded = rx.cap(3).toInt();
             data = rx.cap(4);
             editor->collabTextChange(pos, charsRemoved, charsAdded, data);
+        }
+    }
+    else if (data.startsWith("helo:")) {
+        data.remove(0, 5);
+        rx = QRegExp("([a-zA-Z0-9_]*)");
+        if (data.contains(rx)) {
+            QString name = rx.cap(1);
+            participantPane->updateName(name, socket);
+            toSend = "join:" + name;
         }
     }
     else {
@@ -397,11 +406,12 @@ void Document::participantIncomingData(QString data, int length)
     else if (length > data.length()) {
         // we have incomplete data
     }
+
+    QRegExp rx;
     if (data.startsWith("doc:")) {
         data.remove(0, 4);
         // detect line number, then put text at that position.
-        QRegExp rx = QRegExp("(\\d+)\\s(\\d+)\\s(\\d+)\\s(.*)");
-//        rx.setMinimal(true); // for use with a terminal character if we have text after .*
+        rx = QRegExp("(\\d+)\\s(\\d+)\\s(\\d+)\\s(.*)");
         if (data.contains(rx)) {
             int pos = rx.cap(1).toInt();
             int charsRemoved = rx.cap(2).toInt();
@@ -409,6 +419,31 @@ void Document::participantIncomingData(QString data, int length)
             data = rx.cap(4);
             editor->collabTextChange(pos, charsRemoved, charsAdded, data);
         }
+    }
+    else if (data.startsWith("join:")) {
+        data.remove(0, 5);
+        rx = QRegExp("([a-zA-Z0-9_]*)");
+        if (data.contains(rx)) {
+            QString name = rx.cap(1);
+            participantPane->insertParticipant(name);
+        }
+    }
+    else if (data.startsWith("leave:")) {
+        data.remove(0, 5);
+        rx = QRegExp("([a-zA-Z0-9_]*)");
+        if (data.contains(rx)) {
+            QString name = rx.cap(1);
+            participantPane->removeParticipant(name);
+        }
+    }
+    else if (data.startsWith("populate:")) {
+
+    }
+    else if (data.startsWith("promote:")) {
+
+    }
+    else if (data.startsWith("demote:")) {
+
     }
     else {
         chatPane->appendChatMessage(data);

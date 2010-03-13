@@ -60,6 +60,15 @@ void ParticipantsPane::insertParticipant(QString name, QTcpSocket *socket)
     participant->socket = socket;
 }
 
+void ParticipantsPane::updateName(QString name, QTcpSocket *socket)
+{
+    if (socket) {
+        Participant *participant = participantMap.value(socket);
+        participant->name = name;
+        participant->item->setText(0, name);
+    }
+}
+
 void ParticipantsPane::removeAllParticipants()
 {
     for (int i = 0; i < participantList.size(); i++) {
@@ -99,6 +108,27 @@ void ParticipantsPane::removeParticipant(QTcpSocket *socket)
             return;
         }
     }
+}
+
+void ParticipantsPane::removeParticipant(QString name)
+{
+    // This is a function to be used by the participants in removing participants via control messages.
+    bool alreadyFound = false;
+    QTcpSocket *socket;
+    for (int i = 0; i < participantList.size(); i++) {
+        if (participantList.at(i)->name == name &&) {
+            if (!alreadyFound) {
+                alreadyFound = true;
+                socket = participantList.at(i)->socket;
+            }
+            else {
+                // we have a duplicate name, which shouldn't happen.
+                // it'll be up to the server to make sure it doesn't happen.
+                return;
+            }
+        }
+    }
+    removeParticipant(socket);
 }
 
 bool ParticipantsPane::canWrite(QTcpSocket *socket)
