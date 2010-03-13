@@ -7,5 +7,7 @@ ChatBrowser::ChatBrowser(QWidget *parent) : QPlainTextEdit(parent)
 
 void ChatBrowser::keyPressEvent(QKeyEvent *e)
 {
-    emit keyPress(e);
+    if (e->modifiers() == Qt::NoModifier) {
+        emit keyPress(e);
+    }
 }
