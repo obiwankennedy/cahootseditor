@@ -116,7 +116,7 @@ void ParticipantsPane::removeParticipant(QString name)
     bool alreadyFound = false;
     QTcpSocket *socket;
     for (int i = 0; i < participantList.size(); i++) {
-        if (participantList.at(i)->name == name &&) {
+        if (participantList.at(i)->name == name) {
             if (!alreadyFound) {
                 alreadyFound = true;
                 socket = participantList.at(i)->socket;
