@@ -1,6 +1,8 @@
 #include <QtGui>
 #include <codeeditor.h>
 
+#include <QTextCursor>
+
 CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
 {
     lineNumberArea = new LineNumberArea(this);
@@ -287,91 +289,58 @@ bool CodeEditor::findAll(QString searchString, bool ignoreCase)
 
 bool CodeEditor::findNext(QString searchString, bool ignoreCase, bool wrapAround)
 {
-    (void)ignoreCase;
-    (void)wrapAround;
-
-    // findAll(searchString, ignoreCase);
-
     QTextDocument *document = this->document();
+    QString documentString = document->toPlainText();
+    QTextCursor cursor(document);
+    int position;
 
-    bool found = false;
+    if (this->textCursor().hasSelection()) {
+        position = this->textCursor().position();
+    } else {
+        position = 0;
+    }
 
-    if (searchString == "") {
+    int found = documentString.indexOf(searchString, position, Qt::CaseInsensitive);
+    int length = searchString.size();
+
+    if (found == -1) {
+        return false;
+    } else {
+        cursor.setPosition(found, QTextCursor::MoveAnchor);
+        for (int i = 0; i < length; i++) {
+            cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor);
+        }
+        setTextCursor(cursor);
         return true;
-        // this shouldn't happen, ensure this in the find dialog
     }
-    else {
-        QTextCursor selectionCursor(document);
-        selectionCursor.setPosition(textCursor().position());
-
-        bool firstLoop = true;
-
-        selectionCursor = document->find(searchString, selectionCursor); //, QTextDocument::FindWholeWords);
-
-        if (!selectionCursor.isNull()) {
-            found = true;
-            selectionCursor.movePosition(QTextCursor::EndOfWord, //WordRight,
-                                         QTextCursor::KeepAnchor);
-            setTextCursor(selectionCursor);
-        }
-        else if (firstLoop) {
-            firstLoop = false;
-            selectionCursor.setPosition(0);
-            selectionCursor = document->find(searchString, selectionCursor); //, QTextDocument::FindWholeWords);
-
-            if (!selectionCursor.isNull()) {
-                found = true;
-                selectionCursor.movePosition(QTextCursor::EndOfWord, //WordRight,
-                                             QTextCursor::KeepAnchor);
-                setTextCursor(selectionCursor);
-            }
-        }
-    }
-    return found;
 }
 
 bool CodeEditor::findPrev(QString searchString, bool ignoreCase, bool wrapAround)
 {
-    (void)ignoreCase;
-    (void)wrapAround;
-
     QTextDocument *document = this->document();
+    QString documentString = document->toPlainText();
+    QTextCursor cursor(document);
+    int position;
 
-    bool found = false;
-    bool firstLoop = true;
+    if (this->textCursor().hasSelection()) {
+        position = this->textCursor().selectionStart() - 1;
+    } else {
+        position = 0;
+    }
 
-    if (searchString == "") {
+    int found = documentString.lastIndexOf(searchString, position, Qt::CaseInsensitive);
+    int length = searchString.size();
+
+    if (found == -1) {
+        return false;
+    } else {
+        cursor.setPosition(found, QTextCursor::MoveAnchor);
+        for (int i = 0; i < length; i++) {
+            cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor);
+        }
+        setTextCursor(cursor);
         return true;
-        // this shouldn't happen, ensure this in the find dialog
     }
-    else {
-        QTextCursor selectionCursor(document);
-
-        selectionCursor.setPosition(textCursor().selectionStart()); // selectionStart returns the position OR the start of the cursor's selection's pos
-
-        selectionCursor = document->find(searchString, selectionCursor, QTextDocument::FindBackward); //, QTextDocument::FindWholeWords);
-
-        if (!selectionCursor.isNull()) {
-            found = true;
-            selectionCursor.movePosition(QTextCursor::EndOfWord, QTextCursor::KeepAnchor);
-            setTextCursor(selectionCursor);
-        }
-        else if (firstLoop) {
-            firstLoop = false;
-
-            QTextCursor looparoundCursor(this->document()->lastBlock());
-            looparoundCursor.movePosition(QTextCursor::EndOfLine);
-
-            looparoundCursor = document->find(searchString, looparoundCursor, QTextDocument::FindBackward); //, QTextDocument::FindWholeWords);
-
-            if (!looparoundCursor.isNull()) {
-                found = true;
-                looparoundCursor.movePosition(QTextCursor::EndOfWord, QTextCursor::KeepAnchor);
-                setTextCursor(looparoundCursor);
-            }
-        }
-    }
-    return found;
 }
 
 void CodeEditor::updateLineNumberAreaWidth(int /* newBlockCount */)
