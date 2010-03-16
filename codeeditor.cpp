@@ -289,6 +289,8 @@ bool CodeEditor::findAll(QString searchString, bool ignoreCase)
 
 bool CodeEditor::findNext(QString searchString, bool ignoreCase, bool wrapAround)
 {
+    wrapAround = true; // temporary
+
     QTextDocument *document = this->document();
     QString documentString = document->toPlainText();
     QTextCursor cursor(document);
@@ -300,19 +302,40 @@ bool CodeEditor::findNext(QString searchString, bool ignoreCase, bool wrapAround
         position = 0;
     }
 
-    int found = documentString.indexOf(searchString, position, Qt::CaseInsensitive);
+    bool found = false;
+    position = documentString.indexOf(searchString, position, Qt::CaseInsensitive);
     int length = searchString.size();
 
-    if (found == -1) {
-        return false;
-    } else {
-        cursor.setPosition(found, QTextCursor::MoveAnchor);
+    if (position != -1) {
+        cursor.setPosition(position, QTextCursor::MoveAnchor);
         for (int i = 0; i < length; i++) {
             cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor);
         }
         setTextCursor(cursor);
-        return true;
+        found = true;
     }
+    else if (wrapAround){
+        position = 0; // move cursor to the beginning and begin searching again
+        position = documentString.indexOf(searchString, position, Qt::CaseInsensitive);
+        length = searchString.size();
+
+        if (position != -1) {
+            cursor.setPosition(position, QTextCursor::MoveAnchor);
+            for (int i = 0; i < length; i++) {
+                cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor);
+            }
+            setTextCursor(cursor);
+            found = true;
+        }
+        else {
+            found = false;
+        }
+    }
+    else {
+        found = false;
+    }
+
+    return found;
 }
 
 bool CodeEditor::findPrev(QString searchString, bool ignoreCase, bool wrapAround)
