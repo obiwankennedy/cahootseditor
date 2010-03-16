@@ -36,6 +36,9 @@ public:
     void shiftRight();
     void unCommentSelection();
 
+    void setHighlighter(int Highlighter);
+    enum Highlighter {None, CPlusPlus, Python};
+
     // This sets up the document so people can connect to it.
     // Hopefully we can do something with Bonjour so you can browse for local documents
     // but that's down the road.
@@ -61,6 +64,7 @@ public:
     void previewAsHtml();
 
     void splitEditor();
+    void unSplitEditor();
     bool isEditorSplit();
     bool isAnnounced();
 
@@ -80,7 +84,7 @@ private:
 
     QStringList extraDataList;
 
-    CppHighlighter *cppHighlighter;
+    CppHighlighter *highlighter;
 
     CodeEditor *editor;
     CodeEditor *bottomEditor;

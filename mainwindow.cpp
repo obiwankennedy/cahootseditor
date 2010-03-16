@@ -218,6 +218,11 @@ void MainWindow::on_actionFile_New_triggered()
     
     ui->tabWidget->setCurrentIndex(index);
     ui->actionTools_Announce_Document->setEnabled(true);
+
+
+    ui->actionWindow_Next_Document->setEnabled(ui->tabWidget->count() > 1);
+    ui->actionWindow_Previous_Document->setEnabled(ui->tabWidget->count() > 1);
+
 }
 
 void MainWindow::on_actionFile_Open_triggered()
@@ -248,6 +253,9 @@ void MainWindow::on_actionFile_Open_triggered()
         openPath = QFileInfo(fileName).path();
 
         ui->actionTools_Announce_Document->setEnabled(true);
+
+        ui->actionWindow_Next_Document->setEnabled(ui->tabWidget->count() > 1);
+        ui->actionWindow_Previous_Document->setEnabled(ui->tabWidget->count() > 1);
     }
 }
 
@@ -325,6 +333,9 @@ bool MainWindow::on_actionFile_Save_All_triggered()
 void MainWindow::on_actionFile_Close_triggered()
 {
     tabCloseClicked(ui->tabWidget->currentIndex());
+
+    ui->actionWindow_Next_Document->setEnabled(ui->tabWidget->count() > 1);
+    ui->actionWindow_Previous_Document->setEnabled(ui->tabWidget->count() > 1);
 }
 
 void MainWindow::on_actionFile_Print_triggered()
@@ -370,6 +381,21 @@ void MainWindow::on_actionEdit_Paste_triggered()
 void MainWindow::on_actionEdit_Find_triggered()
 {
     findDialog->show();
+}
+
+void MainWindow::on_actionEdit_None_triggered()
+{
+    tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->setHighlighter(Document::None);
+}
+
+void MainWindow::on_actionEdit_C_triggered()
+{
+
+}
+
+void MainWindow::on_actionEdit_Python_triggered()
+{
+
 }
 
 void MainWindow::on_actionView_Line_Wrap_triggered()
@@ -436,6 +462,39 @@ void MainWindow::on_actionWindow_Split_triggered()
 {
     tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->splitEditor();
     ui->actionWindow_Split->setDisabled(true);
+    ui->actionWindow_Remove_Split->setEnabled(true);
+}
+
+void MainWindow::on_actionWindow_Remove_Split_triggered()
+{
+    ui->actionWindow_Split->setDisabled(false);
+    ui->actionWindow_Remove_Split->setEnabled(false);
+    tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->unSplitEditor();
+}
+
+void MainWindow::on_actionWindow_Next_Document_triggered()
+{
+    int numDocs = ui->tabWidget->count();
+    int curTab = ui->tabWidget->currentIndex();
+    if (numDocs == 1) {
+        return;
+    }
+    ui->tabWidget->setCurrentIndex((curTab + 1) % numDocs);
+}
+
+void MainWindow::on_actionWindow_Previous_Document_triggered()
+{
+    int numDocs = ui->tabWidget->count();
+    int curTab = ui->tabWidget->currentIndex();
+    if (numDocs == 1) {
+        return;
+    }
+    if (curTab == 0) {
+        ui->tabWidget->setCurrentIndex(ui->tabWidget->count() - 1);
+    }
+    else {
+        ui->tabWidget->setCurrentIndex(curTab - 1);
+    }
 }
 
 void MainWindow::setUndoability(bool b)
@@ -453,6 +512,8 @@ void MainWindow::documentChanged(int index)
     ui->actionEdit_Undo->setEnabled(tabWidgetToDocumentMap.value(ui->tabWidget->widget(index))->isUndoable());
     ui->actionEdit_Redo->setEnabled(tabWidgetToDocumentMap.value(ui->tabWidget->widget(index))->isRedoable());
     ui->actionWindow_Split->setDisabled(tabWidgetToDocumentMap.value(ui->tabWidget->widget(index))->isEditorSplit());
+    ui->actionWindow_Remove_Split->setEnabled(tabWidgetToDocumentMap.value(ui->tabWidget->widget(index))->isEditorSplit());
+
     ui->actionTools_Announce_Document->setDisabled(tabWidgetToDocumentMap.value(ui->tabWidget->widget(index))->isAnnounced());
 }
 

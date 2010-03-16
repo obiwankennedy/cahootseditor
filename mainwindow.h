@@ -63,6 +63,10 @@ private slots:
     void on_actionEdit_Paste_triggered();
     void on_actionEdit_Find_triggered();
 
+    void on_actionEdit_None_triggered();
+    void on_actionEdit_C_triggered();
+    void on_actionEdit_Python_triggered();
+
     void on_actionView_Line_Wrap_triggered();
 
     void on_actionTools_Announce_Document_triggered();
@@ -76,6 +80,9 @@ private slots:
     void on_actionWindow_Hide_Show_Participants_triggered();
     void on_actionWindow_Hide_Show_Chat_triggered();
     void on_actionWindow_Split_triggered();
+    void on_actionWindow_Remove_Split_triggered();
+    void on_actionWindow_Next_Document_triggered();
+    void on_actionWindow_Previous_Document_triggered();
 
     void setUndoability(bool b);
     void setRedoability(bool b);

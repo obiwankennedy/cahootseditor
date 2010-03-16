@@ -34,7 +34,18 @@ Document::Document(QWidget *parent) :
     editor->setTabStopWidth(fm.averageCharWidth() * 4);
     ui->editorSplitter->insertWidget(0, editor);
     
-    cppHighlighter = new CppHighlighter(editor->document());
+    // for split pane editing
+    delete ui->bottomEditorFrame;
+    bottomEditor = new CodeEditor(this);
+    bottomEditor->setFont(editor->font());
+    bottomEditor->setTabStopWidth(fm.averageCharWidth() * 4);
+    ui->editorSplitter->insertWidget(1, bottomEditor);
+    // we don't need the default document since we're using the document of the original editor
+    bottomEditor->document()->deleteLater();
+    bottomEditor->setDocument(editor->document());
+    bottomEditor->hide();
+
+    highlighter = new CppHighlighter(editor->document());
 
     delete ui->participantFrame;
     participantPane = new ParticipantsPane();
@@ -46,11 +57,6 @@ Document::Document(QWidget *parent) :
 
     connect(editor, SIGNAL(undoAvailable(bool)), this, SIGNAL(undoAvailable(bool)));
     connect(editor, SIGNAL(redoAvailable(bool)), this, SIGNAL(redoAvailable(bool)));
-
-    connect(editor->document(), SIGNAL(contentsChange(int,int,int)), this, SLOT(onTextChange(int,int,int)));
-    connect(chatPane, SIGNAL(returnPressed(QString)), this, SLOT(onChatSend(QString)));
-
-    connect(participantPane, SIGNAL(memberCanNowRead(QTcpSocket*)), this, SLOT(populateDocumentForUser(QTcpSocket*)));
 
     server = new QTcpServer(this);
     socket = new QTcpSocket(this);
@@ -85,9 +91,12 @@ void Document::connectToDocument(QStringList *list)
     setParticipantsHidden(false);
     participantPane->setConnectInfo(QString("%1:%2").arg(address).arg(portString));
     delete list;
+
+    connect(editor->document(), SIGNAL(contentsChange(int,int,int)), this, SLOT(onTextChange(int,int,int)));
+    connect(chatPane, SIGNAL(returnPressed(QString)), this, SLOT(onChatSend(QString)));
+
     connect(socket, SIGNAL(disconnected()), this, SLOT(disconnected()));
     connect(socket, SIGNAL(connected()), this, SLOT(onNewConnection()));
-    connect(socket, SIGNAL(readyRead()), this, SLOT(onIncomingData()));
 }
 
 void Document::undo()
@@ -186,12 +195,30 @@ void Document::unCommentSelection()
     editor->unCommentSelection();
 }
 
+void Document::setHighlighter(int Highlighter)
+{
+    if (Highlighter == None) {
+        highlighter->deleteLater();
+    }
+    else if (Highlighter == CPlusPlus) {
+
+    }
+    else if (Highlighter == Python) {
+
+    }
+}
+
 void Document::announceDocument()
 {
     isAlreadyAnnounced = true;
     participantPane->setOwnership(isOwner);
     setChatHidden(false);
     setParticipantsHidden(false);
+
+    connect(editor->document(), SIGNAL(contentsChange(int,int,int)), this, SLOT(onTextChange(int,int,int)));
+    connect(chatPane, SIGNAL(returnPressed(QString)), this, SLOT(onChatSend(QString)));
+
+    connect(participantPane, SIGNAL(memberCanNowRead(QTcpSocket*)), this, SLOT(populateDocumentForUser(QTcpSocket*)));
 
     connect(server, SIGNAL(newConnection()), this, SLOT(onNewConnection()));
     server->listen(QHostAddress::Any, 0); // Port is chosen automatically, listening on all NICs
@@ -297,23 +324,20 @@ void Document::splitEditor()
     if (isEditorSplit()) {
         return;
     }
-    else {
-        isAlreadySplit = true;
-        delete ui->bottomEditorFrame;
-        bottomEditor = new CodeEditor(this);
-        bottomEditor->setFont(editor->font());
-        QFontMetrics fm(editor->font());
-        bottomEditor->setTabStopWidth(fm.averageCharWidth() * 4);
-        ui->editorSplitter->insertWidget(1, bottomEditor);
-        // we don't need the default document since we're using the document of the original editor
-        bottomEditor->document()->deleteLater();
-        bottomEditor->setDocument(editor->document());
+    bottomEditor->show();
+}
+
+void Document::unSplitEditor()
+{
+    if (!isEditorSplit()) {
+        return;
     }
+    bottomEditor->hide();
 }
 
 bool Document::isEditorSplit()
 {
-    return isAlreadySplit;
+    return !bottomEditor->isHidden();
 }
 
 bool Document::isAnnounced()
@@ -567,6 +591,7 @@ void Document::onNewConnection()
         connect(participantPane->participantList.last()->socket, SIGNAL(disconnected()), this, SLOT(disconnected()));
     }
     else {
+        qDebug() << "helo:" << myName;
         connect(socket, SIGNAL(readyRead()), this, SLOT(onIncomingData()));
         // The owner does not get this message, probably because it comes before the readyRead() is hooked up?
         socket->write(QString("helo:%1").arg(myName).toAscii());
