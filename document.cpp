@@ -86,6 +86,7 @@ void Document::connectToDocument(QStringList *list)
     participantPane->setConnectInfo(QString("%1:%2").arg(address).arg(portString));
     delete list;
     connect(socket, SIGNAL(disconnected()), this, SLOT(disconnected()));
+    connect(socket, SIGNAL(connected()), this, SLOT(onNewConnection()));
     connect(socket, SIGNAL(readyRead()), this, SLOT(onIncomingData()));
 }
 
@@ -353,6 +354,7 @@ void Document::ownerIncomingData(QString data, QTcpSocket *sender, int length)
         }
     }
     else if (data.startsWith("helo:")) {
+        qDebug() << "helo received";
         data.remove(0, 5);
         rx = QRegExp("([a-zA-Z0-9_]*)");
         if (data.contains(rx)) {
@@ -360,6 +362,9 @@ void Document::ownerIncomingData(QString data, QTcpSocket *sender, int length)
             participantPane->updateName(name, socket);
             toSend = "join:" + name;
         }
+    }
+    else if (data.startsWith("resync")) { // user requesting resync of the entire document
+        populateDocumentForUser(sender);
     }
     else {
         toSend = QString("Someone: %2").arg(data);
@@ -391,8 +396,6 @@ void Document::ownerIncomingData(QString data, QTcpSocket *sender, int length)
 
 void Document::participantIncomingData(QString data, int length)
 {
-    qDebug() << "pdata: " << data;
-
     bool haveExtra = false;
     QString rest;
 
@@ -401,11 +404,12 @@ void Document::participantIncomingData(QString data, int length)
         rest = data;
         rest.remove(0, length);
         data.remove(length, data.length() - length);
-        qDebug() << "data: " << data << ", rest: " << rest;
     }
     else if (length > data.length()) {
         // we have incomplete data
     }
+
+    qDebug() << "pdata: " << data;
 
     QRegExp rx;
     if (data.startsWith("doc:")) {
@@ -425,19 +429,24 @@ void Document::participantIncomingData(QString data, int length)
         rx = QRegExp("([a-zA-Z0-9_]*)");
         if (data.contains(rx)) {
             QString name = rx.cap(1);
-            participantPane->insertParticipant(name);
+            participantPane->newParticipant(name);
         }
     }
     else if (data.startsWith("leave:")) {
-        data.remove(0, 5);
+        data.remove(0, 6);
         rx = QRegExp("([a-zA-Z0-9_]*)");
         if (data.contains(rx)) {
             QString name = rx.cap(1);
             participantPane->removeParticipant(name);
         }
     }
-    else if (data.startsWith("populate:")) {
+    else if (data.startsWith("populate:")) { // populate users data
 
+    }
+    else if (data.startsWith("sync:")) { // this packet is the entire document
+        data.remove(0, 5);
+        // set the document's contents to the contents of the packet
+        editor->setPlainText(data);
     }
     else if (data.startsWith("promote:")) {
 
@@ -523,12 +532,10 @@ void Document::onIncomingData()
     QRegExp rx = QRegExp("^(\\d+)*.");
     int length;
     bool ok;
-    qint64 availableBytes;
 
     if (isOwner) {
-        // We know we have incoming data, so iterate through our current participants to find the correct sender
+        // cast the sender() of this signal to a QTcpSocket
         QTcpSocket *sock = qobject_cast<QTcpSocket *>(sender());
-        availableBytes = sock->bytesAvailable();
         data = sock->readAll();
         if (data.contains(rx)) {
             length = rx.cap(1).toInt(&ok);
@@ -539,7 +546,6 @@ void Document::onIncomingData()
         }
     }
     else { // We are a participant
-        availableBytes = socket->bytesAvailable();
         data = socket->readAll();
         if (data.contains(rx)) {
             length = rx.cap(1).toInt(&ok);
@@ -556,19 +562,21 @@ void Document::onIncomingData()
 void Document::onNewConnection()
 {
     if (isOwner) {
-        participantPane->insertParticipant("Newbie", server->nextPendingConnection());
+        participantPane->newParticipant(server->nextPendingConnection());
         connect(participantPane->participantList.last()->socket, SIGNAL(readyRead()), this, SLOT(onIncomingData()));
         connect(participantPane->participantList.last()->socket, SIGNAL(disconnected()), this, SLOT(disconnected()));
     }
     else {
         connect(socket, SIGNAL(readyRead()), this, SLOT(onIncomingData()));
+        // The owner does not get this message, probably because it comes before the readyRead() is hooked up?
+        socket->write(QString("helo:%1").arg(myName).toAscii());
     }
 }
 
 void Document::populateDocumentForUser(QTcpSocket *socket)
 {
     qDebug() << "Sending entire document";
-    QString toSend = QString("doc:%1 %2 %3 %4").arg(0).arg(0).arg(editor->document()->characterCount()).arg(editor->toPlainText());
+    QString toSend = QString("sync:%1").arg(editor->toPlainText());
     socket->write(QString("%1 %2").arg(toSend.length()).arg(toSend).toAscii());
 }
 
