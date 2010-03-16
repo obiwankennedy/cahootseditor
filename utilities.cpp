@@ -4,11 +4,11 @@
 
 // Fonts
 const QString Utilities::codeFont = getSystem() == "Windows" ? "Monaco" : (getSystem() == "Mac" ? "Monaco" : "Courier 10 Pitch");
-const int Utilities::codeFontSize = getSystem() == "Mac" ? 12 : 9;
+const int Utilities::codeFontSize = getSystem() == "Mac" ? 11 : 9;
 const QString Utilities::labelFont = getSystem() == "Mac" ? "Lucida Grande" : "Verdana";
-const int Utilities::labelFontSize = getSystem() == "Mac" ? 13 : 8;
+const int Utilities::labelFontSize = getSystem() == "Mac" ? 11 : 8;
 const QString Utilities::chatFont = getSystem() == "Mac" ? "Lucida Grande" : "Verdana";
-const int Utilities::chatFontSize = getSystem() == "Mac" ? 13 : 8;
+const int Utilities::chatFontSize = getSystem() == "Mac" ? 11 : 8;
 
 QString Utilities::getSystem() {
     #ifdef Q_WS_X11
