@@ -29,9 +29,14 @@ public:
 
     void setConnectInfo(QString str);
 
-    void insertParticipant(QString name, QTcpSocket *socket = 0);
+    // Owner participant pane function
+    void newParticipant(QTcpSocket *socket);
 
-    void updateName(QString name, QTcpSocket *socket = 0);
+    // Client participant pane add participant functions
+    void newParticipant(QString name);
+
+    // Owner participant function to update someone's name when it gets populated
+    void updateName(QString name, QTcpSocket *socket);
 
     // For when we disconnect
     void removeAllParticipants();

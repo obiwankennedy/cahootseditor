@@ -42,31 +42,62 @@ void ParticipantsPane::setConnectInfo(QString str)
     ui->connectInfoLabel->setText(str);
 }
 
-void ParticipantsPane::insertParticipant(QString name, QTcpSocket *socket)
+void ParticipantsPane::newParticipant(QTcpSocket *socket)
 {
+    qDebug() << socket << " connected";
+    // Add a participant, but don't make an item until we have a name.
+    // Once we have a name, we updateName() (below) and insert it to the treeWidget
     Participant *participant = new Participant;
     participantList.append(participant);
     participantMap.insert(socket, participant);
 
-    participant->color = QColor::fromHsv(qrand() % 256, 190, 190);
-    participant->color = participant->color.lighter(150);
-    participant->name = name;
-    participant->item = new QTreeWidgetItem(waitItem);
-
-    participant->item->setText(0, name);
-    participant->item->setBackgroundColor(1, participant->color);
-
     participant->permissions = Waiting;
     participant->socket = socket;
+
+    participant->item = new QTreeWidgetItem(waitItem);
+    participant->item->setText(0, "Untitled");
+
+
+}
+
+void ParticipantsPane::newParticipant(QString name)
+{
+    // The server has given us a name to add to the treeWidget
+    Participant *participant = new Participant;
+    participantList.append(participant);
+
+    QRegExp nameRx("[a-zA-Z0-9_]*");
+    if (name.contains(nameRx)) {
+        participant->name = nameRx.cap(1);
+    }
+    else {
+        return; // this is an invalid name
+    }
+    participant->permissions = Waiting;
+    // everyone has their own colors - colors aren't consistent across participants
+    participant->color = QColor::fromHsv(qrand() % 256, 190, 190);
+    participant->color = participant->color.lighter(150);
+
+    participant->item = new QTreeWidgetItem(waitItem);
+    participant->item->setText(0, name);
+    participant->item->setBackgroundColor(1, participant->color);
+    participant->item->setToolTip(0, name);
 }
 
 void ParticipantsPane::updateName(QString name, QTcpSocket *socket)
 {
-    if (socket) {
-        Participant *participant = participantMap.value(socket);
-        participant->name = name;
-        participant->item->setText(0, name);
-    }
+    qDebug() << name << " joined.";
+    Participant *participant = participantMap.value(socket);
+    // if the item hasn't been created yet, create it with name and add it to the widget
+    participant->name = name;
+    // This HAS to be waitItem (enforced by having no mechanic to promote the item) until
+    // we add it to the treeWidget.
+    participant->item->setText(0, name);
+
+    participant->color = QColor::fromHsv(qrand() % 256, 190, 190);
+    participant->color = participant->color.lighter(150);
+
+    participant->item->setBackgroundColor(1, participant->color);
 }
 
 void ParticipantsPane::removeAllParticipants()
