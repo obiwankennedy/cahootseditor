@@ -1,6 +1,8 @@
 #include "chatpane.h"
 #include "ui_chatpane.h"
 
+#include "utilities.h"
+
 #include <QDebug>
 #include <QKeyEvent>
 #include <QGridLayout>
@@ -21,6 +23,9 @@ ChatPane::ChatPane(QWidget *parent) :
     layout->addWidget(chatBrowser, 0, 0);
     layout->addWidget(ui->lineEdit, 1, 0);
     this->setLayout(layout);
+
+    chatBrowser->setFont(QFont(Utilities::chatFont, Utilities::chatFontSize));
+    ui->lineEdit->setFont(QFont(Utilities::chatFont, Utilities::chatFontSize));
 
     connect(chatBrowser, SIGNAL(keyPress(QKeyEvent*)), this, SLOT(textBrowserKeyPress(QKeyEvent*)));
 }

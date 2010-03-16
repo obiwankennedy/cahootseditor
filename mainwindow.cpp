@@ -1,6 +1,8 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+#include "utilities.h"
+
 #include <QMessageBox>
 #include <QFileDialog>
 #include <QTextCodec>
@@ -16,6 +18,8 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
+    ui->tabWidget->setFont(QFont(Utilities::labelFont, Utilities::labelFontSize));
 
     connect(ui->tabWidget, SIGNAL(currentChanged(int)), this, SLOT(documentChanged(int)));
     connect(ui->tabWidget, SIGNAL(tabCloseRequested(int)), this, SLOT(tabCloseClicked(int)));
@@ -35,6 +39,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     findToolbar = new FindToolBar(this);
     ui->mainToolBar->addWidget(findToolbar);
+    findToolbar->setFont(QFont(Utilities::codeFont, Utilities::codeFontSize));
     connect(findToolbar, SIGNAL(findAll(QString)), this, SLOT(findAllTriggered(QString)));
 
     tabWidgetToDocumentMap.insert(ui->tabWidget->currentWidget(), document);

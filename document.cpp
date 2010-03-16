@@ -1,6 +1,8 @@
 #include "document.h"
 #include "ui_document.h"
 
+#include "utilities.h"
+
 #include <QDialog>
 #include <QKeyEvent>
 #include <QTextCursor>
@@ -23,13 +25,14 @@ Document::Document(QWidget *parent) :
 {
     ui->setupUi(this);
 
+
     ui->bottomEditorFrame->hide();
 
     isAlreadySplit = false;
 
     delete ui->editorFrame;
     editor = new CodeEditor(this);
-    editor->setFont(QFont("Monaco", 11));
+    editor->setFont(QFont(Utilities::codeFont, Utilities::codeFontSize));
     QFontMetrics fm(editor->font());
     editor->setTabStopWidth(fm.averageCharWidth() * 4);
     ui->editorSplitter->insertWidget(0, editor);

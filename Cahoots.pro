@@ -28,7 +28,8 @@ SOURCES += main.cpp \
     client.cpp \
     findtoolbar.cpp \
     server.cpp \
-    chatbrowser.cpp
+    chatbrowser.cpp \
+    utilities.cpp
 HEADERS += mainwindow.h \
     document.h \
     highlighters/cpphighlighter.h \
@@ -42,7 +43,8 @@ HEADERS += mainwindow.h \
     findtoolbar.h \
     enu.h \
     server.h \
-    chatbrowser.h
+    chatbrowser.h \
+    utilities.h
 FORMS += mainwindow.ui \
     document.ui \
     connecttodocument.ui \

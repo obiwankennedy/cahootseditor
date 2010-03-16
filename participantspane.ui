@@ -56,6 +56,9 @@
      <attribute name="headerVisible">
       <bool>false</bool>
      </attribute>
+     <attribute name="headerVisible">
+      <bool>false</bool>
+     </attribute>
      <column>
       <property name="text">
        <string>Participant</string>
@@ -135,6 +138,9 @@
    </item>
    <item>
     <widget class="QPushButton" name="promotePushButton">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="text">
       <string>Promote</string>
      </property>
@@ -142,6 +148,9 @@
    </item>
    <item>
     <widget class="QPushButton" name="demotePushButton">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="text">
       <string>Demote</string>
      </property>
