@@ -43,7 +43,7 @@
       </property>
       <widget class="QWidget" name="tab">
        <attribute name="title">
-        <string>Untitled</string>
+        <string>untitled.txt</string>
        </attribute>
       </widget>
      </widget>
