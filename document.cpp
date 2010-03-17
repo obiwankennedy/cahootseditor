@@ -27,8 +27,6 @@ Document::Document(QWidget *parent) :
 
     ui->bottomEditorFrame->hide();
 
-    isAlreadySplit = false;
-
     delete ui->editorFrame;
     editor = new CodeEditor(this);
     editor->setFont(QFont(Utilities::codeFont, Utilities::codeFontSize));
@@ -322,9 +320,13 @@ void Document::previewAsHtml()
 
 void Document::splitEditor()
 {
-    if (isEditorSplit()) {
-        return;
-    }
+    ui->editorSplitter->setOrientation(Qt::Vertical);
+    bottomEditor->show();
+}
+
+void Document::splitEditorSideBySide()
+{
+    ui->editorSplitter->setOrientation(Qt::Horizontal);
     bottomEditor->show();
 }
 
@@ -339,6 +341,11 @@ void Document::unSplitEditor()
 bool Document::isEditorSplit()
 {
     return !bottomEditor->isHidden();
+}
+
+bool Document::isEditorSplitSideBySide()
+{
+    return ui->editorSplitter->orientation() == Qt::Horizontal;
 }
 
 bool Document::isAnnounced()

@@ -29,7 +29,6 @@ private:
     QString openPath;
     ConnectToDocument *connectDialog;
     FindDialog *findDialog;
-    FindToolBar *findToolbar;
 
     bool save(int index);
     bool maybeSave(int index);
@@ -68,6 +67,8 @@ private slots:
     void on_actionEdit_Python_triggered();
 
     void on_actionView_Line_Wrap_triggered();
+    void on_actionView_Hide_Show_Participants_triggered();
+    void on_actionView_Hide_Show_Chat_triggered();
 
     void on_actionTools_Announce_Document_triggered();
     void on_actionTools_Connect_to_Document_triggered();
@@ -77,9 +78,8 @@ private slots:
     void on_actionText_Shift_Right_triggered();
     void on_actionText_Comment_Line_triggered();
 
-    void on_actionWindow_Hide_Show_Participants_triggered();
-    void on_actionWindow_Hide_Show_Chat_triggered();
     void on_actionWindow_Split_triggered();
+    void on_actionWindow_Split_Side_by_Side_triggered();
     void on_actionWindow_Remove_Split_triggered();
     void on_actionWindow_Next_Document_triggered();
     void on_actionWindow_Previous_Document_triggered();

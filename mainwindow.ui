@@ -56,7 +56,7 @@
      <x>0</x>
      <y>0</y>
      <width>720</width>
-     <height>23</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -100,6 +100,8 @@
      <string>View</string>
     </property>
     <addaction name="actionView_Line_Wrap"/>
+    <addaction name="actionView_Hide_Show_Participants"/>
+    <addaction name="actionView_Hide_Show_Chat"/>
    </widget>
    <widget class="QMenu" name="menuText">
     <property name="title">
@@ -124,9 +126,8 @@
     <property name="title">
      <string>Window</string>
     </property>
-    <addaction name="actionWindow_Hide_Show_Participants"/>
-    <addaction name="actionWindow_Hide_Show_Chat"/>
     <addaction name="actionWindow_Split"/>
+    <addaction name="actionWindow_Split_Side_by_Side"/>
     <addaction name="actionWindow_Remove_Split"/>
     <addaction name="separator"/>
     <addaction name="actionWindow_Next_Document"/>
@@ -407,12 +408,12 @@
     <string>Ctrl+Shift+A</string>
    </property>
   </action>
-  <action name="actionWindow_Hide_Show_Participants">
+  <action name="actionView_Hide_Show_Participants">
    <property name="text">
     <string>Show/Hide Participants</string>
    </property>
   </action>
-  <action name="actionWindow_Hide_Show_Chat">
+  <action name="actionView_Hide_Show_Chat">
    <property name="text">
     <string>Show/Hide Chat</string>
    </property>
@@ -471,6 +472,11 @@
    </property>
    <property name="text">
     <string>Remove Split</string>
+   </property>
+  </action>
+  <action name="actionWindow_Split_Side_by_Side">
+   <property name="text">
+    <string>Split Side by Side</string>
    </property>
   </action>
  </widget>

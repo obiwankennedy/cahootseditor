@@ -39,11 +39,6 @@ MainWindow::MainWindow(QWidget *parent)
     tabLayout->setContentsMargins(0,0,0,0);
     ui->tabWidget->widget(0)->setLayout(tabLayout);
 
-    findToolbar = new FindToolBar(this);
-    ui->mainToolBar->addWidget(findToolbar);
-    findToolbar->setFont(QFont(Utilities::codeFont, Utilities::codeFontSize));
-    connect(findToolbar, SIGNAL(findAll(QString)), this, SLOT(findAllTriggered(QString)));
-
     tabWidgetToDocumentMap.insert(ui->tabWidget->currentWidget(), document);
 
     connect(document, SIGNAL(undoAvailable(bool)), this, SLOT(setUndoability(bool)));
@@ -411,6 +406,27 @@ void MainWindow::on_actionView_Line_Wrap_triggered()
     tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->toggleLineWrap();
 }
 
+void MainWindow::on_actionView_Hide_Show_Participants_triggered()
+{
+
+    if (tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->isParticipantsHidden()) {
+        tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->setParticipantsHidden(false);
+    }
+    else {
+        tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->setParticipantsHidden(true);
+    }
+}
+
+void MainWindow::on_actionView_Hide_Show_Chat_triggered()
+{
+    if (tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->isChatHidden()) {
+        tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->setChatHidden(false);
+    }
+    else {
+        tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->setChatHidden(true);
+    }
+}
+
 void MainWindow::on_actionTools_Announce_Document_triggered()
 {
     tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->announceDocument();
@@ -444,37 +460,27 @@ void MainWindow::on_actionText_Comment_Line_triggered()
     tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->unCommentSelection();
 }
 
-void MainWindow::on_actionWindow_Hide_Show_Participants_triggered()
-{
-
-    if (tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->isParticipantsHidden()) {
-        tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->setParticipantsHidden(false);
-    }
-    else {
-        tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->setParticipantsHidden(true);
-    }
-}
-
-void MainWindow::on_actionWindow_Hide_Show_Chat_triggered()
-{
-    if (tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->isChatHidden()) {
-        tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->setChatHidden(false);
-    }
-    else {
-        tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->setChatHidden(true);
-    }
-}
-
 void MainWindow::on_actionWindow_Split_triggered()
 {
     tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->splitEditor();
     ui->actionWindow_Split->setDisabled(true);
+    ui->actionWindow_Split_Side_by_Side->setDisabled(false);
     ui->actionWindow_Remove_Split->setEnabled(true);
+}
+
+void MainWindow::on_actionWindow_Split_Side_by_Side_triggered()
+{
+    tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->splitEditorSideBySide();
+    ui->actionWindow_Split->setDisabled(false);
+    ui->actionWindow_Split_Side_by_Side->setDisabled(true);
+    ui->actionWindow_Remove_Split->setEnabled(true);
+
 }
 
 void MainWindow::on_actionWindow_Remove_Split_triggered()
 {
     ui->actionWindow_Split->setDisabled(false);
+    ui->actionWindow_Split_Side_by_Side->setDisabled(false);
     ui->actionWindow_Remove_Split->setEnabled(false);
     tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->unSplitEditor();
 }
@@ -516,12 +522,14 @@ void MainWindow::setRedoability(bool b)
 
 void MainWindow::documentChanged(int index)
 {
-    ui->actionEdit_Undo->setEnabled(tabWidgetToDocumentMap.value(ui->tabWidget->widget(index))->isUndoable());
-    ui->actionEdit_Redo->setEnabled(tabWidgetToDocumentMap.value(ui->tabWidget->widget(index))->isRedoable());
-    ui->actionWindow_Split->setDisabled(tabWidgetToDocumentMap.value(ui->tabWidget->widget(index))->isEditorSplit());
-    ui->actionWindow_Remove_Split->setEnabled(tabWidgetToDocumentMap.value(ui->tabWidget->widget(index))->isEditorSplit());
+    Document *document = tabWidgetToDocumentMap.value(ui->tabWidget->widget(index));
+    ui->actionEdit_Undo->setEnabled(document->isUndoable());
+    ui->actionEdit_Redo->setEnabled(document->isRedoable());
+    ui->actionWindow_Split->setDisabled(document->isEditorSplit() && !document->isEditorSplitSideBySide());
+    ui->actionWindow_Split_Side_by_Side->setDisabled(document->isEditorSplit() && document->isEditorSplitSideBySide());
 
-    ui->actionTools_Announce_Document->setDisabled(tabWidgetToDocumentMap.value(ui->tabWidget->widget(index))->isAnnounced());
+    ui->actionWindow_Remove_Split->setEnabled(document->isEditorSplit());
+    ui->actionTools_Announce_Document->setDisabled(document->isAnnounced());
 }
 
 void MainWindow::tabCloseClicked(int index)

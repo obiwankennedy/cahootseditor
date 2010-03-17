@@ -7,6 +7,7 @@
 #include "participantspane.h"
 #include "chatpane.h"
 #include "enu.h"
+#include "findtoolbar.h"
 
 #include "client.h"
 
@@ -65,8 +66,10 @@ public:
     void previewAsHtml();
 
     void splitEditor();
+    void splitEditorSideBySide();
     void unSplitEditor();
     bool isEditorSplit();
+    bool isEditorSplitSideBySide();
     bool isAnnounced();
 
     // This tells us if we're the host/owner of the document,
@@ -89,8 +92,9 @@ private:
 
     CodeEditor *editor;
     CodeEditor *bottomEditor;
-    bool isAlreadySplit;
     bool isAlreadyAnnounced;
+
+    FindToolBar *findToolbar;
 
     ParticipantsPane *participantPane;
 
