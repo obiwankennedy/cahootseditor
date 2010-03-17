@@ -35,7 +35,7 @@ private slots:
     void on_previousDocsComboBox_currentIndexChanged();
 
 signals:
-    void connectToDocumentClicked(QStringList *list);
+    void connectToDocumentClicked(QStringList list);
 
 };
 

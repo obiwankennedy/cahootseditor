@@ -15,6 +15,7 @@ public:
     static const int chatFontSize;
 
     static QString getSystem();
+
 };
 
 #endif // UTILITIES_H

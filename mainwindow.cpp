@@ -25,11 +25,11 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->tabWidget, SIGNAL(tabCloseRequested(int)), this, SLOT(tabCloseClicked(int)));
 
     connectDialog = new ConnectToDocument(this);
-    connect(connectDialog, SIGNAL(connectToDocumentClicked(QStringList*)), this, SLOT(connectToDocument(QStringList*)));
+    connect(connectDialog, SIGNAL(connectToDocumentClicked(QStringList)), this, SLOT(connectToDocument(QStringList)));
 
     findDialog = new FindDialog(this);
-    connect(findDialog, SIGNAL(findDialogFindNext(QString,bool,bool)), this, SLOT(findNextTriggered(QString,bool,bool)));
-    connect(findDialog, SIGNAL(findDialogFindPrev(QString,bool,bool)), this, SLOT(findPrevTriggered(QString,bool,bool)));
+    connect(findDialog, SIGNAL(findDialogFindNext(QString,bool,bool,Enu::FindMode)), this, SLOT(findNextTriggered(QString,bool,bool,Enu::FindMode)));
+    connect(findDialog, SIGNAL(findDialogFindPrev(QString,bool,bool,Enu::FindMode)), this, SLOT(findPrevTriggered(QString,bool,bool,Enu::FindMode)));
 
     Document *document = new Document(ui->tab);
     QGridLayout *tabLayout = new QGridLayout;
@@ -539,17 +539,17 @@ void MainWindow::findAllTriggered(QString str)
     tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->findAll(str, true);
 }
 
-void MainWindow::findNextTriggered(QString str, bool ignoreCase, bool wrapAround)
+void MainWindow::findNextTriggered(QString str, bool ignoreCase, bool wrapAround, Enu::FindMode mode)
 {
-    tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->findNext(str, ignoreCase, wrapAround);
+    tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->findNext(str, ignoreCase, wrapAround, mode);
 }
 
-void MainWindow::findPrevTriggered(QString str, bool ignoreCase, bool wrapAround)
+void MainWindow::findPrevTriggered(QString str, bool ignoreCase, bool wrapAround, Enu::FindMode mode)
 {
-    tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->findPrev(str, ignoreCase, wrapAround);
+    tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->findPrev(str, ignoreCase, wrapAround, mode);
 }
 
-void MainWindow::connectToDocument(QStringList *list)
+void MainWindow::connectToDocument(QStringList list)
 {
     on_actionFile_New_triggered();
     tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->connectToDocument(list);;

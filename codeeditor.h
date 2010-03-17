@@ -4,6 +4,8 @@
 #include <QPlainTextEdit>
 #include <QObject>
 
+#include "enu.h"
+
 class QPaintEvent;
 class QResizeEvent;
 class QSize;
@@ -30,8 +32,8 @@ public:
 
     // Find functions
     bool findAll(QString searchString, bool ignoreCase = true);
-    bool findNext(QString searchString, bool ignoreCase = true, bool wrapAround = true);
-    bool findPrev(QString searchString, bool ignoreCase = true, bool wrapAround = true);
+    bool findNext(QString searchString, bool ignoreCase = true, bool wrapAround = true, Enu::FindMode mode = Enu::Contains);
+    bool findPrev(QString searchString, bool ignoreCase = true, bool wrapAround = true, Enu::FindMode mode = Enu::Contains);
 
 protected:
     void resizeEvent(QResizeEvent *event);

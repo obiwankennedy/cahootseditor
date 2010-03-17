@@ -11,8 +11,9 @@ namespace Enu
 
    enum FindMode
    {
-       WRAP,
+       Contains, StartsWith, EntireWord,
    };
+
 }
 
 #endif // ENU_H

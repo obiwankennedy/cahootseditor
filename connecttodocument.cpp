@@ -83,10 +83,10 @@ void ConnectToDocument::writeSettings()
 void ConnectToDocument::dialogAccepted()
 {
     addInfo();
-    QStringList *list = new QStringList();
-    list->append(ui->usernameLineEdit->text());
-    list->append(ui->addressLineEdit->text());
-    list->append(ui->portLineEdit->text());
+    QStringList list;
+    list.append(ui->usernameLineEdit->text());
+    list.append(ui->addressLineEdit->text());
+    list.append(ui->portLineEdit->text());
     emit connectToDocumentClicked(list);
 }
 

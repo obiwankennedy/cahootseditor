@@ -3,6 +3,9 @@
 
 #include <QtGui/QDialog>
 
+#include "utilities.h"
+#include "enu.h"
+
 namespace Ui {
     class FindDialog;
 }
@@ -24,8 +27,8 @@ private slots:
     void on_findPreviousPushButton_clicked();
 
 signals:
-    void findDialogFindNext(QString str, bool ignoreCase, bool wrapAround);
-    void findDialogFindPrev(QString str, bool ignoreCase, bool wrapAround);
+    void findDialogFindNext(QString str, bool ignoreCase, bool wrapAround, Enu::FindMode findMode);
+    void findDialogFindPrev(QString str, bool ignoreCase, bool wrapAround, Enu::FindMode findMode);
 };
 
 #endif // FINDDIALOG_H

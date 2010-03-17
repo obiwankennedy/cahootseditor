@@ -25,7 +25,6 @@ Document::Document(QWidget *parent) :
 {
     ui->setupUi(this);
 
-
     ui->bottomEditorFrame->hide();
 
     isAlreadySplit = false;
@@ -80,12 +79,12 @@ Document::~Document()
     delete ui;
 }
 
-void Document::connectToDocument(QStringList *list)
+void Document::connectToDocument(QStringList list)
 {
     isOwner = false;
-    myName = list->at(0);
-    QString address = list->at(1);
-    QString portString = list->at(2);
+    myName = list.at(0);
+    QString address = list.at(1);
+    QString portString = list.at(2);
     int port = portString.toInt();
     socket->connectToHost(QHostAddress(address), port);
     participantPane->setOwnership(isOwner);
@@ -93,7 +92,6 @@ void Document::connectToDocument(QStringList *list)
     setChatHidden(false);
     setParticipantsHidden(false);
     participantPane->setConnectInfo(QString("%1:%2").arg(address).arg(portString));
-    delete list;
 
     connect(editor->document(), SIGNAL(contentsChange(int,int,int)), this, SLOT(onTextChange(int,int,int)));
     connect(chatPane, SIGNAL(returnPressed(QString)), this, SLOT(onChatSend(QString)));
@@ -275,14 +273,14 @@ void Document::findAll(QString searchString, bool ignoreCase)
     editor->findAll(searchString, ignoreCase);
 }
 
-void Document::findNext(QString searchString, bool ignoreCase, bool wrapAround)
+void Document::findNext(QString searchString, bool ignoreCase, bool wrapAround, Enu::FindMode mode)
 {
     if (editor->findNext(searchString, ignoreCase, wrapAround)) {
         emit notFound();
     }
 }
 
-void Document::findPrev(QString searchString, bool ignoreCase, bool wrapAround)
+void Document::findPrev(QString searchString, bool ignoreCase, bool wrapAround, Enu::FindMode mode)
 {
     if (editor->findPrev(searchString, ignoreCase, wrapAround)) {
         emit notFound();
@@ -567,9 +565,9 @@ void Document::onIncomingData()
         if (data.contains(rx)) {
             length = rx.cap(1).toInt(&ok);
             data.remove(0, rx.cap(1).length() + 1); // remove digit indicating packet length and whitespace
-            if (ok && participantPane->canWrite(sock)) {
+//            if (ok && participantPane->canWrite(sock)) {
                 ownerIncomingData(data, sock, length);
-            }
+//            }
         }
     }
     else { // We are a participant

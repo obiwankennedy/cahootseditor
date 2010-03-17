@@ -6,6 +6,7 @@
 #include "codeeditor.h"
 #include "participantspane.h"
 #include "chatpane.h"
+#include "enu.h"
 
 #include "client.h"
 
@@ -23,7 +24,7 @@ public:
     Document(QWidget *parent = 0);
     ~Document();
 
-    void connectToDocument(QStringList *list);
+    void connectToDocument(QStringList list);
 
     void undo();
     void redo();
@@ -52,8 +53,8 @@ public:
 
     // Find functions
     void findAll(QString searchString, bool ignoreCase = true);
-    void findNext(QString searchString, bool ignoreCase = true, bool wrapAround = true);
-    void findPrev(QString searchString, bool ignoreCase = true, bool wrapAround = true);
+    void findNext(QString searchString, bool ignoreCase = true, bool wrapAround = true, Enu::FindMode mode = Enu::Contains);
+    void findPrev(QString searchString, bool ignoreCase = true, bool wrapAround = true, Enu::FindMode mode = Enu::Contains);
 
     QString getPlainText();
     void setPlainText(QString text);

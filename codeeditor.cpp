@@ -287,22 +287,15 @@ bool CodeEditor::findAll(QString searchString, bool ignoreCase)
     return found;
 }
 
-bool CodeEditor::findNext(QString searchString, bool ignoreCase, bool wrapAround)
+bool CodeEditor::findNext(QString searchString, bool ignoreCase, bool wrapAround, Enu::FindMode mode)
 {
-    wrapAround = true; // temporary
-
-    QTextDocument *document = this->document();
-    QString documentString = document->toPlainText();
-    QTextCursor cursor(document);
+    QString documentString = document()->toPlainText();
+    QTextCursor cursor(document());
     int position;
-
-    if (this->textCursor().hasSelection()) {
-        position = this->textCursor().position();
-    } else {
-        position = 0;
-    }
-
     bool found = false;
+
+    position = textCursor().position();
+
     position = documentString.indexOf(searchString, position, Qt::CaseInsensitive);
     int length = searchString.size();
 
@@ -327,43 +320,51 @@ bool CodeEditor::findNext(QString searchString, bool ignoreCase, bool wrapAround
             setTextCursor(cursor);
             found = true;
         }
-        else {
-            found = false;
-        }
-    }
-    else {
-        found = false;
     }
 
     return found;
 }
 
-bool CodeEditor::findPrev(QString searchString, bool ignoreCase, bool wrapAround)
+bool CodeEditor::findPrev(QString searchString, bool ignoreCase, bool wrapAround, Enu::FindMode mode)
 {
-    QTextDocument *document = this->document();
-    QString documentString = document->toPlainText();
-    QTextCursor cursor(document);
+    QString documentString = document()->toPlainText();
+    QTextCursor cursor(document());
     int position;
+    bool found = false;
 
-    if (this->textCursor().hasSelection()) {
-        position = this->textCursor().selectionStart() - 1;
-    } else {
-        position = 0;
+    if (textCursor().hasSelection()) {
+        position = textCursor().selectionStart() - 1;
+    }
+    else {
+        position = textCursor().position();
     }
 
-    int found = documentString.lastIndexOf(searchString, position, Qt::CaseInsensitive);
+    position = documentString.lastIndexOf(searchString, position, Qt::CaseInsensitive);
     int length = searchString.size();
 
-    if (found == -1) {
-        return false;
-    } else {
-        cursor.setPosition(found, QTextCursor::MoveAnchor);
+    if (position != -1) {
+        found = true;
+        cursor.setPosition(position, QTextCursor::MoveAnchor);
         for (int i = 0; i < length; i++) {
             cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor);
         }
         setTextCursor(cursor);
-        return true;
     }
+    else if (wrapAround) {
+        // Move position to the end of the document.
+        // magic # 2 is magic, anything less and it's beyond the scope of the document?
+        position = documentString.lastIndexOf(searchString, document()->characterCount() - 2, Qt::CaseInsensitive);
+        if (position != -1) {
+            found = true;
+            cursor.setPosition(position, QTextCursor::MoveAnchor);
+            for (int i = 0; i < length; i++) {
+                cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor);
+            }
+            setTextCursor(cursor);
+        }
+    }
+
+    return found;
 }
 
 void CodeEditor::updateLineNumberAreaWidth(int /* newBlockCount */)
