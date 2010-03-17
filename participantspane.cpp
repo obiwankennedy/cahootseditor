@@ -2,6 +2,7 @@
 #include "ui_participantspane.h"
 
 #include "utilities.h"
+#include "enu.h"
 
 #include <QTime>
 #include <QHostAddress>
@@ -59,13 +60,21 @@ void ParticipantsPane::newParticipant(QTcpSocket *socket)
     participantList.append(participant);
     participantMap.insert(socket, participant);
 
-    participant->permissions = Waiting;
     participant->socket = socket;
+    participant->permissions = Enu::Waiting;
+    participant->socket = socket;
+    participant->address = socket->peerAddress();
+}
 
+void ParticipantsPane::addParticipant(QString name, QTcpSocket *socket)
+{
+    Participant *participant = participantMap.value(socket);
+
+    // This person is now ready to be added to the permissions tree view
     participant->item = new QTreeWidgetItem(waitItem);
-    participant->item->setText(0, "Untitled");
-
-
+    participant->item->setText(0, name);
+    participant->item->setBackgroundColor(1, QColor::fromHsv(qrand() % 256, 190, 190));
+    participant->item->setToolTip(0, QString("%1@%2").arg(name).arg(participant->address.toString()));
 }
 
 void ParticipantsPane::newParticipant(QString name)
@@ -81,7 +90,7 @@ void ParticipantsPane::newParticipant(QString name)
     else {
         return; // this is an invalid name
     }
-    participant->permissions = Waiting;
+    participant->permissions = Enu::Waiting;
     // everyone has their own colors - colors aren't consistent across participants
     participant->color = QColor::fromHsv(qrand() % 256, 190, 190);
     participant->color = participant->color.lighter(150);
@@ -92,32 +101,16 @@ void ParticipantsPane::newParticipant(QString name)
     participant->item->setToolTip(0, name);
 }
 
-void ParticipantsPane::updateName(QString name, QTcpSocket *socket)
-{
-    qDebug() << name << " joined.";
-    Participant *participant = participantMap.value(socket);
-    // if the item hasn't been created yet, create it with name and add it to the widget
-    participant->name = name;
-    // This HAS to be waitItem (enforced by having no mechanic to promote the item) until
-    // we add it to the treeWidget.
-    participant->item->setText(0, name);
-
-    participant->color = QColor::fromHsv(qrand() % 256, 190, 190);
-    participant->color = participant->color.lighter(150);
-
-    participant->item->setBackgroundColor(1, participant->color);
-}
-
 void ParticipantsPane::removeAllParticipants()
 {
     for (int i = 0; i < participantList.size(); i++) {
-        if (participantList.at(i)->permissions == ReadWrite) {
+        if (participantList.at(i)->permissions == Enu::ReadWrite) {
             rwItem->removeChild(participantList.at(i)->item);
         }
-        else if (participantList.at(i)->permissions == ReadOnly) {
+        else if (participantList.at(i)->permissions == Enu::ReadOnly) {
             roItem->removeChild(participantList.at(i)->item);
         }
-        else if (participantList.at(i)->permissions == Waiting) {
+        else if (participantList.at(i)->permissions == Enu::Waiting) {
             waitItem->removeChild(participantList.at(i)->item);
         }
     }
@@ -132,13 +125,13 @@ void ParticipantsPane::removeParticipant(QTcpSocket *socket)
 {
     for (int i = 0; i < participantList.size(); i++) {
         if (socket == participantList.at(i)->socket) {
-            if (participantList.at(i)->permissions == ReadWrite) {
+            if (participantList.at(i)->permissions == Enu::ReadWrite) {
                 rwItem->removeChild(participantList.at(i)->item);
             }
-            else if (participantList.at(i)->permissions == ReadOnly) {
+            else if (participantList.at(i)->permissions == Enu::ReadOnly) {
                 roItem->removeChild(participantList.at(i)->item);
             }
-            else if (participantList.at(i)->permissions == Waiting) {
+            else if (participantList.at(i)->permissions == Enu::Waiting) {
                 waitItem->removeChild(participantList.at(i)->item);
             }
             delete participantList.at(i);
@@ -172,12 +165,12 @@ void ParticipantsPane::removeParticipant(QString name)
 
 bool ParticipantsPane::canWrite(QTcpSocket *socket)
 {
-    return participantMap.value(socket)->permissions == ReadWrite;
+    return participantMap.value(socket)->permissions == Enu::ReadWrite;
 }
 
 bool ParticipantsPane::canRead(QTcpSocket *socket)
 {
-    return participantMap.value(socket)->permissions == ReadOnly || participantMap.value(socket)->permissions == ReadWrite;
+    return participantMap.value(socket)->permissions == Enu::ReadOnly || participantMap.value(socket)->permissions == Enu::ReadWrite;
 }
 
 void ParticipantsPane::onCurrentItemChanged(QTreeWidgetItem *item, QTreeWidgetItem *)
@@ -213,22 +206,22 @@ void ParticipantsPane::on_promotePushButton_clicked()
     }
     for (int i = 0; i < participantList.size(); i++) {
         if (selectedItems.at(0) == participantList.at(i)->item) {
-            if (participantList.at(i)->permissions == ReadWrite) {
+            if (participantList.at(i)->permissions == Enu::ReadWrite) {
                 // This should not happen, but we won't crash.
                 // Instead, disable the promote button.
                 ui->promotePushButton->setEnabled(false);
             }
-            else if (participantList.at(i)->permissions == ReadOnly) {
+            else if (participantList.at(i)->permissions == Enu::ReadOnly) {
                 roItem->removeChild(participantList.at(i)->item);
                 rwItem->insertChild(0, participantList.at(i)->item);
-                participantList.at(i)->permissions = ReadWrite;
+                participantList.at(i)->permissions = Enu::ReadWrite;
 //                participantList.at(i)->item->setSelected(true);
             }
-            else if (participantList.at(i)->permissions == Waiting) {
+            else if (participantList.at(i)->permissions == Enu::Waiting) {
                 waitItem->removeChild(participantList.at(i)->item);
                 roItem->insertChild(0, participantList.at(i)->item);
 //                participantList.at(i)->item->setSelected(true);
-                participantList.at(i)->permissions = ReadOnly;
+                participantList.at(i)->permissions = Enu::ReadOnly;
                 emit memberCanNowRead(participantList.at(i)->socket);
             }
             return;
@@ -249,19 +242,19 @@ void ParticipantsPane::on_demotePushButton_clicked()
     }
     for (int i = 0; i < participantList.size(); i++) {
         if (selectedItems.at(0) == participantList.at(i)->item) {
-            if (participantList.at(i)->permissions == ReadWrite) {
+            if (participantList.at(i)->permissions == Enu::ReadWrite) {
                 rwItem->removeChild(participantList.at(i)->item);
                 roItem->insertChild(0, participantList.at(i)->item);
 //                participantList.at(i)->item->setSelected(true);
-                participantList.at(i)->permissions = ReadOnly;
+                participantList.at(i)->permissions = Enu::ReadOnly;
             }
-            else if (participantList.at(i)->permissions == ReadOnly) {
+            else if (participantList.at(i)->permissions == Enu::ReadOnly) {
                 roItem->removeChild(participantList.at(i)->item);
                 waitItem->insertChild(0, participantList.at(i)->item);
 //                participantList.at(i)->item->setSelected(true);
-                participantList.at(i)->permissions = Waiting;
+                participantList.at(i)->permissions = Enu::Waiting;
             }
-            else if (participantList.at(i)->permissions == Waiting) {
+            else if (participantList.at(i)->permissions == Enu::Waiting) {
                 // This should not happen, but we won't crash.
                 // Instead, disable the demote button.
                 ui->demotePushButton->setEnabled(false);

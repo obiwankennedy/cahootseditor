@@ -29,14 +29,13 @@ public:
 
     void setConnectInfo(QString str);
 
-    // Owner participant pane function
+    // Owner participant function to add a new participant
+    void addParticipant(QString name, QTcpSocket *socket);
+
     void newParticipant(QTcpSocket *socket);
 
     // Client participant pane add participant functions
     void newParticipant(QString name);
-
-    // Owner participant function to update someone's name when it gets populated
-    void updateName(QString name, QTcpSocket *socket);
 
     // For when we disconnect
     void removeAllParticipants();
@@ -53,14 +52,6 @@ public:
 
 private:
     Ui::ParticipantsPane *ui;
-
-    enum Row {
-        ReadWrite = 2,
-        ReadOnly = 1,
-        Waiting = 0,
-
-        Owner = 1,
-    };
 
     QTreeWidgetItem *rwItem;
     QTreeWidgetItem *roItem;

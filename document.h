@@ -86,7 +86,7 @@ private:
     QTcpSocket *socket;
     Client *client;
 
-    QStringList extraDataList;
+    QList<QTcpSocket*> socketList;
 
     CppHighlighter *highlighter;
 

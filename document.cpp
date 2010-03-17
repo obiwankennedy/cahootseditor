@@ -373,6 +373,9 @@ void Document::ownerIncomingData(QString data, QTcpSocket *sender, int length)
 
     QRegExp rx;
     if (data.startsWith("doc:")) {
+        if (!participantPane->canWrite(sender)) {
+            return;
+        }
         toSend = data;
         data.remove(0, 4);
         // detect line number, then put text at that line.
@@ -386,19 +389,25 @@ void Document::ownerIncomingData(QString data, QTcpSocket *sender, int length)
         }
     }
     else if (data.startsWith("helo:")) {
-        qDebug() << "helo received";
         data.remove(0, 5);
         rx = QRegExp("([a-zA-Z0-9_]*)");
         if (data.contains(rx)) {
             QString name = rx.cap(1);
-            participantPane->updateName(name, socket);
-            toSend = "join:" + name;
+            participantPane->addParticipant(name, sender);
+            toSend = "join:" + name + "@" + sender->peerAddress().toString();
         }
     }
     else if (data.startsWith("resync")) { // user requesting resync of the entire document
+        if (!participantPane->canRead(sender)) {
+            return;
+        }
         populateDocumentForUser(sender);
     }
-    else {
+    else if (data.startsWith("chat:")){
+        if (!participantPane->canRead(sender)) {
+            return;
+        }
+        data.remove(0, 5);
         toSend = QString("Someone: %2").arg(data);
         chatPane->appendChatMessage(toSend);
     }
@@ -486,7 +495,8 @@ void Document::participantIncomingData(QString data, int length)
     else if (data.startsWith("demote:")) {
 
     }
-    else {
+    else if (data.startsWith("chat:")) {
+        data.remove(0, 5);
         chatPane->appendChatMessage(data);
     }
 
@@ -543,13 +553,13 @@ void Document::onChatSend(QString str)
     QString toSend;
 
     if (isOwner) {
-        toSend = QString("%1: %2").arg(myName).arg(str);
+        toSend = QString("chat:%1: %2").arg(myName).arg(str);
         for (int i = 0; i < participantPane->participantList.size(); i++) {
             participantPane->participantList.at(i)->socket->write(QString("%1 %2").arg(toSend.length()).arg(toSend).toAscii());
         }
     }
     else {
-        toSend = str; // for find/replace, much of this will be rewritten later for better Object Oriented design
+        toSend = "chat:" + str; // for find/replace, much of this will be rewritten later for better Object Oriented design
         socket->write(QString("%1 %2").arg(toSend.length()).arg(toSend).toAscii());
     }
     chatPane->appendChatMessage(QString("%1: %2").arg(myName).arg(str));
@@ -572,9 +582,9 @@ void Document::onIncomingData()
         if (data.contains(rx)) {
             length = rx.cap(1).toInt(&ok);
             data.remove(0, rx.cap(1).length() + 1); // remove digit indicating packet length and whitespace
-//            if (ok && participantPane->canWrite(sock)) {
+            if (ok) {
                 ownerIncomingData(data, sock, length);
-//            }
+            }
         }
     }
     else { // We are a participant
@@ -594,15 +604,17 @@ void Document::onIncomingData()
 void Document::onNewConnection()
 {
     if (isOwner) {
-        participantPane->newParticipant(server->nextPendingConnection());
-        connect(participantPane->participantList.last()->socket, SIGNAL(readyRead()), this, SLOT(onIncomingData()));
-        connect(participantPane->participantList.last()->socket, SIGNAL(disconnected()), this, SLOT(disconnected()));
+        QTcpSocket *sock = server->nextPendingConnection();
+        connect(sock, SIGNAL(readyRead()), this, SLOT(onIncomingData()));
+        connect(sock, SIGNAL(disconnected()), this, SLOT(disconnected()));
+        socketList.append(sock);
+        participantPane->newParticipant(sock);
     }
     else {
-        qDebug() << "helo:" << myName;
         connect(socket, SIGNAL(readyRead()), this, SLOT(onIncomingData()));
         // The owner does not get this message, probably because it comes before the readyRead() is hooked up?
-        socket->write(QString("helo:%1").arg(myName).toAscii());
+        QString toSend = QString("helo:%1").arg(myName);
+        socket->write(QString("%1 %2").arg(toSend.length()).arg(toSend).toAscii());
     }
 }
 
