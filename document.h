@@ -53,8 +53,8 @@ public:
 
     // Find functions
     void findAll(QString searchString, bool ignoreCase = true);
-    void findNext(QString searchString, bool ignoreCase = true, bool wrapAround = true, Enu::FindMode mode = Enu::Contains);
-    void findPrev(QString searchString, bool ignoreCase = true, bool wrapAround = true, Enu::FindMode mode = Enu::Contains);
+    void findNext(QString searchString, Qt::CaseSensitivity sensitivity, bool wrapAround, Enu::FindMode mode);
+    void findPrev(QString searchString, Qt::CaseSensitivity sensitivity, bool wrapAround, Enu::FindMode mode);
 
     QString getPlainText();
     void setPlainText(QString text);

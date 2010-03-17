@@ -91,8 +91,8 @@ private slots:
     void tabCloseClicked(int index);
 
     void findAllTriggered(QString str);
-    void findNextTriggered(QString str, bool ignoreCase, bool wrapAround, Enu::FindMode mode);
-    void findPrevTriggered(QString str, bool ignoreCase, bool wrapAround, Enu::FindMode mode);
+    void findNextTriggered(QString str, Qt::CaseSensitivity, bool wrapAround, Enu::FindMode mode);
+    void findPrevTriggered(QString str, Qt::CaseSensitivity, bool wrapAround, Enu::FindMode mode);
 
     void connectToDocument(QStringList list);
     //void viewChanged();

@@ -27,8 +27,8 @@ private slots:
     void on_findPreviousPushButton_clicked();
 
 signals:
-    void findDialogFindNext(QString str, bool ignoreCase, bool wrapAround, Enu::FindMode findMode);
-    void findDialogFindPrev(QString str, bool ignoreCase, bool wrapAround, Enu::FindMode findMode);
+    void findDialogFindNext(QString str, Qt::CaseSensitivity sensitivity, bool wrapAround, Enu::FindMode findMode);
+    void findDialogFindPrev(QString str, Qt::CaseSensitivity sensitivity, bool wrapAround, Enu::FindMode findMode);
 };
 
 #endif // FINDDIALOG_H

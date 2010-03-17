@@ -273,16 +273,16 @@ void Document::findAll(QString searchString, bool ignoreCase)
     editor->findAll(searchString, ignoreCase);
 }
 
-void Document::findNext(QString searchString, bool ignoreCase, bool wrapAround, Enu::FindMode mode)
+void Document::findNext(QString searchString, Qt::CaseSensitivity sensitivity, bool wrapAround, Enu::FindMode mode)
 {
-    if (editor->findNext(searchString, ignoreCase, wrapAround)) {
+    if (editor->findNext(searchString, sensitivity, wrapAround, mode)) {
         emit notFound();
     }
 }
 
-void Document::findPrev(QString searchString, bool ignoreCase, bool wrapAround, Enu::FindMode mode)
+void Document::findPrev(QString searchString, Qt::CaseSensitivity sensitivity, bool wrapAround, Enu::FindMode mode)
 {
-    if (editor->findPrev(searchString, ignoreCase, wrapAround)) {
+    if (editor->findPrev(searchString, sensitivity, wrapAround, mode)) {
         emit notFound();
     }
 }

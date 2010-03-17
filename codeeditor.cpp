@@ -287,16 +287,28 @@ bool CodeEditor::findAll(QString searchString, bool ignoreCase)
     return found;
 }
 
-bool CodeEditor::findNext(QString searchString, bool ignoreCase, bool wrapAround, Enu::FindMode mode)
+bool CodeEditor::findNext(QString searchString, Qt::CaseSensitivity sensitivity, bool wrapAround, Enu::FindMode mode)
 {
     QString documentString = document()->toPlainText();
     QTextCursor cursor(document());
     int position;
     bool found = false;
 
+    QRegExp rx;
+    switch (mode) {
+    case Enu::Contains:
+        rx = QRegExp(searchString, sensitivity);
+        break;
+    case Enu::StartsWith:
+        rx = QRegExp("\\b" + searchString, sensitivity);
+        break;
+    case Enu::EntireWord:
+        rx = QRegExp("\\b" + searchString + "\\b", sensitivity);
+    }
+
     position = textCursor().position();
 
-    position = documentString.indexOf(searchString, position, Qt::CaseInsensitive);
+    position = documentString.indexOf(rx, position);
     int length = searchString.size();
 
     if (position != -1) {
@@ -309,7 +321,7 @@ bool CodeEditor::findNext(QString searchString, bool ignoreCase, bool wrapAround
     }
     else if (wrapAround){
         position = 0; // move cursor to the beginning and begin searching again
-        position = documentString.indexOf(searchString, position, Qt::CaseInsensitive);
+        position = documentString.indexOf(rx, position);
         length = searchString.size();
 
         if (position != -1) {
@@ -325,12 +337,24 @@ bool CodeEditor::findNext(QString searchString, bool ignoreCase, bool wrapAround
     return found;
 }
 
-bool CodeEditor::findPrev(QString searchString, bool ignoreCase, bool wrapAround, Enu::FindMode mode)
+bool CodeEditor::findPrev(QString searchString, Qt::CaseSensitivity sensitivity, bool wrapAround, Enu::FindMode mode)
 {
     QString documentString = document()->toPlainText();
     QTextCursor cursor(document());
     int position;
     bool found = false;
+
+    QRegExp rx;
+    switch (mode) {
+    case Enu::Contains:
+        rx = QRegExp(searchString, sensitivity);
+        break;
+    case Enu::StartsWith:
+        rx = QRegExp("\\b" + searchString, sensitivity);
+        break;
+    case Enu::EntireWord:
+        rx = QRegExp("\\b" + searchString + "\\b", sensitivity);
+    }
 
     if (textCursor().hasSelection()) {
         position = textCursor().selectionStart() - 1;
@@ -339,7 +363,7 @@ bool CodeEditor::findPrev(QString searchString, bool ignoreCase, bool wrapAround
         position = textCursor().position();
     }
 
-    position = documentString.lastIndexOf(searchString, position, Qt::CaseInsensitive);
+    position = documentString.lastIndexOf(rx, position);
     int length = searchString.size();
 
     if (position != -1) {
@@ -353,7 +377,7 @@ bool CodeEditor::findPrev(QString searchString, bool ignoreCase, bool wrapAround
     else if (wrapAround) {
         // Move position to the end of the document.
         // magic # 2 is magic, anything less and it's beyond the scope of the document?
-        position = documentString.lastIndexOf(searchString, document()->characterCount() - 2, Qt::CaseInsensitive);
+        position = documentString.lastIndexOf(rx, document()->characterCount() - 2);
         if (position != -1) {
             found = true;
             cursor.setPosition(position, QTextCursor::MoveAnchor);

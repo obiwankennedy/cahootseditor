@@ -28,8 +28,10 @@ MainWindow::MainWindow(QWidget *parent)
     connect(connectDialog, SIGNAL(connectToDocumentClicked(QStringList)), this, SLOT(connectToDocument(QStringList)));
 
     findDialog = new FindDialog(this);
-    connect(findDialog, SIGNAL(findDialogFindNext(QString,bool,bool,Enu::FindMode)), this, SLOT(findNextTriggered(QString,bool,bool,Enu::FindMode)));
-    connect(findDialog, SIGNAL(findDialogFindPrev(QString,bool,bool,Enu::FindMode)), this, SLOT(findPrevTriggered(QString,bool,bool,Enu::FindMode)));
+    connect(findDialog, SIGNAL(findDialogFindNext(QString,Qt::CaseSensitivity,bool,Enu::FindMode)), this,
+            SLOT(findNextTriggered(QString,Qt::CaseSensitivity,bool,Enu::FindMode)));
+    connect(findDialog, SIGNAL(findDialogFindPrev(QString,Qt::CaseSensitivity,bool,Enu::FindMode)), this,
+            SLOT(findPrevTriggered(QString,Qt::CaseSensitivity,bool,Enu::FindMode)));
 
     Document *document = new Document(ui->tab);
     QGridLayout *tabLayout = new QGridLayout;
@@ -539,14 +541,14 @@ void MainWindow::findAllTriggered(QString str)
     tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->findAll(str, true);
 }
 
-void MainWindow::findNextTriggered(QString str, bool ignoreCase, bool wrapAround, Enu::FindMode mode)
+void MainWindow::findNextTriggered(QString str, Qt::CaseSensitivity sensitivity, bool wrapAround, Enu::FindMode mode)
 {
-    tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->findNext(str, ignoreCase, wrapAround, mode);
+    tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->findNext(str, sensitivity, wrapAround, mode);
 }
 
-void MainWindow::findPrevTriggered(QString str, bool ignoreCase, bool wrapAround, Enu::FindMode mode)
+void MainWindow::findPrevTriggered(QString str, Qt::CaseSensitivity sensitivity, bool wrapAround, Enu::FindMode mode)
 {
-    tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->findPrev(str, ignoreCase, wrapAround, mode);
+    tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->findPrev(str, sensitivity, wrapAround, mode);
 }
 
 void MainWindow::connectToDocument(QStringList list)

@@ -32,8 +32,8 @@ public:
 
     // Find functions
     bool findAll(QString searchString, bool ignoreCase = true);
-    bool findNext(QString searchString, bool ignoreCase = true, bool wrapAround = true, Enu::FindMode mode = Enu::Contains);
-    bool findPrev(QString searchString, bool ignoreCase = true, bool wrapAround = true, Enu::FindMode mode = Enu::Contains);
+    bool findNext(QString searchString, Qt::CaseSensitivity sensitivity, bool wrapAround, Enu::FindMode mode);
+    bool findPrev(QString searchString, Qt::CaseSensitivity sensitivity, bool wrapAround, Enu::FindMode mode);
 
 protected:
     void resizeEvent(QResizeEvent *event);
