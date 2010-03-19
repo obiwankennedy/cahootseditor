@@ -3,6 +3,9 @@
 
 #include <QTextCursor>
 
+#include "enu.h"
+
+
 CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
 {
     lineNumberArea = new LineNumberArea(this);
@@ -262,7 +265,7 @@ bool CodeEditor::findAll(QString searchString, bool ignoreCase)
 
     bool found = false;
 
-    QTextCursor cursor(this->document());
+    QTextCursor cursor(this->document()); //QTextCursor cursor(document);??
     cursor.select(QTextCursor::Document);
     QTextCharFormat format;
     format.setBackground(Qt::white);
@@ -389,6 +392,29 @@ bool CodeEditor::findPrev(QString searchString, Qt::CaseSensitivity sensitivity,
     }
 
     return found;
+}
+
+bool CodeEditor::replaceAll(QString searchString, QString replaceString, Qt::CaseSensitivity, bool wrapAround, Enu::FindMode mode)
+{
+    return false;
+}
+
+bool CodeEditor::replace(QString replaceString)
+{
+    QTextCursor cursor(document());
+
+    if (textCursor().hasSelection()) {
+        cursor.setPosition(textCursor().position());
+        textCursor().removeSelectedText();
+        cursor.insertText(replaceString);
+        return true;
+    }
+    return false;
+}
+
+bool CodeEditor::findReplace(QString searchString, QString replaceString, Qt::CaseSensitivity, bool wrapAround, Enu::FindMode mode)
+{
+    return false;
 }
 
 void CodeEditor::updateLineNumberAreaWidth(int /* newBlockCount */)

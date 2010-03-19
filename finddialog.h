@@ -25,10 +25,16 @@ private:
 private slots:
     void on_findNextPushButton_clicked();
     void on_findPreviousPushButton_clicked();
+    void on_replaceAllPushButton_clicked();
+    void on_replacePushButton_clicked();
+    void on_findReplacePushButton_clicked();
 
 signals:
     void findDialogFindNext(QString str, Qt::CaseSensitivity sensitivity, bool wrapAround, Enu::FindMode findMode);
     void findDialogFindPrev(QString str, Qt::CaseSensitivity sensitivity, bool wrapAround, Enu::FindMode findMode);
+    void findDialogReplaceAll(QString find, QString replace, Qt::CaseSensitivity sensitivity, bool wrapAround, Enu::FindMode findMode);
+    void findDialogReplace(QString replace);
+    void findDiaalogFindReplace(QString find, QString replace, Qt::CaseSensitivity sensitivity, bool wrapAround, Enu::FindMode findMode);
 };
 
 #endif // FINDDIALOG_H

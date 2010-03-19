@@ -2,6 +2,7 @@
 #include "ui_document.h"
 
 #include "utilities.h"
+#include "enu.h"
 
 #include <QDialog>
 #include <QKeyEvent>
@@ -281,6 +282,27 @@ void Document::findNext(QString searchString, Qt::CaseSensitivity sensitivity, b
 void Document::findPrev(QString searchString, Qt::CaseSensitivity sensitivity, bool wrapAround, Enu::FindMode mode)
 {
     if (editor->findPrev(searchString, sensitivity, wrapAround, mode)) {
+        emit notFound();
+    }
+}
+
+void Document::replaceAll(QString searchString, QString replaceString, Qt::CaseSensitivity sensitivity, bool wrapAround, Enu::FindMode mode)
+{
+    if (editor->replaceAll(searchString, replaceString, sensitivity, wrapAround, mode)) {
+        emit notFound();
+    }
+}
+
+void Document::replace(QString replaceString)
+{
+    if (editor->replace(replaceString)) {
+        emit notFound();
+    }
+}
+
+void Document::findReplace(QString searchString, QString replaceString, Qt::CaseSensitivity sensitivity, bool wrapAround, Enu::FindMode mode)
+{
+    if (editor->findReplace(searchString, replaceString, sensitivity, wrapAround, mode)) {
         emit notFound();
     }
 }

@@ -74,3 +74,57 @@ void FindDialog::on_findPreviousPushButton_clicked()
     emit findDialogFindPrev(searchString, sensitivity, ui->wrapAroundCheckBox->isChecked(), mode);
 }
 
+void FindDialog::on_replaceAllPushButton_clicked()
+{
+    QString searchString = ui->findTextEdit->toPlainText();
+    QString replaceString = ui->replaceTextEdit->toPlainText();
+    Qt::CaseSensitivity sensitivity;
+    if (ui->ignoreCaseCheckBox->isChecked()) {
+        sensitivity = Qt::CaseInsensitive;
+    }
+    else {
+        sensitivity = Qt::CaseSensitive;
+    }
+    Enu::FindMode mode;
+    if (ui->findModeComboBox->currentText() == "Contains") {
+        mode = Enu::Contains;
+    }
+    else if (ui->findModeComboBox->currentText() == "Starts With") {
+        mode = Enu::StartsWith;
+    }
+    else if (ui->findModeComboBox->currentText() == "Entire Word") {
+        mode = Enu::EntireWord;
+    }
+    emit findDialogReplaceAll(searchString, replaceString, sensitivity, ui->wrapAroundCheckBox->isChecked(), mode);
+}
+
+void FindDialog::on_replacePushButton_clicked()
+{
+    QString replaceString = ui->replaceTextEdit->toPlainText();
+    emit findDialogReplace(replaceString);
+}
+
+void FindDialog::on_findReplacePushButton_clicked()
+{
+    QString searchString = ui->findTextEdit->toPlainText();
+    QString replaceString = ui->replaceTextEdit->toPlainText();
+    Qt::CaseSensitivity sensitivity;
+    if (ui->ignoreCaseCheckBox->isChecked()) {
+        sensitivity = Qt::CaseInsensitive;
+    }
+    else {
+        sensitivity = Qt::CaseSensitive;
+    }
+    Enu::FindMode mode;
+    if (ui->findModeComboBox->currentText() == "Contains") {
+        mode = Enu::Contains;
+    }
+    else if (ui->findModeComboBox->currentText() == "Starts With") {
+        mode = Enu::StartsWith;
+    }
+    else if (ui->findModeComboBox->currentText() == "Entire Word") {
+        mode = Enu::EntireWord;
+    }
+    emit findDiaalogFindReplace(searchString, replaceString, sensitivity, ui->wrapAroundCheckBox->isChecked(), mode);
+}
+

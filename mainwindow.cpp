@@ -2,6 +2,7 @@
 #include "ui_mainwindow.h"
 
 #include "utilities.h"
+#include "enu.h"
 
 #include <QMessageBox>
 #include <QFileDialog>
@@ -32,6 +33,12 @@ MainWindow::MainWindow(QWidget *parent)
             SLOT(findNextTriggered(QString,Qt::CaseSensitivity,bool,Enu::FindMode)));
     connect(findDialog, SIGNAL(findDialogFindPrev(QString,Qt::CaseSensitivity,bool,Enu::FindMode)), this,
             SLOT(findPrevTriggered(QString,Qt::CaseSensitivity,bool,Enu::FindMode)));
+    connect(findDialog, SIGNAL(findDialogReplaceAll(QString,QString,Qt::CaseSensitivity,bool,Enu::FindMode)), this,
+            SLOT(replaceAllTriggered(QString,QString,Qt::CaseSensitivity,bool,Enu::FindMode)));
+    connect(findDialog, SIGNAL(findDialogReplace(QString)), this,
+            SLOT(replaceTriggered(QString)));
+    connect(findDialog, SIGNAL(findDiaalogFindReplace(QString,QString,Qt::CaseSensitivity,bool,Enu::FindMode)), this,
+            SLOT(findReplaceTriggered(QString,QString,Qt::CaseSensitivity,bool,Enu::FindMode)));
 
     Document *document = new Document(ui->tab);
     QGridLayout *tabLayout = new QGridLayout;
@@ -557,6 +564,21 @@ void MainWindow::findNextTriggered(QString str, Qt::CaseSensitivity sensitivity,
 void MainWindow::findPrevTriggered(QString str, Qt::CaseSensitivity sensitivity, bool wrapAround, Enu::FindMode mode)
 {
     tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->findPrev(str, sensitivity, wrapAround, mode);
+}
+
+void MainWindow::replaceAllTriggered(QString find, QString replace, Qt::CaseSensitivity sensitivity, bool wrapAround, Enu::FindMode mode)
+{
+    tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->replaceAll(find, replace, sensitivity, wrapAround, mode);
+}
+
+void MainWindow::replaceTriggered(QString replace)
+{
+    tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->replace(replace);
+}
+
+void MainWindow::findReplaceTriggered(QString find, QString replace, Qt::CaseSensitivity sensitivity, bool wrapAround, Enu::FindMode mode)
+{
+    tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->findReplace(find, replace, sensitivity, wrapAround, mode);
 }
 
 void MainWindow::connectToDocument(QStringList list)
