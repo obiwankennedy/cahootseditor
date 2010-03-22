@@ -90,12 +90,20 @@ bool ParticipantsPane::addParticipant(QString name, QTcpSocket *socket)
 
     participant->item->setBackgroundColor(1, participant->color);
     participant->item->setToolTip(0, QString("%1@%2").arg(name).arg(participant->address.toString()));
+
+    return true;
 }
 
 QString ParticipantsPane::getNameForSocket(QTcpSocket *socket)
 {
     Participant *participant = participantMap.value(socket);
     return participant->name;
+}
+
+QString ParticipantsPane::getNameAddressForSocket(QTcpSocket *socket)
+{
+    Participant *participant = participantMap.value(socket);
+    return QString("%1@%2").arg(participant->name).arg(participant->address.toString());
 }
 
 void ParticipantsPane::newParticipant(QString name)
@@ -188,12 +196,16 @@ void ParticipantsPane::removeParticipant(QString name)
 
 void ParticipantsPane::promoteParticipant(QString name, QString address)
 {
-
+    (void)name;
+    (void)address;
+#warning "implement"
 }
 
 void ParticipantsPane::demoteParticipant(QString name, QString address)
 {
-
+    (void)name;
+    (void)address;
+#warning "implement"
 }
 
 bool ParticipantsPane::canWrite(QTcpSocket *socket)
@@ -241,21 +253,23 @@ void ParticipantsPane::on_promotePushButton_clicked()
         QString participant;
         participant = selectedItems.at(0)->toolTip(0);
         qDebug() << "promote: " << participant;
-        emit promoteClicked(participant);
     }
 
+    QString permissions;
     for (int i = 0; i < participantList.size(); i++) {
         if (selectedItems.at(0) == participantList.at(i)->item) {
             if (participantList.at(i)->permissions == Enu::ReadWrite) {
                 // This should not happen, but we won't crash.
                 // Instead, disable the promote button.
                 ui->promotePushButton->setEnabled(false);
+                permissions = "write";
             }
             else if (participantList.at(i)->permissions == Enu::ReadOnly) {
                 roItem->removeChild(participantList.at(i)->item);
                 rwItem->insertChild(0, participantList.at(i)->item);
                 participantList.at(i)->permissions = Enu::ReadWrite;
 //                participantList.at(i)->item->setSelected(true);
+                permissions = "write";
             }
             else if (participantList.at(i)->permissions == Enu::Waiting) {
                 waitItem->removeChild(participantList.at(i)->item);
@@ -263,7 +277,9 @@ void ParticipantsPane::on_promotePushButton_clicked()
 //                participantList.at(i)->item->setSelected(true);
                 participantList.at(i)->permissions = Enu::ReadOnly;
                 emit memberCanNowRead(participantList.at(i)->socket);
+                permissions = "read";
             }
+            emit memberPermissionsChanged(participantList.at(i)->socket, permissions, true);
             return;
         }
     }
@@ -284,8 +300,9 @@ void ParticipantsPane::on_demotePushButton_clicked()
         QString participant;
         participant = selectedItems.at(0)->toolTip(0);
         qDebug() << "demote: " << participant;
-        emit demoteClicked(participant);
     }
+
+    QString permissions;
     for (int i = 0; i < participantList.size(); i++) {
         if (selectedItems.at(0) == participantList.at(i)->item) {
             if (participantList.at(i)->permissions == Enu::ReadWrite) {
@@ -293,18 +310,22 @@ void ParticipantsPane::on_demotePushButton_clicked()
                 roItem->insertChild(0, participantList.at(i)->item);
 //                participantList.at(i)->item->setSelected(true);
                 participantList.at(i)->permissions = Enu::ReadOnly;
+                permissions = "read";
             }
             else if (participantList.at(i)->permissions == Enu::ReadOnly) {
                 roItem->removeChild(participantList.at(i)->item);
                 waitItem->insertChild(0, participantList.at(i)->item);
 //                participantList.at(i)->item->setSelected(true);
                 participantList.at(i)->permissions = Enu::Waiting;
+                permissions = "waiting";
             }
             else if (participantList.at(i)->permissions == Enu::Waiting) {
                 // This should not happen, but we won't crash.
                 // Instead, disable the demote button.
                 ui->demotePushButton->setEnabled(false);
+                permissions = "waiting";
             }
+            emit memberPermissionsChanged(participantList.at(i)->socket, permissions, false);
             return;
         }
     }

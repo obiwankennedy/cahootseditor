@@ -99,7 +99,7 @@ void Document::connectToDocument(QStringList list)
 
     connect(socket, SIGNAL(disconnected()), this, SLOT(disconnected()));
     connect(socket, SIGNAL(connected()), this, SLOT(onNewConnection()));
-//    editor->setDisabled(true); // to be uncommented when we finish setting up promotes/demotes
+    editor->setDisabled(true); // to be uncommented when we finish setting up promotes/demotes
 }
 
 void Document::undo()
@@ -222,8 +222,10 @@ void Document::announceDocument()
     connect(chatPane, SIGNAL(returnPressed(QString)), this, SLOT(onChatSend(QString)));
 
     connect(participantPane, SIGNAL(memberCanNowRead(QTcpSocket*)), this, SLOT(populateDocumentForUser(QTcpSocket*)));
+    connect(participantPane, SIGNAL(memberPermissionsChanged(QTcpSocket*,QString,bool)), this, SLOT(memberPermissionsChanged(QTcpSocket*,QString,bool)));
 
     connect(server, SIGNAL(newConnection()), this, SLOT(onNewConnection()));
+
     server->listen(QHostAddress::Any, 0); // Port is chosen automatically, listening on all NICs
     QString port = QString::number(server->serverPort(), 10);
 
@@ -432,7 +434,7 @@ void Document::ownerIncomingData(QString data, QTcpSocket *sender, int length)
         }
         populateDocumentForUser(sender);
     }
-    else if (data.startsWith("chat:")){
+    else if (data.startsWith("chat:")) {
         if (!participantPane->canRead(sender)) {
             return;
         }
@@ -516,14 +518,14 @@ void Document::participantIncomingData(QString data, int length)
     else if (data.startsWith("populate:")) { // populate users data
 
     }
-    else if (data.startsWith("sync:")) { // this packet is the entire document
+    else if (data.startsWith("sync:")) { // the data is the entire document
         data.remove(0, 5);
         // set the document's contents to the contents of the packet
         editor->setPlainText(data);
     }
     else if (data.startsWith("promote:")) {
         data.remove(0, 8);
-        rx = QRegExp("([a-zA-Z0-9_]*):(.*)");
+        rx = QRegExp("([a-zA-Z0-9_]*)@(.*)");
         QString name;
         QString address;
         if (data.contains(rx)) {
@@ -534,7 +536,7 @@ void Document::participantIncomingData(QString data, int length)
     }
     else if (data.startsWith("demote:")) {
         data.remove(0, 7);
-        rx = QRegExp("([a-zA-Z0-9_]*):(.*)");
+        rx = QRegExp("([a-zA-Z0-9_]*)@(.*)");
         QString name;
         QString address;
         if (data.contains(rx)) {
@@ -542,6 +544,22 @@ void Document::participantIncomingData(QString data, int length)
             address = rx.cap(2);
             participantPane->demoteParticipant(name, address);
         }
+    }
+    else if (data.startsWith("setperm:")) { // the server has updated our permissions
+        data.remove(0, 8);
+        if (data == "write") {
+            editor->setDisabled(false);
+            editor->setReadOnly(false);
+        }
+        else if (data == "read") {
+            editor->setDisabled(false);
+            editor->setReadOnly(true);
+        }
+        else if (data == "waiting") {
+            editor->setDisabled(true);
+            editor->setReadOnly(true);
+        }
+        qDebug() << "permissions: " << data;
     }
     else if (data.startsWith("chat:")) {
         data.remove(0, 5);
@@ -663,6 +681,24 @@ void Document::onNewConnection()
         // The owner does not get this message, probably because it comes before the readyRead() is hooked up?
         QString toSend = QString("helo:%1").arg(myName);
         socket->write(QString("%1 %2").arg(toSend.length()).arg(toSend).toAscii());
+    }
+}
+
+void Document::memberPermissionsChanged(QTcpSocket *participant, QString permissions, bool wasPromoted)
+{
+    qDebug() << "permissions changed, populating...";
+
+    if (isOwner) { // shouldn't be necessary, but defensive
+        QString toSend = QString("setperm:%1").arg(permissions);
+        participant->write(QString("%1 %2").arg(toSend.length()).arg(toSend).toAscii());
+
+        toSend = QString("%1:%2").arg(wasPromoted ? "promote:" : "demote:").arg(participantPane->getNameAddressForSocket(participant));
+
+        for (int i = 0; i < participantPane->participantList.size(); i++) {
+            if (participantPane->canRead(participantPane->participantList.at(i)->socket)) {
+                participantPane->participantList.at(i)->socket->write(QString("%1 %2").arg(toSend.length()).arg(toSend).toAscii());
+            }
+        }
     }
 }
 

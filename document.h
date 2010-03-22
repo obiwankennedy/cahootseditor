@@ -116,6 +116,8 @@ private slots:
     void onIncomingData();
     void onNewConnection();
 
+    void memberPermissionsChanged(QTcpSocket *participant, QString permissions, bool wasPromoted);
+
     void populateDocumentForUser(QTcpSocket *socket);
 
     void disconnected();

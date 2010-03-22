@@ -33,8 +33,10 @@ public:
     void newParticipant(QTcpSocket *socket);
     // ...and later added when they send their greetings
     bool addParticipant(QString name, QTcpSocket *socket);
-    // getName allows us to set their name in the chat pane correctly
+    // getNameForSocket allows us to set their name in the chat pane correctly
     QString getNameForSocket(QTcpSocket *socket);
+    // getNameAddressForSocket allows us to get name@address as the owner
+    QString getNameAddressForSocket(QTcpSocket *socket);
 
     // Client participant pane add participant functions
     void newParticipant(QString name);
@@ -71,9 +73,8 @@ private slots:
     void on_demotePushButton_clicked();
 
 signals:
-    void memberCanNowRead(QTcpSocket *);
-    void promoteClicked(QString participant);
-    void demoteClicked(QString participant);
+    void memberCanNowRead(QTcpSocket *member);
+    void memberPermissionsChanged(QTcpSocket *member, QString readability, bool wasPromoted);
 };
 
 #endif // PARTICIPANTSPANE_H

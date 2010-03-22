@@ -395,7 +395,13 @@ bool CodeEditor::findPrev(QString searchString, Qt::CaseSensitivity sensitivity,
 }
 
 bool CodeEditor::replaceAll(QString searchString, QString replaceString, Qt::CaseSensitivity, bool wrapAround, Enu::FindMode mode)
+#warning "implement"
 {
+    (void)searchString;
+    (void)replaceString;
+    (void)wrapAround;
+    (void)mode;
+
     return false;
 }
 
@@ -413,7 +419,13 @@ bool CodeEditor::replace(QString replaceString)
 }
 
 bool CodeEditor::findReplace(QString searchString, QString replaceString, Qt::CaseSensitivity, bool wrapAround, Enu::FindMode mode)
+#warning "implement"
 {
+    (void)searchString;
+    (void)replaceString;
+    (void)wrapAround;
+    (void)mode;
+
     return false;
 }
 
