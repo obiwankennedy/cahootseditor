@@ -279,35 +279,35 @@ void Document::findAll(QString searchString, bool ignoreCase)
 
 void Document::findNext(QString searchString, Qt::CaseSensitivity sensitivity, bool wrapAround, Enu::FindMode mode)
 {
-    if (editor->findNext(searchString, sensitivity, wrapAround, mode)) {
+    if (!editor->findNext(searchString, sensitivity, wrapAround, mode)) {
         emit notFound();
     }
 }
 
 void Document::findPrev(QString searchString, Qt::CaseSensitivity sensitivity, bool wrapAround, Enu::FindMode mode)
 {
-    if (editor->findPrev(searchString, sensitivity, wrapAround, mode)) {
+    if (!editor->findPrev(searchString, sensitivity, wrapAround, mode)) {
         emit notFound();
     }
 }
 
 void Document::replaceAll(QString searchString, QString replaceString, Qt::CaseSensitivity sensitivity, bool wrapAround, Enu::FindMode mode)
 {
-    if (editor->replaceAll(searchString, replaceString, sensitivity, wrapAround, mode)) {
+    if (!editor->replaceAll(searchString, replaceString, sensitivity, wrapAround, mode)) {
         emit notFound();
     }
 }
 
 void Document::replace(QString replaceString)
 {
-    if (editor->replace(replaceString)) {
+    if (!editor->replace(replaceString)) {
         emit notFound();
     }
 }
 
 void Document::findReplace(QString searchString, QString replaceString, Qt::CaseSensitivity sensitivity, bool wrapAround, Enu::FindMode mode)
 {
-    if (editor->findReplace(searchString, replaceString, sensitivity, wrapAround, mode)) {
+    if (!editor->findReplace(searchString, replaceString, sensitivity, wrapAround, mode)) {
         emit notFound();
     }
 }
