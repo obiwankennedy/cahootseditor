@@ -79,6 +79,7 @@ public:
     // This tells us if we're the host/owner of the document,
     // and affects how we talk with participants
     bool isOwner;
+    Enu::Permissions myPermissions;
     QString curFile;
     
     QString myName;

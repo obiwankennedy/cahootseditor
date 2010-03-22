@@ -5,7 +5,6 @@ CppHighlighter::CppHighlighter(QTextDocument *parent)
 {
     HighlightingRule rule;
 
-
 //    functionFormat.setFontItalic(true);
 //    functionFormat.setFontWeight(QFont::Bold);
     functionFormat.setForeground(Qt::darkYellow);

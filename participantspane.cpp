@@ -43,6 +43,7 @@ void ParticipantsPane::setOwnership(bool isOwner)
 {
     ui->promotePushButton->setShown(isOwner);
     ui->demotePushButton->setShown(isOwner);
+    this->isOwner = isOwner;
 }
 
 void ParticipantsPane::setConnectInfo(QString str)
@@ -66,15 +67,35 @@ void ParticipantsPane::newParticipant(QTcpSocket *socket)
     participant->address = socket->peerAddress();
 }
 
-void ParticipantsPane::addParticipant(QString name, QTcpSocket *socket)
+bool ParticipantsPane::addParticipant(QString name, QTcpSocket *socket)
 {
     Participant *participant = participantMap.value(socket);
 
+    for (int i = 0; i < participantList.size(); i++) {
+        if (participantList.at(i)->socket == socket && participantList.at(i)->name == name) {
+            // duplicate connection, reject
+            socket->disconnectFromHost();
+            participantList.removeAt(i);
+            participantMap.remove(socket);
+            return false;
+        }
+    }
+    participant->name = name;
     // This person is now ready to be added to the permissions tree view
     participant->item = new QTreeWidgetItem(waitItem);
     participant->item->setText(0, name);
-    participant->item->setBackgroundColor(1, QColor::fromHsv(qrand() % 256, 190, 190));
+
+    participant->color = QColor::fromHsv(qrand() % 256, 190, 190);
+    participant->color = participant->color.lighter(150);
+
+    participant->item->setBackgroundColor(1, participant->color);
     participant->item->setToolTip(0, QString("%1@%2").arg(name).arg(participant->address.toString()));
+}
+
+QString ParticipantsPane::getNameForSocket(QTcpSocket *socket)
+{
+    Participant *participant = participantMap.value(socket);
+    return participant->name;
 }
 
 void ParticipantsPane::newParticipant(QString name)
@@ -160,7 +181,19 @@ void ParticipantsPane::removeParticipant(QString name)
             }
         }
     }
-    removeParticipant(socket);
+    if (socket) {
+        removeParticipant(socket);
+    }
+}
+
+void ParticipantsPane::promoteParticipant(QString name, QString address)
+{
+
+}
+
+void ParticipantsPane::demoteParticipant(QString name, QString address)
+{
+
 }
 
 bool ParticipantsPane::canWrite(QTcpSocket *socket)
@@ -204,6 +237,13 @@ void ParticipantsPane::on_promotePushButton_clicked()
     for (int i = 0; i < selectedItems.size(); i++) {
         selectedItems.at(i)->setSelected(false);
     }
+    if (isOwner) {
+        QString participant;
+        participant = selectedItems.at(0)->toolTip(0);
+        qDebug() << "promote: " << participant;
+        emit promoteClicked(participant);
+    }
+
     for (int i = 0; i < participantList.size(); i++) {
         if (selectedItems.at(0) == participantList.at(i)->item) {
             if (participantList.at(i)->permissions == Enu::ReadWrite) {
@@ -239,6 +279,12 @@ void ParticipantsPane::on_demotePushButton_clicked()
     }
     for (int i = 0; i < selectedItems.size(); i++) {
         selectedItems.at(i)->setSelected(false);
+    }
+    if (isOwner) {
+        QString participant;
+        participant = selectedItems.at(0)->toolTip(0);
+        qDebug() << "demote: " << participant;
+        emit demoteClicked(participant);
     }
     for (int i = 0; i < participantList.size(); i++) {
         if (selectedItems.at(0) == participantList.at(i)->item) {

@@ -71,6 +71,7 @@ Document::Document(QWidget *parent) :
 
     isAlreadyAnnounced = false;
     isOwner = true; // We are the document owner, unless we're connecting to someone elses document
+    myPermissions = Enu::ReadWrite;
 }
 
 Document::~Document()
@@ -81,6 +82,7 @@ Document::~Document()
 void Document::connectToDocument(QStringList list)
 {
     isOwner = false;
+    myPermissions = Enu::Waiting;
     myName = list.at(0);
     QString address = list.at(1);
     QString portString = list.at(2);
@@ -97,6 +99,7 @@ void Document::connectToDocument(QStringList list)
 
     connect(socket, SIGNAL(disconnected()), this, SLOT(disconnected()));
     connect(socket, SIGNAL(connected()), this, SLOT(onNewConnection()));
+//    editor->setDisabled(true); // to be uncommented when we finish setting up promotes/demotes
 }
 
 void Document::undo()
@@ -415,8 +418,12 @@ void Document::ownerIncomingData(QString data, QTcpSocket *sender, int length)
         rx = QRegExp("([a-zA-Z0-9_]*)");
         if (data.contains(rx)) {
             QString name = rx.cap(1);
-            participantPane->addParticipant(name, sender);
-            toSend = "join:" + name + "@" + sender->peerAddress().toString();
+            if (participantPane->addParticipant(name, sender)) {
+                toSend = "join:" + name + "@" + sender->peerAddress().toString();
+            }
+            else {
+                return;
+            }
         }
     }
     else if (data.startsWith("resync")) { // user requesting resync of the entire document
@@ -430,15 +437,18 @@ void Document::ownerIncomingData(QString data, QTcpSocket *sender, int length)
             return;
         }
         data.remove(0, 5);
-        toSend = QString("Someone: %2").arg(data);
+        toSend = QString("%1:\t%2").arg(participantPane->getNameForSocket(sender)).arg(data);
         chatPane->appendChatMessage(toSend);
+        toSend.insert(0, "chat:");
     }
 
     // Distribute data to all the other participants
-    for (int i = 0; i < participantPane->participantList.size(); i++) {
-        if (participantPane->participantList.at(i)->socket != sender &&
-            participantPane->canRead(participantPane->participantList.at(i)->socket)) {
-            participantPane->participantList.at(i)->socket->write(QString("%1 %2").arg(toSend.length()).arg(toSend).toAscii());
+    if (toSend != "") {
+        for (int i = 0; i < participantPane->participantList.size(); i++) {
+            if (participantPane->participantList.at(i)->socket != sender &&
+                participantPane->canRead(participantPane->participantList.at(i)->socket)) {
+                participantPane->participantList.at(i)->socket->write(QString("%1 %2").arg(toSend.length()).arg(toSend).toAscii());
+            }
         }
     }
 
@@ -512,10 +522,26 @@ void Document::participantIncomingData(QString data, int length)
         editor->setPlainText(data);
     }
     else if (data.startsWith("promote:")) {
-
+        data.remove(0, 8);
+        rx = QRegExp("([a-zA-Z0-9_]*):(.*)");
+        QString name;
+        QString address;
+        if (data.contains(rx)) {
+            name = rx.cap(1);
+            address = rx.cap(2);
+            participantPane->promoteParticipant(name, address);
+        }
     }
     else if (data.startsWith("demote:")) {
-
+        data.remove(0, 7);
+        rx = QRegExp("([a-zA-Z0-9_]*):(.*)");
+        QString name;
+        QString address;
+        if (data.contains(rx)) {
+            name = rx.cap(1);
+            address = rx.cap(2);
+            participantPane->demoteParticipant(name, address);
+        }
     }
     else if (data.startsWith("chat:")) {
         data.remove(0, 5);
@@ -575,7 +601,7 @@ void Document::onChatSend(QString str)
     QString toSend;
 
     if (isOwner) {
-        toSend = QString("chat:%1: %2").arg(myName).arg(str);
+        toSend = QString("chat:%1:\t%2").arg(myName).arg(str);
         for (int i = 0; i < participantPane->participantList.size(); i++) {
             participantPane->participantList.at(i)->socket->write(QString("%1 %2").arg(toSend.length()).arg(toSend).toAscii());
         }
@@ -584,7 +610,7 @@ void Document::onChatSend(QString str)
         toSend = "chat:" + str; // for find/replace, much of this will be rewritten later for better Object Oriented design
         socket->write(QString("%1 %2").arg(toSend.length()).arg(toSend).toAscii());
     }
-    chatPane->appendChatMessage(QString("%1: %2").arg(myName).arg(str));
+    chatPane->appendChatMessage(QString("%1:\t%2").arg(myName).arg(str));
 }
 
 void Document::onIncomingData()
@@ -645,6 +671,7 @@ void Document::populateDocumentForUser(QTcpSocket *socket)
     qDebug() << "Sending entire document";
     QString toSend = QString("sync:%1").arg(editor->toPlainText());
     socket->write(QString("%1 %2").arg(toSend.length()).arg(toSend).toAscii());
+//    toSend = QString("users:");
 }
 
 void Document::disconnected()
