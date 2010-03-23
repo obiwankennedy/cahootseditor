@@ -1,47 +1,50 @@
 #ifndef SERVER_H
 #define SERVER_H
 
+#include <QObject>
 #include <QTcpServer>
-#include <QTime>
-#include <QTimer>
+#include "participantspane.h"
+#include "codeeditor.h"
+#include "chatpane.h"
 
-static const int MaxBufferSize = 1024000;
-
-class Server : public QTcpServer
+class Server : public QObject
 {
 Q_OBJECT
 public:
-    explicit Server(QObject *parent = 0);
+    explicit Server(CodeEditor *editor, ParticipantsPane *participantsPane, ChatPane *chatPane, QObject *parent = 0);
 
-    enum ConnectionState {
-        WaitingForGreeting,
-        ReadingGreeting,
-        ReadyForUse
-    };
-    enum DataType {
-        PlainText,
-        Ping,
-        Pong,
-        Greeting,
-        ChatMsg,
-        UserJoinLeave,
-        Undefined
-    };
+    bool listen(const QHostAddress & address = QHostAddress::Any, quint16 port = 0);
 
-    void newConnection(QTcpSocket *socket);
+    quint16 serverPort();
+
+    // This writes to all sockets except exception
+    void writeToAll(QString data, QTcpSocket *exception = 0);
+
+private:
+    CodeEditor *editor;
+    ParticipantsPane *participantPane;
+    ChatPane *chatPane;
+
+    QTcpServer *server;
+
+    void processData(QString data, QTcpSocket *sender, int length = 0);
 
 signals:
 
 public slots:
 
-private:
-    QTimer pingTimer;
-    QTime pongTime;
-    QByteArray buffer;
-    ConnectionState state;
+private slots:
+    void onTextChange(int pos, int charsRemoved, int charsAdded);
 
-    QList<QTcpSocket*> clientList;
+    void onChatSend(QString str);
+    void onIncomingData();
+    void onNewConnection();
 
+    void memberPermissionsChanged(QTcpSocket *participant, QString permissions, bool wasPromoted);
+
+    void populateDocumentForUser(QTcpSocket *socket);
+
+    void disconnected();
 };
 
 #endif // SERVER_H

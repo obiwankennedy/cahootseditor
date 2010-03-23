@@ -10,6 +10,7 @@
 #include "findtoolbar.h"
 
 #include "client.h"
+#include "server.h"
 
 #include <QtNetwork>
 #include <QTcpServer>
@@ -87,11 +88,9 @@ public:
 private:
     Ui::Document *ui;
 
-    QTcpServer *server;
     QTcpSocket *socket;
     Client *client;
-
-    QList<QTcpSocket*> socketList;
+    Server *server;
 
     CppHighlighter *highlighter;
 
@@ -105,7 +104,6 @@ private:
 
     ChatPane *chatPane;
 
-    void ownerIncomingData(QString data, QTcpSocket *sender, int length = 0);
     void participantIncomingData(QString data, int length = 0);
 
 private slots:
@@ -115,10 +113,6 @@ private slots:
     void onChatSend(QString str);
     void onIncomingData();
     void onNewConnection();
-
-    void memberPermissionsChanged(QTcpSocket *participant, QString permissions, bool wasPromoted);
-
-    void populateDocumentForUser(QTcpSocket *socket);
 
     void disconnected();
 

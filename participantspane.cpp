@@ -31,7 +31,6 @@ ParticipantsPane::ParticipantsPane(QWidget *parent) :
     ui->connectInfoLabel->setFont(QFont(Utilities::labelFont, Utilities::labelFontSize));
     ui->promotePushButton->setFont(QFont(Utilities::labelFont, Utilities::labelFontSize));
     ui->demotePushButton->setFont(QFont(Utilities::labelFont, Utilities::labelFontSize));
-
 }
 
 ParticipantsPane::~ParticipantsPane()
@@ -106,28 +105,32 @@ QString ParticipantsPane::getNameAddressForSocket(QTcpSocket *socket)
     return QString("%1@%2").arg(participant->name).arg(participant->address.toString());
 }
 
-void ParticipantsPane::newParticipant(QString name)
+void ParticipantsPane::newParticipant(QString name, QString address, QString permissions)
 {
     // The server has given us a name to add to the treeWidget
     Participant *participant = new Participant;
     participantList.append(participant);
 
-    QRegExp nameRx("[a-zA-Z0-9_]*");
-    if (name.contains(nameRx)) {
-        participant->name = nameRx.cap(1);
-    }
-    else {
-        return; // this is an invalid name
-    }
+    participant->name = name;
+    participant->address = QHostAddress(address);
+
     participant->permissions = Enu::Waiting;
     // everyone has their own colors - colors aren't consistent across participants
     participant->color = QColor::fromHsv(qrand() % 256, 190, 190);
     participant->color = participant->color.lighter(150);
 
-    participant->item = new QTreeWidgetItem(waitItem);
+    if (permissions == "waiting") {
+        participant->item = new QTreeWidgetItem(waitItem);
+    }
+    else if (permissions == "read") {
+        participant->item = new QTreeWidgetItem(roItem);
+    }
+    else if (permissions == "write") {
+        participant->item = new QTreeWidgetItem(rwItem);
+    }
     participant->item->setText(0, name);
     participant->item->setBackgroundColor(1, participant->color);
-    participant->item->setToolTip(0, name);
+    participant->item->setToolTip(0, name + "@" + address);
 }
 
 void ParticipantsPane::removeAllParticipants()
@@ -171,13 +174,13 @@ void ParticipantsPane::removeParticipant(QTcpSocket *socket)
     }
 }
 
-void ParticipantsPane::removeParticipant(QString name)
+void ParticipantsPane::removeParticipant(QString name, QString address)
 {
     // This is a function to be used by the participants in removing participants via control messages.
     bool alreadyFound = false;
     QTcpSocket *socket;
     for (int i = 0; i < participantList.size(); i++) {
-        if (participantList.at(i)->name == name) {
+        if (participantList.at(i)->name == name && participantList.at(i)->address.toString() == address) {
             if (!alreadyFound) {
                 alreadyFound = true;
                 socket = participantList.at(i)->socket;
@@ -196,16 +199,44 @@ void ParticipantsPane::removeParticipant(QString name)
 
 void ParticipantsPane::promoteParticipant(QString name, QString address)
 {
-    (void)name;
-    (void)address;
-#warning "implement"
+    QString fullName = name + "@" + address;
+    for (int i = 0; i < participantList.size(); i++) {
+        if (participantList.at(i)->item->toolTip(0) == fullName) {
+            if (participantList.at(i)->permissions == Enu::ReadWrite) {
+                // This should not happen, but we won't crash. Up to the server to make sure this doesn't happen.
+            }
+            else if (participantList.at(i)->permissions == Enu::ReadOnly) {
+                roItem->removeChild(participantList.at(i)->item);
+                rwItem->insertChild(0, participantList.at(i)->item);
+            }
+            else if (participantList.at(i)->permissions == Enu::Waiting) {
+                waitItem->removeChild(participantList.at(i)->item);
+                roItem->insertChild(0, participantList.at(i)->item);
+            }
+            return;
+        }
+    }
 }
 
 void ParticipantsPane::demoteParticipant(QString name, QString address)
 {
-    (void)name;
-    (void)address;
-#warning "implement"
+    QString fullName = name + "@" + address;
+    for (int i = 0; i < participantList.size(); i++) {
+        if (participantList.at(i)->item->toolTip(0) == fullName) {
+            if (participantList.at(i)->permissions == Enu::ReadWrite) {
+                rwItem->removeChild(participantList.at(i)->item);
+                roItem->insertChild(0, participantList.at(i)->item);
+            }
+            else if (participantList.at(i)->permissions == Enu::ReadOnly) {
+                roItem->removeChild(participantList.at(i)->item);
+                waitItem->insertChild(0, participantList.at(i)->item);
+            }
+            else if (participantList.at(i)->permissions == Enu::Waiting) {
+                // This shouldn't happen. Up to the server to make sure it doesn't
+            }
+            return;
+        }
+    }
 }
 
 bool ParticipantsPane::canWrite(QTcpSocket *socket)

@@ -78,7 +78,6 @@ void ChatPane::cut()
 void ChatPane::copy()
 {
     if (ui->lineEdit->hasFocus()) {
-        qDebug() << "lineEdit has focus";
         ui->lineEdit->copy();
     }
     else {

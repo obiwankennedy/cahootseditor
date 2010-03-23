@@ -29,7 +29,8 @@ SOURCES += main.cpp \
     findtoolbar.cpp \
     server.cpp \
     chatbrowser.cpp \
-    utilities.cpp
+    utilities.cpp \
+    highlighters/pythonhighlighter.cpp
 HEADERS += mainwindow.h \
     document.h \
     highlighters/cpphighlighter.h \
@@ -44,7 +45,8 @@ HEADERS += mainwindow.h \
     enu.h \
     server.h \
     chatbrowser.h \
-    utilities.h
+    utilities.h \
+    highlighters/pythonhighlighter.h
 FORMS += mainwindow.ui \
     document.ui \
     connecttodocument.ui \

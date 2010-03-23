@@ -39,14 +39,14 @@ public:
     QString getNameAddressForSocket(QTcpSocket *socket);
 
     // Client participant pane add participant functions
-    void newParticipant(QString name);
+    void newParticipant(QString name, QString address, QString permissions = "waiting");
 
     // For when we disconnect
     void removeAllParticipants();
     // This is a function to be used by the owner
     void removeParticipant(QTcpSocket *socket);
     // This is a function to be used by the participants in removing participants via control messages.
-    void removeParticipant(QString name);
+    void removeParticipant(QString name, QString address);
 
     void promoteParticipant(QString name, QString address);
     void demoteParticipant(QString name, QString address);
