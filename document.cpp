@@ -85,7 +85,6 @@ void Document::announceDocument()
     server->listen(QHostAddress::Any, 0); // Port is chosen automatically, listening on all NICs
     QString port = QString::number(server->serverPort(), 10);
 
-    chatPane->appendChatMessage("Listening on port " + port);
 
     QString ipAddress;
     QList<QHostAddress> ipAddressesList = QNetworkInterface::allAddresses();
@@ -99,6 +98,7 @@ void Document::announceDocument()
     if (ipAddress.isEmpty()) {
         ipAddress = QHostAddress(QHostAddress::LocalHost).toString();
     }
+    chatPane->appendChatMessage("Listening at " + ipAddress + ":" + port);
 
     participantPane->setConnectInfo(ipAddress + ":" + port);
 }

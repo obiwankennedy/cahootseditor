@@ -102,6 +102,9 @@ void Server::processData(QString data, QTcpSocket *sender, int length)
             QString name = rx.cap(1);
             if (participantPane->addParticipant(name, sender)) {
                 toSend = "join:" + participantPane->getNameAddressForSocket(sender);
+#warning "implement owner name"
+                QString myName = "Chris";
+                sender->write(QString("%1 helo:%2").arg(5 + myName.length()).arg(myName).toAscii());
             }
             else {
                 return;
@@ -207,9 +210,31 @@ void Server::memberPermissionsChanged(QTcpSocket *participant, QString permissio
 
 void Server::populateDocumentForUser(QTcpSocket *socket)
 {
-    qDebug() << "Sending entire document";
+    // Send entire document
     QString toSend = QString("sync:%1").arg(editor->toPlainText());
     socket->write(QString("%1 %2").arg(toSend.length()).arg(toSend).toAscii());
+
+    // Send participants
+    toSend.clear();
+    QString name;
+    QString address;
+    QString permissions;
+    for (int i = 0; i < participantPane->participantList.size(); i++) {
+        name = participantPane->participantList.at(i)->name;
+        address = participantPane->participantList.at(i)->address.toString();
+        if (participantPane->participantList.at(i)->permissions == Enu::Waiting) {
+            permissions = "waiting";
+        }
+        else if (participantPane->participantList.at(i)->permissions == Enu::ReadOnly) {
+            permissions = "read";
+        }
+        else if (participantPane->participantList.at(i)->permissions == Enu::ReadWrite) {
+            permissions = "write";
+        }
+
+        toSend = QString("adduser:%1@%2 %3").arg(name).arg(address).arg(permissions);
+        socket->write(QString("%1 %2").arg(toSend.length()).arg(toSend).toAscii());
+    }
 }
 
 void Server::disconnected()

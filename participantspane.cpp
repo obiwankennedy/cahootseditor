@@ -70,10 +70,10 @@ bool ParticipantsPane::addParticipant(QString name, QTcpSocket *socket)
     Participant *participant = participantMap.value(socket);
 
     for (int i = 0; i < participantList.size(); i++) {
-        if (participantList.at(i)->socket == socket && participantList.at(i)->name == name) {
+        if (participantList.at(i)->socket->peerAddress() == participantList.at(i)->address && participantList.at(i)->name == name) {
             // duplicate connection, reject
             socket->disconnectFromHost();
-            participantList.removeAt(i);
+            participantList.removeOne(participant);
             participantMap.remove(socket);
             return false;
         }
@@ -236,6 +236,12 @@ void ParticipantsPane::demoteParticipant(QString name, QString address)
             return;
         }
     }
+}
+
+void ParticipantsPane::setOwnerName(QString name)
+{
+    qDebug() << "setting owner name: " << name;
+    owner->setText(0, name);
 }
 
 bool ParticipantsPane::canWrite(QTcpSocket *socket)

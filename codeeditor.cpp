@@ -531,7 +531,6 @@ void CodeEditor::lineNumberAreaPaintEvent(QPaintEvent *event)
     QPainter painter(lineNumberArea);
     painter.fillRect(event->rect(), QColor(232, 232, 232)); // light grey
 
-
     QTextBlock block = firstVisibleBlock();
     int blockNumber = block.blockNumber();
     int top = (int) blockBoundingGeometry(block).translated(contentOffset()).top();

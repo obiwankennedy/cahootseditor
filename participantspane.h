@@ -54,6 +54,8 @@ public:
     void promoteParticipant(QString name, QString address);
     void demoteParticipant(QString name, QString address);
 
+    void setOwnerName(QString name);
+
     bool canWrite(QTcpSocket *socket);
     bool canRead(QTcpSocket *socket);
 
