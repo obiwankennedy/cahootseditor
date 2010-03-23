@@ -76,6 +76,7 @@ void Server::processData(QString data, QTcpSocket *sender, int length)
             int charsAdded = rx.cap(3).toInt();
             data = rx.cap(4);
             editor->collabTextChange(pos, charsRemoved, charsAdded, data);
+            exception = sender;
         }
     }
     else if (data.startsWith("chat:")) {

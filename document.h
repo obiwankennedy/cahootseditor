@@ -26,6 +26,11 @@ public:
     Document(QWidget *parent = 0);
     ~Document();
 
+    // This sets up the document so people can connect to it.
+    // Hopefully we can do something with Bonjour so you can browse for local documents
+    // but that's down the road.
+    void announceDocument();
+
     void connectToDocument(QStringList list);
 
     void undo();
@@ -42,11 +47,6 @@ public:
     void setHighlighter(int Highlighter);
     enum Highlighter {None, CPlusPlus, Python};
 
-    // This sets up the document so people can connect to it.
-    // Hopefully we can do something with Bonjour so you can browse for local documents
-    // but that's down the road.
-    void announceDocument();
-
     bool isUndoable();
     bool isRedoable();
     bool isModified();
@@ -60,7 +60,6 @@ public:
     void replaceAll(QString searchString, QString replaceString, Qt::CaseSensitivity sensitivity, bool wrapAround, Enu::FindMode mode);
     void replace(QString replaceString);
     void findReplace(QString searchString, QString replaceString, Qt::CaseSensitivity sensitivity, bool wrapAround, Enu::FindMode mode);
-
 
     QString getPlainText();
     void setPlainText(QString text);
@@ -79,7 +78,6 @@ public:
 
     // This tells us if we're the host/owner of the document,
     // and affects how we talk with participants
-    bool isOwner;
     Enu::Permissions myPermissions;
     QString curFile;
     
@@ -88,7 +86,6 @@ public:
 private:
     Ui::Document *ui;
 
-    QTcpSocket *socket;
     Client *client;
     Server *server;
 
@@ -99,22 +96,8 @@ private:
     bool isAlreadyAnnounced;
 
     FindToolBar *findToolbar;
-
     ParticipantsPane *participantPane;
-
     ChatPane *chatPane;
-
-    void participantIncomingData(QString data, int length = 0);
-
-private slots:
-    // The elephant in the room. Handles collaborative editing.
-    void onTextChange(int pos, int charsRemoved, int charsAdded);
-
-    void onChatSend(QString str);
-    void onIncomingData();
-    void onNewConnection();
-
-    void disconnected();
 
 signals:
     void redoAvailable(bool);

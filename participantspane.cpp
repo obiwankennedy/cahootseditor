@@ -42,7 +42,6 @@ void ParticipantsPane::setOwnership(bool isOwner)
 {
     ui->promotePushButton->setShown(isOwner);
     ui->demotePushButton->setShown(isOwner);
-    this->isOwner = isOwner;
 }
 
 void ParticipantsPane::setConnectInfo(QString str)
@@ -280,11 +279,6 @@ void ParticipantsPane::on_promotePushButton_clicked()
     for (int i = 0; i < selectedItems.size(); i++) {
         selectedItems.at(i)->setSelected(false);
     }
-    if (isOwner) {
-        QString participant;
-        participant = selectedItems.at(0)->toolTip(0);
-        qDebug() << "promote: " << participant;
-    }
 
     QString permissions;
     for (int i = 0; i < participantList.size(); i++) {
@@ -299,13 +293,11 @@ void ParticipantsPane::on_promotePushButton_clicked()
                 roItem->removeChild(participantList.at(i)->item);
                 rwItem->insertChild(0, participantList.at(i)->item);
                 participantList.at(i)->permissions = Enu::ReadWrite;
-//                participantList.at(i)->item->setSelected(true);
                 permissions = "write";
             }
             else if (participantList.at(i)->permissions == Enu::Waiting) {
                 waitItem->removeChild(participantList.at(i)->item);
                 roItem->insertChild(0, participantList.at(i)->item);
-//                participantList.at(i)->item->setSelected(true);
                 participantList.at(i)->permissions = Enu::ReadOnly;
                 emit memberCanNowRead(participantList.at(i)->socket);
                 permissions = "read";
@@ -327,11 +319,6 @@ void ParticipantsPane::on_demotePushButton_clicked()
     for (int i = 0; i < selectedItems.size(); i++) {
         selectedItems.at(i)->setSelected(false);
     }
-    if (isOwner) {
-        QString participant;
-        participant = selectedItems.at(0)->toolTip(0);
-        qDebug() << "demote: " << participant;
-    }
 
     QString permissions;
     for (int i = 0; i < participantList.size(); i++) {
@@ -339,14 +326,12 @@ void ParticipantsPane::on_demotePushButton_clicked()
             if (participantList.at(i)->permissions == Enu::ReadWrite) {
                 rwItem->removeChild(participantList.at(i)->item);
                 roItem->insertChild(0, participantList.at(i)->item);
-//                participantList.at(i)->item->setSelected(true);
                 participantList.at(i)->permissions = Enu::ReadOnly;
                 permissions = "read";
             }
             else if (participantList.at(i)->permissions == Enu::ReadOnly) {
                 roItem->removeChild(participantList.at(i)->item);
                 waitItem->insertChild(0, participantList.at(i)->item);
-//                participantList.at(i)->item->setSelected(true);
                 participantList.at(i)->permissions = Enu::Waiting;
                 permissions = "waiting";
             }

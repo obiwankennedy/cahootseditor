@@ -1,286 +1,211 @@
 #include "client.h"
 
-#include <QtNetwork>
+#include <QTextDocumentFragment>
 
-static const int TransferTimeout = 30 * 1000;
-static const int PongTimeout = 60 * 1000;
-static const int PingInterval = 5 * 1000;
-static const char SeparatorToken = ' ';
+Client::Client(CodeEditor *editor, ParticipantsPane *participantsPane, ChatPane *chatPane, QObject *parent) :
+    QObject(parent)
+{
+    this->editor = editor;
+    this->participantPane = participantsPane;
+    this->chatPane = chatPane;
 
-Client::Client()
-{    
-    greetingMessage = tr("undefined");
-    username = tr("unknown");
-    state = WaitingForGreeting;
-    currentDataType = Undefined;
-    numBytesForCurrentDataType = -1;
-    transferTimerId = 0;
-    isGreetingMessageSent = false;
-    pingTimer.setInterval(PingInterval);
+    socket = new QTcpSocket(this);
 
-    connect(socket, SIGNAL(readyRead()), this, SLOT(processReadyRead()));
-    connect(socket, SIGNAL(disconnected()), &pingTimer, SLOT(stop()));
-    connect(&pingTimer, SIGNAL(timeout()), this, SLOT(sendPing()));
-    connect(socket, SIGNAL(connected()), this, SLOT(sendGreetingMessage()));
+    connect(editor->document(), SIGNAL(contentsChange(int,int,int)), this, SLOT(onTextChange(int,int,int)));
+    connect(chatPane, SIGNAL(returnPressed(QString)), this, SLOT(onChatSend(QString)));
+
+    connect(socket, SIGNAL(disconnected()), this, SLOT(disconnected()));
+    connect(socket, SIGNAL(connected()), this, SLOT(onNewConnection()));
 }
 
-void Client::setGreetingMessage(const QString &message)
+void Client::connectToHost(QHostAddress hostName, int port)
 {
-    greetingMessage = message;
+    socket->connectToHost(hostName, port);
 }
 
-void Client::sendMessage(const QString &message)
+void Client::setUsername(QString username)
 {
-    if (message.isEmpty()) {
+    myName = username;
+}
+
+void Client::processData(QString data, int length)
+{
+    bool haveExtra = false;
+    QString rest;
+
+    if (length < data.length()) { // in case incoming data packets were concatenated
+        haveExtra = true;
+        rest = data;
+        rest.remove(0, length);
+        data.remove(length, data.length() - length);
+    }
+    else if (length > data.length()) {
+        // we have incomplete data
+    }
+
+    qDebug() << "pdata: " << data;
+
+    QRegExp rx;
+    if (data.startsWith("doc:")) {
+        data.remove(0, 4);
+        // detect line number, then put text at that position.
+        rx = QRegExp("(\\d+)\\s(\\d+)\\s(\\d+)\\s(.*)");
+        if (data.contains(rx)) {
+            int pos = rx.cap(1).toInt();
+            int charsRemoved = rx.cap(2).toInt();
+            int charsAdded = rx.cap(3).toInt();
+            data = rx.cap(4);
+            editor->collabTextChange(pos, charsRemoved, charsAdded, data);
+        }
+    }
+    else if (data.startsWith("chat:")) {
+        data.remove(0, 5);
+        chatPane->appendChatMessage(data);
+    }
+    else if (data.startsWith("promote:")) {
+        data.remove(0, 8);
+        rx = QRegExp("([a-zA-Z0-9_]*)@(.*)");
+        QString name;
+        QString address;
+        if (data.contains(rx)) {
+            name = rx.cap(1);
+            address = rx.cap(2);
+            participantPane->promoteParticipant(name, address);
+        }
+    }
+    else if (data.startsWith("demote:")) {
+        data.remove(0, 7);
+        rx = QRegExp("([a-zA-Z0-9_]*)@(.*)");
+        QString name;
+        QString address;
+        if (data.contains(rx)) {
+            name = rx.cap(1);
+            address = rx.cap(2);
+            participantPane->demoteParticipant(name, address);
+        }
+    }
+    else if (data.startsWith("join:")) {
+        data.remove(0, 5);
+        rx = QRegExp("([a-zA-Z0-9_]*)@(.*)");
+        if (data.contains(rx)) {
+            QString name = rx.cap(1);
+            QString address = rx.cap(2);
+            participantPane->newParticipant(name, address);
+        }
+    }
+    else if (data.startsWith("leave:")) {
+        data.remove(0, 6);
+        rx = QRegExp("([a-zA-Z0-9_]*)@(.*)");
+        if (data.contains(rx)) {
+            QString name = rx.cap(1);
+            QString address = rx.cap(2);
+            participantPane->removeParticipant(name, address);
+        }
+    }
+    else if (data.startsWith("populate:")) { // populate participant data
+#warning "implement"
+    }
+    else if (data.startsWith("setperm:")) { // the server has updated our permissions
+        data.remove(0, 8);
+        if (data == "write") {
+            editor->setDisabled(false);
+            editor->setReadOnly(false);
+        }
+        else if (data == "read") {
+            editor->setDisabled(false);
+            editor->setReadOnly(true);
+        }
+        else if (data == "waiting") {
+            editor->setDisabled(true);
+            editor->setReadOnly(true);
+        }
+    }
+    else if (data.startsWith("sync:")) { // the data is the entire document
+        data.remove(0, 5);
+        // set the document's contents to the contents of the packet
+        editor->setPlainText(data);
+    }
+
+    bool ok;
+
+    if (haveExtra) {
+        QRegExp rx = QRegExp("^(\\d+)*.");
+        if (rest.contains(rx)) {
+            length = rx.cap(1).toInt(&ok);
+            rest.remove(0, rx.cap(1).length() + 1); // remove digit indicating packet length and whitespace
+            if (ok) {
+                processData(rest, length);
+            }
+        }
+    }
+}
+
+void Client::onTextChange(int pos, int charsRemoved, int charsAdded)
+{
+    QString toSend;
+
+    if (socket->state() != QAbstractSocket::ConnectedState) {
         return;
     }
 
-    QByteArray msg = message.toUtf8();
-    QByteArray data = "MESSAGE " + QByteArray::number(msg.size()) + " " + msg;
-    if (socket->write(data) == data.size()) {
-        // potential debug
+    QString data;
+    if (charsRemoved > 0 && charsAdded == 0) {
+        data = "";
     }
-}
-
-QString Client::nickName() const
-{
-    return QString(nickName() + "@" + QHostInfo::localHostName() + ":" + QString::number(socket->peerPort()));
-}
-
-bool Client::hasConnection(const QHostAddress &senderIp, int senderPort) const
-{
-    if (socket->peerPort() == senderPort) {
-        return true;
+    else if (charsAdded > 0) {
+        QTextCursor cursor = QTextCursor(editor->document());
+        cursor.setPosition(pos, QTextCursor::MoveAnchor);
+        cursor.movePosition(QTextCursor::NextCharacter, QTextCursor::KeepAnchor, charsAdded);
+        data = cursor.selection().toPlainText();
     }
 
-
-    return false;
+    toSend = QString("doc:%1 %2 %3 %4").arg(pos).arg(charsRemoved).arg(charsAdded).arg(data);
+    socket->write(QString("%1 %2").arg(toSend.length()).arg(toSend).toAscii());
 }
 
-void Client::timerEvent(QTimerEvent *timerEvent)
+void Client::onChatSend(QString str)
 {
-    if (timerEvent->timerId() == transferTimerId) {
-        abort();
-        killTimer(transferTimerId);
-        transferTimerId = 0;
+    QString toSend;
+
+    toSend = "chat:" + str;
+    socket->write(QString("%1 %2").arg(toSend.length()).arg(toSend).toAscii());
+
+    chatPane->appendChatMessage(QString("%1:\t%2").arg(myName).arg(str));
+}
+
+void Client::onIncomingData()
+{
+    // disconnect the signal that fires when the contents of the editor change so we don't echo
+    disconnect(editor->document(), SIGNAL(contentsChange(int,int,int)), this, SLOT(onTextChange(int,int,int)));
+
+    QString data;
+    QRegExp rx = QRegExp("^(\\d+)*.");
+    int length;
+    bool ok;
+
+    // We are a participant
+    data = socket->readAll();
+    if (data.contains(rx)) {
+        length = rx.cap(1).toInt(&ok);
+        data.remove(0, rx.cap(1).length() + 1); // remove digit indicating packet length and whitespace
+        if (ok) {
+            processData(data, length);
+        }
     }
+    // reconnect the signal that fires when the contents of the editor change so we continue to send new text
+    connect(editor->document(), SIGNAL(contentsChange(int,int,int)), this, SLOT(onTextChange(int,int,int)));
 }
 
-void Client::newConnection()
+void Client::onNewConnection()
 {
-    QByteArray greeting = greetingMessage.toUtf8();
-    QByteArray data = "GREETING " + QByteArray::number(greeting.size()) + " " + greeting;
-    if (socket->write(data) == data.size())
-        isGreetingMessageSent = true;
-
-    connect(socket, SIGNAL(error(QAbstractSocket::SocketError)),
-            this, SLOT(connectionError(QAbstractSocket::SocketError)));
-    connect(socket, SIGNAL(disconnected()), this, SLOT(disconnected()));
-}
-
-void Client::connectionError(QAbstractSocket::SocketError /* socketError */)
-{
-    closeConnection();
+    connect(socket, SIGNAL(readyRead()), this, SLOT(onIncomingData()));
+    QString toSend = QString("helo:%1").arg(myName);
+    socket->write(QString("%1 %2").arg(toSend.length()).arg(toSend).toAscii());
 }
 
 void Client::disconnected()
 {
-    closeConnection();
+    participantPane->removeAllParticipants();
+    chatPane->hide();
+    participantPane->hide();
 }
-
-void Client::readyForUse()
-{
-    if (!socket || (socket->state() != QTcpSocket::ConnectedState)) {
-        return;
-    }
-
-    connect(socket, SIGNAL(newMessage(const QString &, const QString &)),
-            this, SIGNAL(newMessage(const QString &, const QString &)));
-}
-
-void Client::processReadyRead()
-{
-    if (state == WaitingForGreeting) {
-        if (!readProtocolHeader())
-            return;
-        if (currentDataType != Greeting) {
-            socket->abort();
-            return;
-        }
-        state = ReadingGreeting;
-    }
-
-    if (state == ReadingGreeting) {
-        if (!hasEnoughData())
-            return;
-
-        buffer = socket->read(numBytesForCurrentDataType);
-        if (buffer.size() != numBytesForCurrentDataType) {
-            socket->abort();
-            return;
-        }
-
-        username = QString(buffer) + "@" + socket->peerAddress().toString() + ":"
-                   + QString::number(socket->peerPort());
-        currentDataType = Undefined;
-        numBytesForCurrentDataType = 0;
-        buffer.clear();
-
-        if (!socket->isValid()) {
-            socket->abort();
-            return;
-        }
-
-        if (!isGreetingMessageSent)
-            sendGreetingMessage();
-
-        pingTimer.start();
-        pongTime.start();
-        state = ReadyForUse;
-        readyForUse();
-    }
-
-    do {
-        if (currentDataType == Undefined) {
-            if (!readProtocolHeader())
-                return;
-        }
-        if (!hasEnoughData())
-            return;
-        processData();
-    } while (socket->bytesAvailable() > 0);
-}
-
-void Client::sendPing()
-{
-    if (pongTime.elapsed() > PongTimeout) {
-        socket->abort();
-        return;
-    }
-
-    socket->write("PING 1 p");
-}
-
-void Client::sendGreetingMessage()
-{
-    QByteArray greeting = greetingMessage.toUtf8();
-    QByteArray data = "GREETING " + QByteArray::number(greeting.size()) + " " + greeting;
-    if (socket->write(data) == data.size())
-        isGreetingMessageSent = true;
-}
-
-void Client::closeConnection()
-{
-    socket->deleteLater();
-}
-
-int Client::readDataIntoBuffer(int maxSize)
-{
-    if (maxSize > MaxBufferSize)
-        return 0;
-
-    int numBytesBeforeRead = buffer.size();
-    if (numBytesBeforeRead == MaxBufferSize) {
-        socket->abort();
-        return 0;
-    }
-
-    while (socket->bytesAvailable() > 0 && buffer.size() < maxSize) {
-        buffer.append(socket->read(1));
-        if (buffer.endsWith(SeparatorToken))
-            break;
-    }
-    return buffer.size() - numBytesBeforeRead;
-}
-
-int Client::dataLengthForCurrentDataType()
-{
-    if (socket->bytesAvailable() <= 0 || readDataIntoBuffer() <= 0
-            || !buffer.endsWith(SeparatorToken))
-        return 0;
-
-    buffer.chop(1);
-    int number = buffer.toInt();
-    buffer.clear();
-    return number;
-}
-
-bool Client::readProtocolHeader()
-{
-    if (transferTimerId) {
-        socket->killTimer(transferTimerId);
-        transferTimerId = 0;
-    }
-
-    if (readDataIntoBuffer() <= 0) {
-        transferTimerId = socket->startTimer(TransferTimeout);
-        return false;
-    }
-
-    if (buffer == "PING ") {
-        currentDataType = Ping;
-    } else if (buffer == "PONG ") {
-        currentDataType = Pong;
-    } else if (buffer == "MESSAGE ") {
-        currentDataType = PlainText;
-    } else if (buffer == "GREETING ") {
-        currentDataType = Greeting;
-    } else {
-        currentDataType = Undefined;
-        abort();
-        return false;
-    }
-
-    buffer.clear();
-    numBytesForCurrentDataType = dataLengthForCurrentDataType();
-    return true;
-}
-
-bool Client::hasEnoughData()
-{
-    if (transferTimerId) {
-        socket->killTimer(transferTimerId);
-        transferTimerId = 0;
-    }
-
-    if (numBytesForCurrentDataType <= 0)
-        numBytesForCurrentDataType = dataLengthForCurrentDataType();
-
-    if (socket->bytesAvailable() < numBytesForCurrentDataType
-            || numBytesForCurrentDataType <= 0) {
-        transferTimerId = startTimer(TransferTimeout);
-        return false;
-    }
-
-    return true;
-}
-
-void Client::processData()
-{
-    buffer = socket->read(numBytesForCurrentDataType);
-    if (buffer.size() != numBytesForCurrentDataType) {
-        abort();
-        return;
-    }
-
-    switch (currentDataType) {
-    case PlainText:
-        newMessage(username, QString::fromUtf8(buffer));
-        break;
-    case Ping:
-        socket->write("PONG 1 p");
-        break;
-    case Pong:
-        pongTime.restart();
-        break;
-    default:
-        break;
-    }
-
-    currentDataType = Undefined;
-    numBytesForCurrentDataType = 0;
-    buffer.clear();
-}
-
-
-

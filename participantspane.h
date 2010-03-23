@@ -11,10 +11,13 @@ namespace Ui {
 }
 
 struct Participant {
+    // Used by owner and particiapnts:
     QString name;
     QHostAddress address;
     QColor color;
     QTreeWidgetItem *item;
+
+    // Only used by the owner:
     int permissions;
     QTcpSocket *socket;
 };
@@ -64,8 +67,6 @@ private:
     QTreeWidgetItem *roItem;
     QTreeWidgetItem *waitItem;
     QTreeWidgetItem *owner;
-
-    bool isOwner;
 
 private slots:
     void onCurrentItemChanged(QTreeWidgetItem *item, QTreeWidgetItem *);

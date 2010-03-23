@@ -59,9 +59,6 @@ Document::Document(QWidget *parent) :
     connect(editor, SIGNAL(undoAvailable(bool)), this, SIGNAL(undoAvailable(bool)));
     connect(editor, SIGNAL(redoAvailable(bool)), this, SIGNAL(redoAvailable(bool)));
 
-    socket = new QTcpSocket(this);
-//    client = new Client();
-
     // Hide the panels that only matter if we're using the collaborative portion of the app
     setChatHidden(true);
     setParticipantsHidden(true);
@@ -69,7 +66,6 @@ Document::Document(QWidget *parent) :
     myName = "Owner"; // temporary
 
     isAlreadyAnnounced = false;
-    isOwner = true; // We are the document owner, unless we're connecting to someone elses document
     myPermissions = Enu::ReadWrite;
 }
 
@@ -78,27 +74,55 @@ Document::~Document()
     delete ui;
 }
 
-void Document::connectToDocument(QStringList list)
+void Document::announceDocument()
 {
-    isOwner = false;
-    myPermissions = Enu::Waiting;
-    myName = list.at(0);
-    QString address = list.at(1);
-    QString portString = list.at(2);
-    int port = portString.toInt();
-    socket->connectToHost(QHostAddress(address), port);
-    participantPane->setOwnership(isOwner);
     isAlreadyAnnounced = true;
     setChatHidden(false);
     setParticipantsHidden(false);
+
+    server = new Server(editor, participantPane, chatPane);
+
+    server->listen(QHostAddress::Any, 0); // Port is chosen automatically, listening on all NICs
+    QString port = QString::number(server->serverPort(), 10);
+
+    chatPane->appendChatMessage("Listening on port " + port);
+
+    QString ipAddress;
+    QList<QHostAddress> ipAddressesList = QNetworkInterface::allAddresses();
+    // use the first non-localhost IPv4 address
+    for (int i = 0; i < ipAddressesList.size(); ++i) {
+        if (ipAddressesList.at(i) != QHostAddress::LocalHost &&
+            ipAddressesList.at(i).toIPv4Address())
+            ipAddress = ipAddressesList.at(i).toString();
+    }
+    // if we did not find one, use IPv4 localhost
+    if (ipAddress.isEmpty()) {
+        ipAddress = QHostAddress(QHostAddress::LocalHost).toString();
+    }
+
+    participantPane->setConnectInfo(ipAddress + ":" + port);
+}
+
+void Document::connectToDocument(QStringList list)
+{
+    myPermissions = Enu::Waiting;
+
+    myName = list.at(0);    
+    QString address = list.at(1);
+    QString portString = list.at(2);
+
+    int port = portString.toInt();
+    participantPane->setOwnership(false);
+    isAlreadyAnnounced = true;
+
+    setChatHidden(false);
+    setParticipantsHidden(false);
+    editor->setEnabled(false);
+
+    client = new Client(editor, participantPane, chatPane);
+    client->setUsername(myName);
+    client->connectToHost(QHostAddress(address), port);
     participantPane->setConnectInfo(QString("%1:%2").arg(address).arg(portString));
-
-    connect(editor->document(), SIGNAL(contentsChange(int,int,int)), this, SLOT(onTextChange(int,int,int)));
-    connect(chatPane, SIGNAL(returnPressed(QString)), this, SLOT(onChatSend(QString)));
-
-    connect(socket, SIGNAL(disconnected()), this, SLOT(disconnected()));
-    connect(socket, SIGNAL(connected()), this, SLOT(onNewConnection()));
-    editor->setDisabled(true); // to be uncommented when we finish setting up promotes/demotes
 }
 
 void Document::undo()
@@ -208,36 +232,6 @@ void Document::setHighlighter(int Highlighter)
     else if (Highlighter == Python) {
 
     }
-}
-
-void Document::announceDocument()
-{
-    isAlreadyAnnounced = true;
-    participantPane->setOwnership(isOwner);
-    setChatHidden(false);
-    setParticipantsHidden(false);
-
-    server = new Server(editor, participantPane, chatPane);
-
-    server->listen(QHostAddress::Any, 0); // Port is chosen automatically, listening on all NICs
-    QString port = QString::number(server->serverPort(), 10);
-
-    chatPane->appendChatMessage("Listening on port " + port);
-
-    QString ipAddress;
-    QList<QHostAddress> ipAddressesList = QNetworkInterface::allAddresses();
-    // use the first non-localhost IPv4 address
-    for (int i = 0; i < ipAddressesList.size(); ++i) {
-        if (ipAddressesList.at(i) != QHostAddress::LocalHost &&
-            ipAddressesList.at(i).toIPv4Address())
-            ipAddress = ipAddressesList.at(i).toString();
-    }
-    // if we did not find one, use IPv4 localhost
-    if (ipAddress.isEmpty()) {
-        ipAddress = QHostAddress(QHostAddress::LocalHost).toString();
-    }
-
-    participantPane->setConnectInfo(ipAddress + ":" + port);
 }
 
 bool Document::isUndoable()
@@ -371,191 +365,6 @@ bool Document::isEditorSplitSideBySide()
 bool Document::isAnnounced()
 {
     return isAlreadyAnnounced;
-}
-
-void Document::participantIncomingData(QString data, int length)
-{
-    bool haveExtra = false;
-    QString rest;
-
-    if (length < data.length()) { // in case incoming data packets were concatenated
-        haveExtra = true;
-        rest = data;
-        rest.remove(0, length);
-        data.remove(length, data.length() - length);
-    }
-    else if (length > data.length()) {
-        // we have incomplete data
-    }
-
-    qDebug() << "pdata: " << data;
-
-    QRegExp rx;
-    if (data.startsWith("doc:")) {
-        data.remove(0, 4);
-        // detect line number, then put text at that position.
-        rx = QRegExp("(\\d+)\\s(\\d+)\\s(\\d+)\\s(.*)");
-        if (data.contains(rx)) {
-            int pos = rx.cap(1).toInt();
-            int charsRemoved = rx.cap(2).toInt();
-            int charsAdded = rx.cap(3).toInt();
-            data = rx.cap(4);
-            editor->collabTextChange(pos, charsRemoved, charsAdded, data);
-        }
-    }
-    else if (data.startsWith("chat:")) {
-        data.remove(0, 5);
-        chatPane->appendChatMessage(data);
-    }
-    else if (data.startsWith("promote:")) {
-        data.remove(0, 8);
-        rx = QRegExp("([a-zA-Z0-9_]*)@(.*)");
-        QString name;
-        QString address;
-        if (data.contains(rx)) {
-            name = rx.cap(1);
-            address = rx.cap(2);
-            participantPane->promoteParticipant(name, address);
-        }
-    }
-    else if (data.startsWith("demote:")) {
-        data.remove(0, 7);
-        rx = QRegExp("([a-zA-Z0-9_]*)@(.*)");
-        QString name;
-        QString address;
-        if (data.contains(rx)) {
-            name = rx.cap(1);
-            address = rx.cap(2);
-            participantPane->demoteParticipant(name, address);
-        }
-    }
-    else if (data.startsWith("join:")) {
-        data.remove(0, 5);
-        rx = QRegExp("([a-zA-Z0-9_]*)@(.*)");
-        if (data.contains(rx)) {
-            QString name = rx.cap(1);
-            QString address = rx.cap(2);
-            participantPane->newParticipant(name, address);
-        }
-    }
-    else if (data.startsWith("leave:")) {
-        data.remove(0, 6);
-        rx = QRegExp("([a-zA-Z0-9_]*)@(.*)");
-        if (data.contains(rx)) {
-            QString name = rx.cap(1);
-            QString address = rx.cap(2);
-            participantPane->removeParticipant(name, address);
-        }
-    }
-    else if (data.startsWith("populate:")) { // populate participant data
-#warning "implement"
-    }
-    else if (data.startsWith("setperm:")) { // the server has updated our permissions
-        data.remove(0, 8);
-        if (data == "write") {
-            editor->setDisabled(false);
-            editor->setReadOnly(false);
-        }
-        else if (data == "read") {
-            editor->setDisabled(false);
-            editor->setReadOnly(true);
-        }
-        else if (data == "waiting") {
-            editor->setDisabled(true);
-            editor->setReadOnly(true);
-        }
-    }
-    else if (data.startsWith("sync:")) { // the data is the entire document
-        data.remove(0, 5);
-        // set the document's contents to the contents of the packet
-        editor->setPlainText(data);
-    }
-
-    bool ok;
-
-    if (haveExtra) {
-        QRegExp rx = QRegExp("^(\\d+)*.");
-        if (rest.contains(rx)) {
-            length = rx.cap(1).toInt(&ok);
-            rest.remove(0, rx.cap(1).length() + 1); // remove digit indicating packet length and whitespace
-            if (ok) {
-                participantIncomingData(rest, length);
-            }
-        }
-    }
-}
-
-// much of this will be reorganized into client/server classes later
-void Document::onTextChange(int pos, int charsRemoved, int charsAdded)
-{
-    QString toSend;
-
-    if (socket->state() != QAbstractSocket::ConnectedState) {
-        return;
-    }
-
-    QString data;
-    if (charsRemoved > 0 && charsAdded == 0) {
-        data = "";
-    }
-    else if (charsAdded > 0) {
-        QTextCursor cursor = QTextCursor(editor->document());
-        cursor.setPosition(pos, QTextCursor::MoveAnchor);
-        cursor.movePosition(QTextCursor::NextCharacter, QTextCursor::KeepAnchor, charsAdded);
-        data = cursor.selection().toPlainText();
-    }
-
-    toSend = QString("doc:%1 %2 %3 %4").arg(pos).arg(charsRemoved).arg(charsAdded).arg(data);
-    socket->write(QString("%1 %2").arg(toSend.length()).arg(toSend).toAscii());
-}
-
-// much of this will be reorganized into client/server classes later
-void Document::onChatSend(QString str)
-{
-    QString toSend;
-
-    toSend = "chat:" + str;
-    socket->write(QString("%1 %2").arg(toSend.length()).arg(toSend).toAscii());
-
-    chatPane->appendChatMessage(QString("%1:\t%2").arg(myName).arg(str));
-}
-
-void Document::onIncomingData()
-{
-    // disconnect the signal that fires when the contents of the editor change so we don't echo
-    disconnect(editor->document(), SIGNAL(contentsChange(int,int,int)), this, SLOT(onTextChange(int,int,int)));
-
-    QString data;
-    QRegExp rx = QRegExp("^(\\d+)*.");
-    int length;
-    bool ok;
-
-    // We are a participant
-    data = socket->readAll();
-    if (data.contains(rx)) {
-        length = rx.cap(1).toInt(&ok);
-        data.remove(0, rx.cap(1).length() + 1); // remove digit indicating packet length and whitespace
-        if (ok) {
-            participantIncomingData(data, length);
-        }
-    }
-    // reconnect the signal that fires when the contents of the editor change so we continue to send new text
-    connect(editor->document(), SIGNAL(contentsChange(int,int,int)), this, SLOT(onTextChange(int,int,int)));
-}
-
-void Document::onNewConnection()
-{
-    connect(socket, SIGNAL(readyRead()), this, SLOT(onIncomingData()));
-    // The owner does not get this message, probably because it comes before the readyRead() is hooked up?
-    QString toSend = QString("helo:%1").arg(myName);
-    socket->write(QString("%1 %2").arg(toSend.length()).arg(toSend).toAscii());
-}
-
-void Document::disconnected()
-{
-    participantPane->removeAllParticipants();
-    chatPane->hide();
-    participantPane->hide();
 }
 
 

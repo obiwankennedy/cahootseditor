@@ -9,7 +9,7 @@
 
 class Server : public QObject
 {
-Q_OBJECT
+    Q_OBJECT
 public:
     explicit Server(CodeEditor *editor, ParticipantsPane *participantsPane, ChatPane *chatPane, QObject *parent = 0);
 
@@ -28,10 +28,6 @@ private:
     QTcpServer *server;
 
     void processData(QString data, QTcpSocket *sender, int length = 0);
-
-signals:
-
-public slots:
 
 private slots:
     void onTextChange(int pos, int charsRemoved, int charsAdded);
