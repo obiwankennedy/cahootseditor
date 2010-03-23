@@ -102,9 +102,6 @@ void Client::processData(QString data, int length)
             participantPane->removeParticipant(name, address);
         }
     }
-    else if (data.startsWith("populate:")) { // populate participant data
-#warning "implement"
-    }
     else if (data.startsWith("setperm:")) { // the server has updated our permissions
         data.remove(0, 8);
         if (data == "write") {
@@ -118,11 +115,12 @@ void Client::processData(QString data, int length)
         else if (data == "waiting") {
             editor->setDisabled(true);
             editor->setReadOnly(true);
+            participantPane->removeAllParticipants();
         }
     }
     else if (data.startsWith("adduser:")) {
         data.remove(0, 8);
-        rx = QRegExp("([a-zA-Z0-9_]*)@([0-9\\.]*)\\s(.*)");
+        rx = QRegExp("([a-zA-Z0-9_]*)@([0-9\\.]*)\\s(waiting|read|write)");
         if (data.contains(rx)) {
             QString name = rx.cap(1);
             QString address = rx.cap(2);

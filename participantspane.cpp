@@ -113,19 +113,21 @@ void ParticipantsPane::newParticipant(QString name, QString address, QString per
     participant->name = name;
     participant->address = QHostAddress(address);
 
-    participant->permissions = Enu::Waiting;
     // everyone has their own colors - colors aren't consistent across participants
     participant->color = QColor::fromHsv(qrand() % 256, 190, 190);
     participant->color = participant->color.lighter(150);
 
     if (permissions == "waiting") {
         participant->item = new QTreeWidgetItem(waitItem);
+        participant->permissions = Enu::Waiting;
     }
     else if (permissions == "read") {
         participant->item = new QTreeWidgetItem(roItem);
+        participant->permissions = Enu::ReadOnly;
     }
     else if (permissions == "write") {
         participant->item = new QTreeWidgetItem(rwItem);
+        participant->permissions = Enu::ReadWrite;
     }
     participant->item->setText(0, name);
     participant->item->setBackgroundColor(1, participant->color);
@@ -135,17 +137,7 @@ void ParticipantsPane::newParticipant(QString name, QString address, QString per
 void ParticipantsPane::removeAllParticipants()
 {
     for (int i = 0; i < participantList.size(); i++) {
-        if (participantList.at(i)->permissions == Enu::ReadWrite) {
-            rwItem->removeChild(participantList.at(i)->item);
-        }
-        else if (participantList.at(i)->permissions == Enu::ReadOnly) {
-            roItem->removeChild(participantList.at(i)->item);
-        }
-        else if (participantList.at(i)->permissions == Enu::Waiting) {
-            waitItem->removeChild(participantList.at(i)->item);
-        }
-    }
-    for (int i = 0; i < participantList.size(); i++) {
+        participantList.at(i)->item->parent()->removeChild(participantList.at(i)->item);
         delete participantList.at(i);
     }
     participantList.clear();

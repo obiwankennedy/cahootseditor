@@ -199,7 +199,7 @@ void Server::memberPermissionsChanged(QTcpSocket *participant, QString permissio
     QString toSend = QString("setperm:%1").arg(permissions);
     participant->write(QString("%1 %2").arg(toSend.length()).arg(toSend).toAscii());
 
-    toSend = QString("%1:%2").arg(wasPromoted ? "promote:" : "demote:").arg(participantPane->getNameAddressForSocket(participant));
+    toSend = QString("%1:%2").arg(wasPromoted ? "promote" : "demote").arg(participantPane->getNameAddressForSocket(participant));
 
     for (int i = 0; i < participantPane->participantList.size(); i++) {
         if (participantPane->canRead(participantPane->participantList.at(i)->socket)) {
