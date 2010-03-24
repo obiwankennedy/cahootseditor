@@ -62,26 +62,17 @@ void Client::processData(QString data, int length)
         data.remove(0, 5);
         chatPane->appendChatMessage(data);
     }
-    else if (data.startsWith("promote:")) {
+    else if (data.startsWith("setperm:")) {
         data.remove(0, 8);
-        rx = QRegExp("([a-zA-Z0-9_]*)@(.*)");
+        rx = QRegExp("([a-zA-Z0-9_]*)@([0-9\\.]*):(waiting|read|write)");
         QString name;
         QString address;
+        QString permissions;
         if (data.contains(rx)) {
             name = rx.cap(1);
             address = rx.cap(2);
-            participantPane->promoteParticipant(name, address);
-        }
-    }
-    else if (data.startsWith("demote:")) {
-        data.remove(0, 7);
-        rx = QRegExp("([a-zA-Z0-9_]*)@(.*)");
-        QString name;
-        QString address;
-        if (data.contains(rx)) {
-            name = rx.cap(1);
-            address = rx.cap(2);
-            participantPane->demoteParticipant(name, address);
+            permissions = rx.cap(3);
+            participantPane->setParticipantPermissions(name, address, permissions);
         }
     }
     else if (data.startsWith("join:")) {
@@ -102,8 +93,8 @@ void Client::processData(QString data, int length)
             participantPane->removeParticipant(name, address);
         }
     }
-    else if (data.startsWith("setperm:")) { // the server has updated our permissions
-        data.remove(0, 8);
+    else if (data.startsWith("updateperm:")) { // the server has updated our permissions
+        data.remove(0, 11);
         if (data == "write") {
             editor->setDisabled(false);
             editor->setReadOnly(false);
@@ -120,7 +111,8 @@ void Client::processData(QString data, int length)
     }
     else if (data.startsWith("adduser:")) {
         data.remove(0, 8);
-        rx = QRegExp("([a-zA-Z0-9_]*)@([0-9\\.]*)\\s(waiting|read|write)");
+        qDebug() << "add user: " << data;
+        rx = QRegExp("([a-zA-Z0-9_]*)@([0-9\\.]*):(waiting|read|write)");
         if (data.contains(rx)) {
             QString name = rx.cap(1);
             QString address = rx.cap(2);

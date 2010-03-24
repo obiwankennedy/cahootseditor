@@ -70,7 +70,7 @@ Document::Document(QWidget *parent) :
 }
 
 Document::~Document()
-{
+{    
     delete ui;
 }
 
@@ -80,7 +80,7 @@ void Document::announceDocument()
     setChatHidden(false);
     setParticipantsHidden(false);
 
-    server = new Server(editor, participantPane, chatPane);
+    server = new Server(editor, participantPane, chatPane, this);
 
     server->listen(QHostAddress::Any, 0); // Port is chosen automatically, listening on all NICs
     QString port = QString::number(server->serverPort(), 10);
@@ -119,7 +119,7 @@ void Document::connectToDocument(QStringList list)
     setParticipantsHidden(false);
     editor->setEnabled(false);
 
-    client = new Client(editor, participantPane, chatPane);
+    client = new Client(editor, participantPane, chatPane, this);
     client->setUsername(myName);
     client->connectToHost(QHostAddress(address), port);
     participantPane->setConnectInfo(QString("%1:%2").arg(address).arg(portString));

@@ -51,8 +51,7 @@ public:
     // This is a function to be used by the participants in removing participants via control messages.
     void removeParticipant(QString name, QString address);
 
-    void promoteParticipant(QString name, QString address);
-    void demoteParticipant(QString name, QString address);
+    void setParticipantPermissions(QString name, QString address, QString permissions);
 
     void setOwnerName(QString name);
 
@@ -77,7 +76,7 @@ private slots:
 
 signals:
     void memberCanNowRead(QTcpSocket *member);
-    void memberPermissionsChanged(QTcpSocket *member, QString readability, bool wasPromoted);
+    void memberPermissionsChanged(QTcpSocket *member, QString readability);
 };
 
 #endif // PARTICIPANTSPANE_H

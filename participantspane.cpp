@@ -122,10 +122,12 @@ void ParticipantsPane::newParticipant(QString name, QString address, QString per
         participant->permissions = Enu::Waiting;
     }
     else if (permissions == "read") {
+        qDebug() << "adding read-only participant " << name;
         participant->item = new QTreeWidgetItem(roItem);
         participant->permissions = Enu::ReadOnly;
     }
     else if (permissions == "write") {
+        qDebug() << "adding read-write participant " << name;
         participant->item = new QTreeWidgetItem(rwItem);
         participant->permissions = Enu::ReadWrite;
     }
@@ -146,86 +148,46 @@ void ParticipantsPane::removeAllParticipants()
 
 void ParticipantsPane::removeParticipant(QTcpSocket *socket)
 {
-    for (int i = 0; i < participantList.size(); i++) {
-        if (socket == participantList.at(i)->socket) {
-            if (participantList.at(i)->permissions == Enu::ReadWrite) {
-                rwItem->removeChild(participantList.at(i)->item);
-            }
-            else if (participantList.at(i)->permissions == Enu::ReadOnly) {
-                roItem->removeChild(participantList.at(i)->item);
-            }
-            else if (participantList.at(i)->permissions == Enu::Waiting) {
-                waitItem->removeChild(participantList.at(i)->item);
-            }
-            delete participantList.at(i);
-            participantList.removeAt(i);
-            participantMap.remove(socket);
-            return;
-        }
-    }
+    Participant *participant = participantMap.value(socket);
+    participant->item->parent()->removeChild(participant->item);
+    participantMap.remove(socket);
+    participantList.removeOne(participant); // this iterates through the list
+    delete participant;
 }
 
 void ParticipantsPane::removeParticipant(QString name, QString address)
 {
     // This is a function to be used by the participants in removing participants via control messages.
-    bool alreadyFound = false;
-    QTcpSocket *socket;
     for (int i = 0; i < participantList.size(); i++) {
         if (participantList.at(i)->name == name && participantList.at(i)->address.toString() == address) {
-            if (!alreadyFound) {
-                alreadyFound = true;
-                socket = participantList.at(i)->socket;
-            }
-            else {
-                // we have a duplicate name, which shouldn't happen.
-                // it'll be up to the server to make sure it doesn't happen.
-                return;
-            }
-        }
-    }
-    if (socket) {
-        removeParticipant(socket);
-    }
-}
-
-void ParticipantsPane::promoteParticipant(QString name, QString address)
-{
-    QString fullName = name + "@" + address;
-    for (int i = 0; i < participantList.size(); i++) {
-        if (participantList.at(i)->item->toolTip(0) == fullName) {
-            if (participantList.at(i)->permissions == Enu::ReadWrite) {
-                // This should not happen, but we won't crash. Up to the server to make sure this doesn't happen.
-            }
-            else if (participantList.at(i)->permissions == Enu::ReadOnly) {
-                roItem->removeChild(participantList.at(i)->item);
-                rwItem->insertChild(0, participantList.at(i)->item);
-            }
-            else if (participantList.at(i)->permissions == Enu::Waiting) {
-                waitItem->removeChild(participantList.at(i)->item);
-                roItem->insertChild(0, participantList.at(i)->item);
-            }
-            return;
+            Participant *participant = participantList.at(i);
+            participant->item->parent()->removeChild(participant->item);
+            participantList.removeAt(i);
+            delete participant;
         }
     }
 }
 
-void ParticipantsPane::demoteParticipant(QString name, QString address)
+void ParticipantsPane::setParticipantPermissions(QString name, QString address, QString permissions)
 {
     QString fullName = name + "@" + address;
     for (int i = 0; i < participantList.size(); i++) {
         if (participantList.at(i)->item->toolTip(0) == fullName) {
-            if (participantList.at(i)->permissions == Enu::ReadWrite) {
-                rwItem->removeChild(participantList.at(i)->item);
-                roItem->insertChild(0, participantList.at(i)->item);
+            Participant *participant = participantList.at(i);
+            participant->item->parent()->removeChild(participant->item);
+
+            if (permissions == "waiting") {
+                waitItem->addChild(participant->item);
+                participant->permissions = Enu::Waiting;
             }
-            else if (participantList.at(i)->permissions == Enu::ReadOnly) {
-                roItem->removeChild(participantList.at(i)->item);
-                waitItem->insertChild(0, participantList.at(i)->item);
+            else if (permissions == "read") {
+                roItem->addChild(participant->item);
+                participant->permissions = Enu::ReadOnly;
             }
-            else if (participantList.at(i)->permissions == Enu::Waiting) {
-                // This shouldn't happen. Up to the server to make sure it doesn't
+            else if (permissions == "write") {
+                rwItem->addChild(participant->item);
+                participant->permissions = Enu::ReadWrite;
             }
-            return;
         }
     }
 }
@@ -297,10 +259,11 @@ void ParticipantsPane::on_promotePushButton_clicked()
                 waitItem->removeChild(participantList.at(i)->item);
                 roItem->insertChild(0, participantList.at(i)->item);
                 participantList.at(i)->permissions = Enu::ReadOnly;
+
                 emit memberCanNowRead(participantList.at(i)->socket);
                 permissions = "read";
             }
-            emit memberPermissionsChanged(participantList.at(i)->socket, permissions, true);
+            emit memberPermissionsChanged(participantList.at(i)->socket, permissions);
             return;
         }
     }
@@ -339,7 +302,7 @@ void ParticipantsPane::on_demotePushButton_clicked()
                 ui->demotePushButton->setEnabled(false);
                 permissions = "waiting";
             }
-            emit memberPermissionsChanged(participantList.at(i)->socket, permissions, false);
+            emit memberPermissionsChanged(participantList.at(i)->socket, permissions);
             return;
         }
     }

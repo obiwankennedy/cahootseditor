@@ -15,7 +15,7 @@ Server::Server(CodeEditor *editor, ParticipantsPane *participantsPane, ChatPane 
     connect(chatPane, SIGNAL(returnPressed(QString)), this, SLOT(onChatSend(QString)));
 
     connect(participantPane, SIGNAL(memberCanNowRead(QTcpSocket*)), this, SLOT(populateDocumentForUser(QTcpSocket*)));
-    connect(participantPane, SIGNAL(memberPermissionsChanged(QTcpSocket*,QString,bool)), this, SLOT(memberPermissionsChanged(QTcpSocket*,QString,bool)));
+    connect(participantPane, SIGNAL(memberPermissionsChanged(QTcpSocket*,QString)), this, SLOT(memberPermissionsChanged(QTcpSocket*,QString)));
 
     connect(server, SIGNAL(newConnection()), this, SLOT(onNewConnection()));
 }
@@ -100,14 +100,15 @@ void Server::processData(QString data, QTcpSocket *sender, int length)
         rx = QRegExp("([a-zA-Z0-9_]*)");
         if (data.contains(rx)) {
             QString name = rx.cap(1);
-            if (participantPane->addParticipant(name, sender)) {
+            if (participantPane->addParticipant(name, sender)) { // returns false if there is a duplicate
                 toSend = "join:" + participantPane->getNameAddressForSocket(sender);
 #warning "implement owner name"
                 QString myName = "Chris";
                 sender->write(QString("%1 helo:%2").arg(5 + myName.length()).arg(myName).toAscii());
             }
-            else {
-                return;
+            else {                
+                participantPane->removeParticipant(sender);
+                toSend = "";
             }
         }
     }
@@ -115,11 +116,10 @@ void Server::processData(QString data, QTcpSocket *sender, int length)
     // Distribute data to all the other participants
     writeToAll(toSend, exception);
 
-    bool ok;
-
     if (haveExtra) {
         QRegExp rx = QRegExp("^(\\d+)*.");
         if (rest.contains(rx)) {
+            bool ok;
             length = rx.cap(1).toInt(&ok);
             rest.remove(0, rx.cap(1).length() + 1); // remove digit indicating packet length and whitespace
             if (ok) {
@@ -194,12 +194,14 @@ void Server::onNewConnection()
     participantPane->newParticipant(sock);
 }
 
-void Server::memberPermissionsChanged(QTcpSocket *participant, QString permissions, bool wasPromoted)
+void Server::memberPermissionsChanged(QTcpSocket *participant, QString permissions)
 {
-    QString toSend = QString("setperm:%1").arg(permissions);
+    // send the participant itself the updated permissions specifically
+    QString toSend = QString("updateperm:%1").arg(permissions);
     participant->write(QString("%1 %2").arg(toSend.length()).arg(toSend).toAscii());
 
-    toSend = QString("%1:%2").arg(wasPromoted ? "promote" : "demote").arg(participantPane->getNameAddressForSocket(participant));
+    // update all users with the users' new permissions
+    toSend = QString("setperm:%1:%2").arg(participantPane->getNameAddressForSocket(participant)).arg(permissions);
 
     for (int i = 0; i < participantPane->participantList.size(); i++) {
         if (participantPane->canRead(participantPane->participantList.at(i)->socket)) {
@@ -232,7 +234,7 @@ void Server::populateDocumentForUser(QTcpSocket *socket)
             permissions = "write";
         }
 
-        toSend = QString("adduser:%1@%2 %3").arg(name).arg(address).arg(permissions);
+        toSend = QString("adduser:%1@%2:%3").arg(name).arg(address).arg(permissions);
         socket->write(QString("%1 %2").arg(toSend.length()).arg(toSend).toAscii());
     }
 }
@@ -240,12 +242,8 @@ void Server::populateDocumentForUser(QTcpSocket *socket)
 void Server::disconnected()
 {
     QTcpSocket *socket = qobject_cast<QTcpSocket *>(sender());
+    QString toSend = QString("leave:%1").arg(participantPane->getNameAddressForSocket(socket));
     participantPane->removeParticipant(socket);
-    for (int i = 0; i < participantPane->participantList.size(); i++) {
-        if (socket == participantPane->participantList.at(i)->socket) {
-            participantPane->participantList.removeAt(i);
-            return;
-        }
-    }
+    writeToAll(toSend);
 }
 

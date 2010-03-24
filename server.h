@@ -36,7 +36,7 @@ private slots:
     void onIncomingData();
     void onNewConnection();
 
-    void memberPermissionsChanged(QTcpSocket *participant, QString permissions, bool wasPromoted);
+    void memberPermissionsChanged(QTcpSocket *participant, QString permissions);
 
     void populateDocumentForUser(QTcpSocket *socket);
 
