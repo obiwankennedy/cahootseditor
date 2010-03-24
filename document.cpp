@@ -366,9 +366,3 @@ bool Document::isAnnounced()
 {
     return isAlreadyAnnounced;
 }
-
-
-
-
-
-

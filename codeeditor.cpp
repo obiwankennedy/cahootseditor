@@ -400,10 +400,11 @@ bool CodeEditor::replaceAll(QString searchString, QString replaceString, Qt::Cas
     bool isFound = false;
     bool isReplaced = false;
 
-    int count = documentString.count(searchString, sensitivity);
-
     QTextCursor cursor(document());
-    int position;
+    int position = 0;
+    cursor.setPosition(position);
+
+    int length = searchString.size();
 
     QRegExp rx;
     switch (mode) {
@@ -417,13 +418,12 @@ bool CodeEditor::replaceAll(QString searchString, QString replaceString, Qt::Cas
         rx = QRegExp("\\b" + searchString + "\\b", sensitivity);
     }
 
+//    int count = documentString.count(rx);
+
     cursor.beginEditBlock();
-    for (int i = 0; i < count; i++) {
 
-        position = textCursor().position();
-
-        position = documentString.indexOf(rx, position);
-        int length = searchString.size();
+    while (position != -1) {
+        position = documentString.indexOf(rx, position + 1);
 
         if (position != -1) {
             cursor.setPosition(position, QTextCursor::MoveAnchor);
@@ -433,23 +433,9 @@ bool CodeEditor::replaceAll(QString searchString, QString replaceString, Qt::Cas
             setTextCursor(cursor);
             isFound = true;
         }
-        else if (wrapAround){
-            position = 0; // move cursor to the beginning and begin searching again
-            position = documentString.indexOf(rx, position);
-            length = searchString.size();
-
-            if (position != -1) {
-                cursor.setPosition(position, QTextCursor::MoveAnchor);
-                for (int i = 0; i < length; i++) {
-                    cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor);
-                }
-                setTextCursor(cursor);
-                isFound = true;
-            }
-        }
-
         isReplaced = replace(replaceString);
     }
+
     cursor.endEditBlock();
 
     if (isFound && isReplaced) {
