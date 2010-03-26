@@ -5,7 +5,6 @@ PythonHighlighter::PythonHighlighter(QTextDocument *parent)
 {
     HighlightingRule rule;
 
-
 //    functionFormat.setFontItalic(true);
 //    functionFormat.setFontWeight(QFont::Bold);
     functionFormat.setForeground(Qt::darkYellow);
@@ -17,19 +16,13 @@ PythonHighlighter::PythonHighlighter(QTextDocument *parent)
     declarationFormat.setForeground(Qt::darkYellow);
     QStringList declarationPatterns;
 // This is a temporary bunch of rules until I sort them into declarations and keywords
-    declarationPatterns << "\\bint\\b" << "\\blong\\b" << "\\bbool\\b" << "\\bchar\\b" << "\\bconst\\b"
-            << "\\bconst_cast\\b" << "\\bfloat\\b" << "\\breinterpret_cast\\b" << "\\bshort\\b" << "\\basm\\b"
-            << "\\bdynamic_cast\\b" << "\\bauto\\b" << "\\bbreak\\b" << "\\bcase\\b" << "\\bcatch\\b"
-            << "\\bclass\\b" << "\\bcontinue\\b" << "\\bdefault\\b" << "\\bdelete\\b" << "\\bdo\\b"
-            << "\\bdouble\\b" << "\\belse\\b" << "\\benum\\b" << "\\bexplicit\\b" << "\\bexport\\b"
-            << "\\bextern\\b" << "\\bfalse\\b"  << "\\bfor\\b" << "\\bfriend\\b" << "\\bgoto\\b"
-            << "\\bif\\b" << "\\binline\\b" << "\\bmutable\\b" << "\\bnamespace\\b" << "\\bnew\\b"
-            << "\\boperator\\b" << "\\bprivate\\b" << "\\bprotected\\b" << "\\bpublic\\b" << "\\bregister\\b"
-            << "\\breturn\\b" << "\\bsigned\\b" << "\\bsizeof\\b" << "\\bstatic\\b" << "\\bstatic_cast\\b"
-            << "\\bstruct\\b" << "\\bswitch\\b" << "\\btemplate\\b" << "\\bthis\\b" << "\\bthrow\\b"
-            << "\\btrue\\b" << "\\btry\\b" << "\\btypedef\\b" << "\\btypeid\\b" << "\\btypename\\b"
-            << "\\bunion\\b" << "\\bunsigned\\b" << "\\busing\\b" << "\\bvirtual\\b" << "\\bvoid\\b"
-            << "\\bvolatile\\b" << "\\bwhile\\b";
+    declarationPatterns << "\\bFalse\\b" << "\\bclass\\b" << "\\bfinally\\b" << "\\bis\\b" << "\\breturn\\b"
+            << "\\bTrue\\b" << "\\bdef\\b" << "\\bfrom\\b" << "\\bnonlocal\\b" << "\\bwhile\\b"
+            << "\\band\\b" << "\\bdel\\b" << "\\bglobal\\b" << "\\bnot\\b" << "\\bwith\\b"
+            << "\\bas\\b" << "\\belif\\b" << "\\bif\\b" << "\\bor\\b" << "\\byield\\b"
+            << "\\bassert\\b" << "\\belse\\b" << "\\bimport\\b" << "\\bpass\\b"
+            << "\\bbreak\\b" << "\\bexcept\\b" << "\\bin\\b" << "\\braise\\b";
+
 
     foreach (const QString &pattern, declarationPatterns) {
         rule.pattern = QRegExp(pattern);
