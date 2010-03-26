@@ -3,6 +3,8 @@
 
 #include <QObject>
 #include <QTcpServer>
+#include <QUdpSocket>
+#include <QTimer>
 #include "participantspane.h"
 #include "codeeditor.h"
 #include "chatpane.h"
@@ -27,6 +29,9 @@ private:
 
     QTcpServer *server;
 
+    QUdpSocket *udpSocket;
+    QTimer *timer;
+
     void processData(QString data, QTcpSocket *sender, int length = 0);
 
 private slots:
@@ -41,6 +46,8 @@ private slots:
     void populateDocumentForUser(QTcpSocket *socket);
 
     void disconnected();
+
+    void broadcastDatagram();
 };
 
 #endif // SERVER_H

@@ -1,6 +1,7 @@
 #include "server.h"
 
 #include <QTextDocumentFragment>
+#include <QNetworkInterface>
 
 Server::Server(CodeEditor *editor, ParticipantsPane *participantsPane, ChatPane *chatPane, QObject *parent) :
     QObject(parent)
@@ -18,6 +19,12 @@ Server::Server(CodeEditor *editor, ParticipantsPane *participantsPane, ChatPane 
     connect(participantPane, SIGNAL(memberPermissionsChanged(QTcpSocket*,QString)), this, SLOT(memberPermissionsChanged(QTcpSocket*,QString)));
 
     connect(server, SIGNAL(newConnection()), this, SLOT(onNewConnection()));
+
+    // set up udp broadcasting of our document. have a preference for this later?
+    timer = new QTimer(this);
+    udpSocket = new QUdpSocket(this);
+    timer->start(1000); // 1 second delay between broadcasts
+    connect(timer, SIGNAL(timeout()), this, SLOT(broadcastDatagram()));
 }
 
 bool Server::listen(const QHostAddress &address, quint16 port)
@@ -245,5 +252,28 @@ void Server::disconnected()
     QString toSend = QString("leave:%1").arg(participantPane->getNameAddressForSocket(socket));
     participantPane->removeParticipant(socket);
     writeToAll(toSend);
+}
+
+void Server::broadcastDatagram()
+{
+    QByteArray datagram;
+
+    QString ipAddress;
+    QList<QHostAddress> ipAddressesList = QNetworkInterface::allAddresses();
+    // use the first non-localhost IPv4 address
+    for (int i = 0; i < ipAddressesList.size(); ++i) {
+        if (ipAddressesList.at(i) != QHostAddress::LocalHost &&
+            ipAddressesList.at(i).toIPv4Address())
+            ipAddress = ipAddressesList.at(i).toString();
+    }
+    // if we did not find one, use IPv4 localhost
+    if (ipAddress.isEmpty()) {
+        ipAddress = QHostAddress(QHostAddress::LocalHost).toString();
+    }
+
+    datagram = QString("untitled.txt, %1:%2").arg(ipAddress).arg(server->serverPort()).toAscii();
+    udpSocket->writeDatagram(datagram.data(), datagram.size(),
+                             QHostAddress::Broadcast, 45454);
+    qDebug() << "Sent datagram: " << datagram.data();
 }
 

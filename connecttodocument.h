@@ -3,6 +3,7 @@
 
 #include <QDialog>
 #include <QRegExpValidator>
+#include <QUdpSocket>
 
 namespace Ui {
     class ConnectToDocument;
@@ -25,6 +26,8 @@ private:
     QRegExpValidator* addressValidator;
     QRegExpValidator* portValidator;
 
+    QUdpSocket *udpSocket;
+
     void addInfo();
 
     void readSettings();
@@ -33,6 +36,7 @@ private:
 private slots:
     void dialogAccepted();
     void on_previousDocsComboBox_currentIndexChanged();
+    void processPendingDatagrams();
 
 signals:
     void connectToDocumentClicked(QStringList list);

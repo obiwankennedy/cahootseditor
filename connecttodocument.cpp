@@ -27,6 +27,10 @@ ConnectToDocument::ConnectToDocument(QWidget *parent) :
     QRegExp portRx("\\b[0-9]{0,9}\\b");
     portValidator = new QRegExpValidator(portRx, 0);
     ui->portLineEdit->setValidator(portValidator);
+
+    udpSocket = new QUdpSocket(this);
+    udpSocket->bind(45454);
+    connect(udpSocket, SIGNAL(readyRead()), this, SLOT(processPendingDatagrams()));
 }
 
 ConnectToDocument::~ConnectToDocument()
@@ -100,5 +104,15 @@ void ConnectToDocument::on_previousDocsComboBox_currentIndexChanged()
             ui->addressLineEdit->setText(rx.cap(2).toAscii());
             ui->portLineEdit->setText(rx.cap(3).toAscii());
         }
+    }
+}
+
+void ConnectToDocument::processPendingDatagrams()
+{
+    while (udpSocket->hasPendingDatagrams()) {
+        QByteArray datagram;
+        datagram.resize(udpSocket->pendingDatagramSize());
+        udpSocket->readDatagram(datagram.data(), datagram.size());
+        qDebug() << "read datagram: " << datagram;
     }
 }
