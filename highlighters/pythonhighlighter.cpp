@@ -15,13 +15,18 @@ PythonHighlighter::PythonHighlighter(QTextDocument *parent)
 //    declarationFormat.setFontItalic(true);
     declarationFormat.setForeground(Qt::darkYellow);
     QStringList declarationPatterns;
-// This is a temporary bunch of rules until I sort them into declarations and keywords
-    declarationPatterns << "\\bFalse\\b" << "\\bclass\\b" << "\\bfinally\\b" << "\\bis\\b" << "\\breturn\\b"
-            << "\\bTrue\\b" << "\\bdef\\b" << "\\bfrom\\b" << "\\bnonlocal\\b" << "\\bwhile\\b"
-            << "\\band\\b" << "\\bdel\\b" << "\\bglobal\\b" << "\\bnot\\b" << "\\bwith\\b"
-            << "\\bas\\b" << "\\belif\\b" << "\\bif\\b" << "\\bor\\b" << "\\byield\\b"
-            << "\\bassert\\b" << "\\belse\\b" << "\\bimport\\b" << "\\bpass\\b"
-            << "\\bbreak\\b" << "\\bexcept\\b" << "\\bin\\b" << "\\braise\\b";
+//    So far these include string, integer, floating point, and imaginary literals
+    declarationPatterns << "\\bstringliteral\\b" << "\\bstringprefix\\b"
+            << "\\bshortstring\\b" << "\\blongstring\\b" << "\\bshortstringitem\\b"
+            << "\\blongstringitem\\b" << "\\bshortstringchar\\b" << "\\blongstringchar\\b"
+            << "\\bstringescapeseq\\b" << "\\bbytesliteral\\b" << "\\bbytesprefix\\b"
+            << "\\bshortbytes\\b" << "\\blongbytes\\b" << "\\bshortbytesitem\\b"
+            << "\\blongbytesitem\\b" << "\\bshortbyteschar\\b" << "\\blongbyteschar\\b"
+            << "\\bbytesescapeseq\\b" << "\\binteger\\b" << "\\bdecimalinteger\\b"
+            << "\\bnonzerodigit\\b" << "\\bdigit\\b" << "\\boctinteger\\b" << "\\bhexinteger\\b"
+            << "\\bbininteger\\b" << "\\boctdigit\\b" << "\\bhexdigit\\b" << "\\bbindigit\\b"
+            << "\\bfloatnumber\\b" << "\\bpointfloat\\b" << "\\bexponentfloat\\b"
+            << "\\bintpart\\b" << "\\bfraction\\b" << "\\bexponent\\b" << "\\bimagnumber\\b";
 
 
     foreach (const QString &pattern, declarationPatterns) {
@@ -33,9 +38,12 @@ PythonHighlighter::PythonHighlighter(QTextDocument *parent)
     keywordFormat.setForeground(Qt::darkBlue);
 //    keywordFormat.setFontWeight(QFont::Bold);
     QStringList keywordPatterns;
-    keywordPatterns << "\\bwhile\\b" << "\\bfor\\b" << "\\bswitch\\b"
-            << "\\bif\\b" << "\\bdo\\b" << "\\bnew\\b"
-            << "\\breturn\\b" << "\\belse\\b";
+    keywordPatterns << "\\bFalse\\b" << "\\bclass\\b" << "\\bfinally\\b" << "\\bis\\b" << "\\breturn\\b"
+            << "\\bTrue\\b" << "\\bdef\\b" << "\\bfrom\\b" << "\\bnonlocal\\b" << "\\bwhile\\b"
+            << "\\band\\b" << "\\bdel\\b" << "\\bglobal\\b" << "\\bnot\\b" << "\\bwith\\b"
+            << "\\bas\\b" << "\\belif\\b" << "\\bif\\b" << "\\bor\\b" << "\\byield\\b"
+            << "\\bassert\\b" << "\\belse\\b" << "\\bimport\\b" << "\\bpass\\b"
+            << "\\bbreak\\b" << "\\bexcept\\b" << "\\bin\\b" << "\\braise\\b";
     foreach (const QString &pattern, keywordPatterns) {
         rule.pattern = QRegExp(pattern);
         rule.format = keywordFormat;
