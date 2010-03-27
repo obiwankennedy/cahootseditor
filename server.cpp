@@ -271,9 +271,9 @@ void Server::broadcastDatagram()
         ipAddress = QHostAddress(QHostAddress::LocalHost).toString();
     }
 
-    datagram = QString("untitled.txt, %1:%2").arg(ipAddress).arg(server->serverPort()).toAscii();
+    datagram = QString("untitled.txt@%1:%2").arg(ipAddress).arg(server->serverPort()).toAscii();
     udpSocket->writeDatagram(datagram.data(), datagram.size(),
-                             QHostAddress::Broadcast, 45454);
+                             QHostAddress::Broadcast, 45321);
     qDebug() << "Sent datagram: " << datagram.data();
 }
 

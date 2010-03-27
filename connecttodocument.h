@@ -5,6 +5,8 @@
 #include <QRegExpValidator>
 #include <QUdpSocket>
 
+#include <QListWidget>
+
 namespace Ui {
     class ConnectToDocument;
 }
@@ -28,6 +30,9 @@ private:
 
     QUdpSocket *udpSocket;
 
+    QList<QTimer*> timerList;
+    QList<QListWidgetItem*> itemList;
+
     void addInfo();
 
     void readSettings();
@@ -37,6 +42,8 @@ private slots:
     void dialogAccepted();
     void on_previousDocsComboBox_currentIndexChanged();
     void processPendingDatagrams();
+    void timerTimedOut();
+    void listWidgetItemClicked(QListWidgetItem *current);
 
 signals:
     void connectToDocumentClicked(QStringList list);

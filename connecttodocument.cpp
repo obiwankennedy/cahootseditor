@@ -3,6 +3,7 @@
 
 #include <QDebug>
 #include <QSettings>
+#include <QTimer>
 
 ConnectToDocument::ConnectToDocument(QWidget *parent) :
     QDialog(parent),
@@ -29,8 +30,10 @@ ConnectToDocument::ConnectToDocument(QWidget *parent) :
     ui->portLineEdit->setValidator(portValidator);
 
     udpSocket = new QUdpSocket(this);
-    udpSocket->bind(45454);
+    udpSocket->bind(45321);
     connect(udpSocket, SIGNAL(readyRead()), this, SLOT(processPendingDatagrams()));
+
+    connect(ui->listWidget, SIGNAL(itemClicked(QListWidgetItem*)), this, SLOT(listWidgetItemClicked(QListWidgetItem*)));
 }
 
 ConnectToDocument::~ConnectToDocument()
@@ -114,5 +117,57 @@ void ConnectToDocument::processPendingDatagrams()
         datagram.resize(udpSocket->pendingDatagramSize());
         udpSocket->readDatagram(datagram.data(), datagram.size());
         qDebug() << "read datagram: " << datagram;
+        QRegExp rx = QRegExp("([a-zA-Z0-9_\\.]*)@([0-9\\.]+):(\\d+)");
+        QString data = datagram.data();
+        if (data.contains(rx)) {
+            QString data = QString(rx.cap(1) + ", " + rx.cap(2) + ":" + rx.cap(3));
+            for (int i = 0; i < itemList.size(); i++) {
+                if (itemList.at(i)->text() == data) {
+                    timerList.at(i)->start(5000);
+                    return; // item already exists in the list, nothing to see here...
+                }
+            }
+            QListWidgetItem *item = new QListWidgetItem(data, ui->listWidget);
+            ui->listWidget->insertItem(0, item);
+
+            QTimer *timer = new QTimer(this);
+            timer->start(5000); // five second timeout
+            connect(timer, SIGNAL(timeout()), this, SLOT(timerTimedOut()));
+            itemList.prepend(item);
+            timerList.prepend(timer);
+        }
     }
 }
+
+void ConnectToDocument::timerTimedOut()
+{
+    QTimer *timer = qobject_cast<QTimer *>(sender());
+    timer->stop();
+    int index;
+    for (int i = 0; i < timerList.size(); i++) {
+        if (timer == timerList.at(i)) {
+            index = i;
+        }
+    }
+    qDebug() << "removing item";
+    ui->listWidget->takeItem(index); // This is guaranteed to be at the same index as the itemList/timerList
+    itemList.removeAt(index);
+    timerList.removeAt(index);
+}
+
+void ConnectToDocument::listWidgetItemClicked(QListWidgetItem *current)
+{
+    QString text = current->text();
+    qDebug() << "Clicked: " << text;
+    QRegExp rx = QRegExp("([a-zA-Z0-9_\\.]*),\\s([0-9\\.]+):(\\d+)");
+    if (text.contains(rx)) {
+        ui->addressLineEdit->setText(rx.cap(2));
+        ui->portLineEdit->setText(rx.cap(3));
+    }
+}
+
+
+
+
+
+
