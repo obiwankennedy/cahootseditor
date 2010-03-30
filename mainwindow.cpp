@@ -33,8 +33,8 @@ MainWindow::MainWindow(QWidget *parent)
             SLOT(findNextTriggered(QString,Qt::CaseSensitivity,bool,Enu::FindMode)));
     connect(findDialog, SIGNAL(findDialogFindPrev(QString,Qt::CaseSensitivity,bool,Enu::FindMode)), this,
             SLOT(findPrevTriggered(QString,Qt::CaseSensitivity,bool,Enu::FindMode)));
-    connect(findDialog, SIGNAL(findDialogReplaceAll(QString,QString,Qt::CaseSensitivity,bool,Enu::FindMode)), this,
-            SLOT(replaceAllTriggered(QString,QString,Qt::CaseSensitivity,bool,Enu::FindMode)));
+    connect(findDialog, SIGNAL(findDialogReplaceAll(QString,QString,Qt::CaseSensitivity,Enu::FindMode)), this,
+            SLOT(replaceAllTriggered(QString,QString,Qt::CaseSensitivity,Enu::FindMode)));
     connect(findDialog, SIGNAL(findDialogReplace(QString)), this,
             SLOT(replaceTriggered(QString)));
     connect(findDialog, SIGNAL(findDiaalogFindReplace(QString,QString,Qt::CaseSensitivity,bool,Enu::FindMode)), this,
@@ -553,7 +553,9 @@ void MainWindow::tabCloseClicked(int index)
 
 void MainWindow::findAllTriggered(QString str)
 {
-    tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->findAll(str, true);
+// I am going to set Sensitivity to insensitive until I find out more...
+    Qt::CaseSensitivity sensitivity = Qt::CaseInsensitive;
+    tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->findAll(str, sensitivity);
 }
 
 void MainWindow::findNextTriggered(QString str, Qt::CaseSensitivity sensitivity, bool wrapAround, Enu::FindMode mode)
@@ -566,9 +568,9 @@ void MainWindow::findPrevTriggered(QString str, Qt::CaseSensitivity sensitivity,
     tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->findPrev(str, sensitivity, wrapAround, mode);
 }
 
-void MainWindow::replaceAllTriggered(QString find, QString replace, Qt::CaseSensitivity sensitivity, bool wrapAround, Enu::FindMode mode)
+void MainWindow::replaceAllTriggered(QString find, QString replace, Qt::CaseSensitivity sensitivity, Enu::FindMode mode)
 {
-    tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->replaceAll(find, replace, sensitivity, wrapAround, mode);
+    tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->replaceAll(find, replace, sensitivity, mode);
 }
 
 void MainWindow::replaceTriggered(QString replace)

@@ -31,10 +31,10 @@ public:
     void shiftRight();
 
     // Find functions
-    bool findAll(QString searchString, bool ignoreCase = true);
+    bool findAll(QString searchString, Qt::CaseSensitivity sensitivity);
     bool findNext(QString searchString, Qt::CaseSensitivity sensitivity, bool wrapAround, Enu::FindMode mode);
     bool findPrev(QString searchString, Qt::CaseSensitivity sensitivity, bool wrapAround, Enu::FindMode mode);
-    bool replaceAll(QString searchString, QString replaceString, Qt::CaseSensitivity sensitivity, bool wrapAround, Enu::FindMode mode);
+    bool replaceAll(QString searchString, QString replaceString, Qt::CaseSensitivity sensitivity, Enu::FindMode mode);
     bool replace(QString replaceString);
     bool findReplace(QString searchString, QString replaceString, Qt::CaseSensitivity sensitivity, bool wrapAround, Enu::FindMode mode);
 

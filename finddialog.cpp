@@ -95,7 +95,7 @@ void FindDialog::on_replaceAllPushButton_clicked()
     else if (ui->findModeComboBox->currentText() == "Entire Word") {
         mode = Enu::EntireWord;
     }
-    emit findDialogReplaceAll(searchString, replaceString, sensitivity, ui->wrapAroundCheckBox->isChecked(), mode);
+    emit findDialogReplaceAll(searchString, replaceString, sensitivity, mode);
 }
 
 void FindDialog::on_replacePushButton_clicked()

@@ -257,37 +257,33 @@ void CodeEditor::shiftRight()
     setTextCursor(cursor);
 }
 
-bool CodeEditor::findAll(QString searchString, bool ignoreCase)
+bool CodeEditor::findAll(QString searchString, Qt::CaseSensitivity sensitivity)
 {
-    (void)ignoreCase;
+    QString documentString = document()->toPlainText();
+    bool isFound = false;
 
-    QTextDocument *document = this->document();
+    QTextCursor cursor(document());
+    int position = 0;
+    cursor.setPosition(position);
 
-    bool found = false;
+    int length = searchString.size();
 
-    QTextCursor cursor(this->document()); //QTextCursor cursor(document);??
-    cursor.select(QTextCursor::Document);
-    QTextCharFormat format;
-    format.setBackground(Qt::white);
-    cursor.mergeCharFormat(format);
+    cursor.beginEditBlock();
 
-    QTextCursor highlightCursor(document);
+    while (position != -1) {
+        position = documentString.indexOf(searchString, position + 1, sensitivity);
 
-    QTextCharFormat plainFormat(highlightCursor.charFormat());
-    QTextCharFormat colorFormat = plainFormat;
-    colorFormat.setBackground(Qt::yellow);
-
-    while (!highlightCursor.isNull() && !highlightCursor.atEnd()) {
-        highlightCursor = document->find(searchString, highlightCursor); //, QTextDocument::FindWholeWords);
-
-        if (!highlightCursor.isNull()) {
-            found = true;
-            highlightCursor.movePosition(QTextCursor::WordRight,
-                                         QTextCursor::KeepAnchor);
-            highlightCursor.mergeCharFormat(colorFormat);
+        if (position != -1) {
+            cursor.setPosition(position, QTextCursor::MoveAnchor);
+            for (int i = 0; i < length; i++) {
+                 cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor);
+            }
+            setTextCursor(cursor);
+            isFound = true;
         }
     }
-    return found;
+
+    return isFound;
 }
 
 bool CodeEditor::findNext(QString searchString, Qt::CaseSensitivity sensitivity, bool wrapAround, Enu::FindMode mode)
@@ -394,7 +390,7 @@ bool CodeEditor::findPrev(QString searchString, Qt::CaseSensitivity sensitivity,
     return found;
 }
 
-bool CodeEditor::replaceAll(QString searchString, QString replaceString, Qt::CaseSensitivity sensitivity, bool wrapAround, Enu::FindMode mode)
+bool CodeEditor::replaceAll(QString searchString, QString replaceString, Qt::CaseSensitivity sensitivity, Enu::FindMode mode)
 {
     QString documentString = document()->toPlainText();
     bool isFound = false;

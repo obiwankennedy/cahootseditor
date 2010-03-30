@@ -32,7 +32,7 @@ private slots:
 signals:
     void findDialogFindNext(QString str, Qt::CaseSensitivity sensitivity, bool wrapAround, Enu::FindMode findMode);
     void findDialogFindPrev(QString str, Qt::CaseSensitivity sensitivity, bool wrapAround, Enu::FindMode findMode);
-    void findDialogReplaceAll(QString find, QString replace, Qt::CaseSensitivity sensitivity, bool wrapAround, Enu::FindMode findMode);
+    void findDialogReplaceAll(QString find, QString replace, Qt::CaseSensitivity sensitivity, Enu::FindMode findMode);
     void findDialogReplace(QString replace);
     void findDiaalogFindReplace(QString find, QString replace, Qt::CaseSensitivity sensitivity, bool wrapAround, Enu::FindMode findMode);
 };

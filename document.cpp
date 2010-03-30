@@ -259,9 +259,9 @@ bool Document::isParticipantsHidden()
     return ui->participantSplitter->widget(1)->isHidden();
 }
 
-void Document::findAll(QString searchString, bool ignoreCase)
+void Document::findAll(QString searchString, Qt::CaseSensitivity sensitivity)
 {
-    editor->findAll(searchString, ignoreCase);
+    editor->findAll(searchString, sensitivity);
 }
 
 void Document::findNext(QString searchString, Qt::CaseSensitivity sensitivity, bool wrapAround, Enu::FindMode mode)
@@ -278,9 +278,9 @@ void Document::findPrev(QString searchString, Qt::CaseSensitivity sensitivity, b
     }
 }
 
-void Document::replaceAll(QString searchString, QString replaceString, Qt::CaseSensitivity sensitivity, bool wrapAround, Enu::FindMode mode)
+void Document::replaceAll(QString searchString, QString replaceString, Qt::CaseSensitivity sensitivity, Enu::FindMode mode)
 {
-    if (!editor->replaceAll(searchString, replaceString, sensitivity, wrapAround, mode)) {
+    if (!editor->replaceAll(searchString, replaceString, sensitivity, mode)) {
         emit notFound();
     }
 }
