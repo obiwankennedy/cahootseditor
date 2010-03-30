@@ -428,12 +428,12 @@ bool CodeEditor::replaceAll(QString searchString, QString replaceString, Qt::Cas
         if (position != -1) {
             cursor.setPosition(position, QTextCursor::MoveAnchor);
             for (int i = 0; i < length; i++) {
-                cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor);
+                cursor.deleteChar();
             }
-            setTextCursor(cursor);
             isFound = true;
+            cursor.insertText(replaceString);
+            isReplaced = true;
         }
-        isReplaced = replace(replaceString);
     }
 
     cursor.endEditBlock();
@@ -442,8 +442,6 @@ bool CodeEditor::replaceAll(QString searchString, QString replaceString, Qt::Cas
         return true;
     }
     return false;
-
-
 }
 
 bool CodeEditor::replace(QString replaceString)
