@@ -16,6 +16,8 @@ Client::Client(CodeEditor *editor, ParticipantsPane *participantsPane, ChatPane 
 
     connect(socket, SIGNAL(disconnected()), this, SLOT(disconnected()));
     connect(socket, SIGNAL(connected()), this, SLOT(onNewConnection()));
+
+    permissions = Enu::Waiting;
 }
 
 void Client::connectToHost(QHostAddress hostName, int port)
@@ -26,6 +28,16 @@ void Client::connectToHost(QHostAddress hostName, int port)
 void Client::setUsername(QString username)
 {
     myName = username;
+}
+
+void Client::resynchronize()
+{
+    QString toSend;
+
+    toSend = "resync";
+    socket->write(QString("%1 %2").arg(toSend.length()).arg(toSend).toAscii());
+    participantPane->removeAllParticipants();
+    editor->setReadOnly(true);
 }
 
 void Client::processData(QString data, int length)
@@ -96,14 +108,17 @@ void Client::processData(QString data, int length)
     else if (data.startsWith("updateperm:")) { // the server has updated our permissions
         data.remove(0, 11);
         if (data == "write") {
+            permissions = Enu::ReadWrite;
             editor->setDisabled(false);
             editor->setReadOnly(false);
         }
         else if (data == "read") {
+            permissions = Enu::ReadOnly;
             editor->setDisabled(false);
             editor->setReadOnly(true);
         }
         else if (data == "waiting") {
+            permissions = Enu::Waiting;
             editor->setDisabled(true);
             editor->setReadOnly(true);
             participantPane->removeAllParticipants();
@@ -124,6 +139,7 @@ void Client::processData(QString data, int length)
         data.remove(0, 5);
         // set the document's contents to the contents of the packet
         editor->setPlainText(data);
+        editor->setReadOnly(Enu::ReadWrite != permissions);
     }
     else if (data.startsWith("helo:")) {
         data.remove(0, 5);

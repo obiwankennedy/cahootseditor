@@ -19,6 +19,8 @@ public:
 
     void setUsername(QString username);
 
+    void resynchronize();
+
 private:
     CodeEditor *editor;
     ParticipantsPane *participantPane;
@@ -27,6 +29,7 @@ private:
     QTcpSocket *socket;
 
     QString myName;
+    Enu::Permissions permissions;
 
     void processData(QString data, int length = 0);
 

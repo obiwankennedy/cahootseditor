@@ -50,6 +50,13 @@ void Server::writeToAll(QString data, QTcpSocket *exception)
     }
 }
 
+void Server::resynchronize()
+{
+    for (int i = 0; i < participantPane->participantList.size(); i++) {
+        populateDocumentForUser(participantPane->participantList.at(i)->socket);
+    }
+}
+
 void Server::processData(QString data, QTcpSocket *sender, int length)
 {
     qDebug() << "odata: " << data;

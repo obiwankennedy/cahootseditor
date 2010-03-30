@@ -44,6 +44,8 @@ public:
     void shiftRight();
     void unCommentSelection();
 
+    void resynchronizeTriggered();
+
     void setHighlighter(int Highlighter);
     enum Highlighter {None, CPlusPlus, Python};
 

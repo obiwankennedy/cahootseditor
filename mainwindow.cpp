@@ -452,6 +452,11 @@ void MainWindow::on_actionTools_Preview_as_Html_triggered()
     tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->previewAsHtml();
 }
 
+void MainWindow::on_actionTools_Resynchronize_Document_triggered()
+{
+    tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget()); // do more
+}
+
 void MainWindow::on_actionText_Shift_Left_triggered()
 {
     tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->shiftLeft();

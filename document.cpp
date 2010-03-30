@@ -221,6 +221,16 @@ void Document::unCommentSelection()
     editor->unCommentSelection();
 }
 
+void Document::resynchronizeTriggered()
+{
+    if (server) {
+        server->resynchronize();
+    }
+    else if (client) {
+        client->resynchronize();
+    }
+}
+
 void Document::setHighlighter(int Highlighter)
 {
     if (Highlighter == None) {

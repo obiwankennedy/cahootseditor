@@ -22,6 +22,8 @@ public:
     // This writes to all sockets except exception
     void writeToAll(QString data, QTcpSocket *exception = 0);
 
+    void resynchronize();
+
 private:
     CodeEditor *editor;
     ParticipantsPane *participantPane;
