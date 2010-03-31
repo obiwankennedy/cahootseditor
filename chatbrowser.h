@@ -9,6 +9,8 @@ Q_OBJECT
 public:
     ChatBrowser(QWidget *parent = 0);
 
+    void addChatLine(QString str, QColor color = Qt::black);
+
 signals:
     void keyPress(QKeyEvent *e);
 

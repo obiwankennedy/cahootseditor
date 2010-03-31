@@ -100,7 +100,7 @@ void Document::announceDocument()
     }
     chatPane->appendChatMessage("Listening at " + ipAddress + ":" + port);
 
-    participantPane->setConnectInfo(ipAddress + ":" + port);
+    participantPane->setConnectInfo(ipAddress, port);
 }
 
 void Document::connectToDocument(QStringList list)
@@ -122,7 +122,7 @@ void Document::connectToDocument(QStringList list)
     client = new Client(editor, participantPane, chatPane, this);
     client->setUsername(myName);
     client->connectToHost(QHostAddress(address), port);
-    participantPane->setConnectInfo(QString("%1:%2").arg(address).arg(portString));
+    participantPane->setConnectInfo(address, portString);
 }
 
 void Document::undo()

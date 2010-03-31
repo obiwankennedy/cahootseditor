@@ -30,7 +30,7 @@ public:
 
     void setOwnership(bool isOwner);
 
-    void setConnectInfo(QString str);
+    void setConnectInfo(QString address, QString port);
 
     // Participants are first new'd (prior to greetings)
     void newParticipant(QTcpSocket *socket);

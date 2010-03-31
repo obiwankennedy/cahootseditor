@@ -15,7 +15,7 @@ public:
     ChatPane(QWidget *parent = 0);
     ~ChatPane();
 
-    void appendChatMessage(QString str);
+    void appendChatMessage(QString str, QColor color = Qt::black);
 
     bool hasFocus() const;
 

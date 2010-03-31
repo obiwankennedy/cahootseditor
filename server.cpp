@@ -59,7 +59,12 @@ void Server::resynchronize()
 
 void Server::processData(QString data, QTcpSocket *sender, int length)
 {
-    qDebug() << "odata: " << data;
+
+    if (length != data.length()) { // someone pasted something too big, until we error handle that, just repopulate them.
+        populateDocumentForUser(sender);
+        return;
+    }
+
     QString toSend;
     QTcpSocket *exception = 0;
     bool haveExtra = false;

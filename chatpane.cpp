@@ -18,7 +18,6 @@ ChatPane::ChatPane(QWidget *parent) :
     layout->setVerticalSpacing(0);
 
     chatBrowser = new ChatBrowser(this);
-    chatBrowser->setFont(QFont("Lucida Grande", 12));
 
     layout->addWidget(chatBrowser, 0, 0);
     layout->addWidget(ui->lineEdit, 1, 0);
@@ -35,9 +34,9 @@ ChatPane::~ChatPane()
     delete ui;
 }
 
-void ChatPane::appendChatMessage(QString str)
+void ChatPane::appendChatMessage(QString str, QColor color)
 {
-    chatBrowser->appendPlainText(str);
+    chatBrowser->addChatLine(str, color);
 }
 
 bool ChatPane::hasFocus() const

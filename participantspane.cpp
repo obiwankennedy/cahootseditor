@@ -44,10 +44,10 @@ void ParticipantsPane::setOwnership(bool isOwner)
     ui->demotePushButton->setShown(isOwner);
 }
 
-void ParticipantsPane::setConnectInfo(QString str)
+void ParticipantsPane::setConnectInfo(QString address, QString port)
 {
     ui->connectInfoLabel->show();
-    ui->connectInfoLabel->setText(str);
+    ui->connectInfoLabel->setText("IP: " + address + "\nPort: " + port);
 }
 
 void ParticipantsPane::newParticipant(QTcpSocket *socket)
@@ -84,7 +84,7 @@ bool ParticipantsPane::addParticipant(QString name, QTcpSocket *socket)
     participant->item->setText(0, name);
 
     participant->color = QColor::fromHsv(qrand() % 256, 190, 190);
-    participant->color = participant->color.lighter(150);
+//    participant->color = participant->color.lighter(150);
 
     participant->item->setBackgroundColor(1, participant->color);
     participant->item->setToolTip(0, QString("%1@%2").arg(name).arg(participant->address.toString()));
@@ -115,7 +115,7 @@ void ParticipantsPane::newParticipant(QString name, QString address, QString per
 
     // everyone has their own colors - colors aren't consistent across participants
     participant->color = QColor::fromHsv(qrand() % 256, 190, 190);
-    participant->color = participant->color.lighter(150);
+//    participant->color = participant->color.lighter(150);
 
     if (permissions == "waiting") {
         participant->item = new QTreeWidgetItem(waitItem);
