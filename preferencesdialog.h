@@ -18,6 +18,9 @@ protected:
 
 private:
     Ui::PreferencesDialog *ui;
+
+signals:
+    void preferencesClicked();
 };
 
 #endif // PREFERENCESDIALOG_H

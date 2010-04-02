@@ -40,6 +40,10 @@ MainWindow::MainWindow(QWidget *parent)
     connect(findDialog, SIGNAL(findDiaalogFindReplace(QString,QString,Qt::CaseSensitivity,bool,Enu::FindMode)), this,
             SLOT(findReplaceTriggered(QString,QString,Qt::CaseSensitivity,bool,Enu::FindMode)));
 
+    preferencesDialog = new PreferencesDialog(this);
+    connect(preferencesDialog, SIGNAL(preferencesClicked()), this,
+            SLOT(on_actionTools_Preferences_triggered()));
+
     Document *document = new Document(ui->tab);
     QGridLayout *tabLayout = new QGridLayout;
     tabLayout->addWidget(document);
@@ -455,6 +459,11 @@ void MainWindow::on_actionTools_Preview_as_Html_triggered()
 void MainWindow::on_actionTools_Resynchronize_Document_triggered()
 {
     tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget()); // do more
+}
+
+void MainWindow::on_actionTools_Preferences_triggered()
+{
+    preferencesDialog->show();
 }
 
 void MainWindow::on_actionText_Shift_Left_triggered()

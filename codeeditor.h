@@ -30,6 +30,8 @@ public:
     void shiftLeft();
     void shiftRight();
 
+//    void changeFont();
+
     // Find functions
     bool findAll(QString searchString, Qt::CaseSensitivity sensitivity);
     bool findNext(QString searchString, Qt::CaseSensitivity sensitivity, bool wrapAround, Enu::FindMode mode);

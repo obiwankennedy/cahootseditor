@@ -26,6 +26,8 @@ public:
     void copy();
     void paste();
 
+//    void changeFont();
+
 private:
     Ui::ChatPane *ui;
 

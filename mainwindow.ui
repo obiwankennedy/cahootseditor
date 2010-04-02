@@ -121,6 +121,8 @@
     <addaction name="actionTools_Connect_to_Document"/>
     <addaction name="separator"/>
     <addaction name="actionTools_Resynchronize_Document"/>
+    <addaction name="separator"/>
+    <addaction name="actionTools_Preferences"/>
    </widget>
    <widget class="QMenu" name="menuWindow">
     <property name="title">
@@ -477,6 +479,11 @@
   <action name="actionWindow_Split_Side_by_Side">
    <property name="text">
     <string>Split Side by Side</string>
+   </property>
+  </action>
+  <action name="actionTools_Preferences">
+   <property name="text">
+    <string>Preferences</string>
    </property>
   </action>
  </widget>

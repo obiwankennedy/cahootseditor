@@ -257,6 +257,15 @@ void CodeEditor::shiftRight()
     setTextCursor(cursor);
 }
 
+//void CodeEditor::changeFont()
+//{
+////    bool ok = false;
+////    QFont newFont = QFontDialog::getFont(&ok, QFont(font()), this, "Set Input Font", QFontDialog::DontUseNativeDialog);
+////    if (ok) {
+////        setFont(newFont);
+////    }
+//}
+
 bool CodeEditor::findAll(QString searchString, Qt::CaseSensitivity sensitivity)
 {
     QString documentString = document()->toPlainText();
