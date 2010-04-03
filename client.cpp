@@ -42,7 +42,7 @@ void Client::writeToServer(QString string)
 
     // Move the head to the beginning and replace the reserved space at the beginning with the size of the block.
     out.device()->seek(0);
-    out << (quint16)(block.size() - sizeof(quint32));
+    out << (quint32)(block.size() - sizeof(quint32));
 
     qDebug() << "[Client] length: " << block.size() << ", send: " << string;
 
