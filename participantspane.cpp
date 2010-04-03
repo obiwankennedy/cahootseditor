@@ -209,7 +209,7 @@ void ParticipantsPane::setOwnerName(QString name)
 
 bool ParticipantsPane::canWrite(QTcpSocket *socket)
 {
-    return participantMap.value(socket)->permissions == Enu::ReadWrite;
+    return participantMap.contains(socket) && participantMap.value(socket)->permissions == Enu::ReadWrite;
 }
 
 bool ParticipantsPane::canRead(QTcpSocket *socket)

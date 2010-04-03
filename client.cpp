@@ -17,6 +17,7 @@ Client::Client(CodeEditor *editor, ParticipantsPane *participantsPane, ChatPane 
 
     connect(socket, SIGNAL(disconnected()), this, SLOT(disconnected()));
     connect(socket, SIGNAL(connected()), this, SLOT(onNewConnection()));
+    connect(socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(displayError(QAbstractSocket::SocketError)));
 
     permissions = Enu::Waiting;
 
@@ -256,8 +257,8 @@ void Client::displayError(QAbstractSocket::SocketError socketError)
         break;
     case QAbstractSocket::ConnectionRefusedError:
         QMessageBox::information(editor, tr("Cahoots"),
-                                 tr("The connection was refused by the peer. "
-                                    "Make sure the fortune server is running, "
+                                 tr("The connection was refused. "
+                                    "Make sure the server is running, "
                                     "and check that the host name and port "
                                     "settings are correct."));
         break;

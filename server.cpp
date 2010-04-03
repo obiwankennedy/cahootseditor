@@ -314,18 +314,6 @@ void Server::displayError(QAbstractSocket::SocketError socketError)
     switch (socketError) {
     case QAbstractSocket::RemoteHostClosedError:
         break;
-    case QAbstractSocket::HostNotFoundError:
-        QMessageBox::information(editor, tr("Cahoots"),
-                                 tr("The host was not found. Please check the "
-                                    "host name and port settings."));
-        break;
-    case QAbstractSocket::ConnectionRefusedError:
-        QMessageBox::information(editor, tr("Cahoots"),
-                                 tr("The connection was refused by the peer. "
-                                    "Make sure the fortune server is running, "
-                                    "and check that the host name and port "
-                                    "settings are correct."));
-        break;
     default:
         QMessageBox::information(editor, tr("Cahoots"),
                                  tr("The following error occurred: %1.")
