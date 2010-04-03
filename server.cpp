@@ -45,16 +45,16 @@ void Server::writeToAll(QString string, QTcpSocket *exception)
         out.setVersion(QDataStream::Qt_4_6);
 
         // Reserve space for a 16 bit int that will contain the total size of the block we're sending
-        out << (quint16)0;
+        out << (quint32)0;
 
         // Write the data to the stream
         out << string;
 
         // Move the head to the beginning and replace the reserved space at the beginning with the size of the block.
         out.device()->seek(0);
-        out << (quint16)(block.size() - sizeof(quint16));
+        out << (quint32)(block.size() - sizeof(quint32));
 
-        qDebug() << "[Owner] length: " << block.size() << ", send: " << string;
+//        qDebug() << "[Owner] length: " << block.size() << ", send: " << string;
 
         for (int i = 0; i < participantPane->participantList.size(); i++) {
             if (participantPane->participantList.at(i)->socket != exception && participantPane->canRead(participantPane->participantList.at(i)->socket)) {
@@ -71,17 +71,17 @@ void Server::writeToSocket(QString string, QTcpSocket *socket)
     QDataStream out(&block, QIODevice::WriteOnly);
     out.setVersion(QDataStream::Qt_4_6);
 
-    // Reserve space for a 16 bit int that will contain the total size of the block we're sending
-    out << (quint16)0;
+    // Reserve space for a 32 bit int that will contain the total size of the block we're sending
+    out << (quint32)0;
 
     // Write the data to the stream
     out << string;
 
     // Move the head to the beginning and replace the reserved space at the beginning with the size of the block, minus the size of the uint.
     out.device()->seek(0);
-    out << (quint16)(block.size() - sizeof(quint16));
+    out << (quint32)(block.size() - sizeof(quint32));
 
-    qDebug() << "[Owner] length: " << block.size() << ", send: " << string;
+//    qDebug() << "[Owner] length: " << block.size() << ", send: " << string;
 
     socket->write(block);
 }
@@ -200,8 +200,8 @@ void Server::onIncomingData()
         in.setVersion(QDataStream::Qt_4_6);
 
         if (participant->blockSize == 0) { // blockSize is 0, so we don't know how big the next packet is yet
-            // We check if we have at least the size of quint16 to read, if not, return and wait for the next readyRead
-            if (sock->bytesAvailable() < (int)sizeof(quint16))
+            // We check if we have at least the size of quint32 to read, if not, return and wait for the next readyRead
+            if (sock->bytesAvailable() < (int)sizeof(quint32))
                 return;
 
             // blockSize is the first chunk, so fetch that to find out how big this packet is going to be
@@ -215,7 +215,7 @@ void Server::onIncomingData()
 
         //    data = sock->read(participant->blockSize); // read in this packet
         in >> data;
-        qDebug() << "[Owner] length: " << participant->blockSize << ", read: " << data;
+//        qDebug() << "[Owner] length: " << participant->blockSize << ", read: " << data;
         processData(data, sock, participant->blockSize);
 
         participant->blockSize = 0; // reset blockSize to 0 for the next packet

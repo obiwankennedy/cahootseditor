@@ -35,14 +35,14 @@ void Client::writeToServer(QString string)
     out.setVersion(QDataStream::Qt_4_6);
 
     // Reserve space for a 16 bit int that will contain the total size of the block we're sending
-    out << (quint16)0;
+    out << (quint32)0;
 
     // Write the data to the stream
     out << string;
 
     // Move the head to the beginning and replace the reserved space at the beginning with the size of the block.
     out.device()->seek(0);
-    out << (quint16)(block.size() - sizeof(quint16));
+    out << (quint16)(block.size() - sizeof(quint32));
 
     qDebug() << "[Client] length: " << block.size() << ", send: " << string;
 
@@ -66,7 +66,7 @@ void Client::resynchronize()
 
 void Client::processData(QString data, int length)
 {
-    qDebug() << "pdata: " << data;
+//    qDebug() << "pdata: " << data;
 
     QRegExp rx;
     if (data.startsWith("doc:")) {
@@ -204,8 +204,8 @@ void Client::onIncomingData()
         in.setVersion(QDataStream::Qt_4_6);
 
         if (blockSize == 0) { // blockSize is 0, so we don't know how big the next packet is yet
-            // We check if we have at least the size of quint16 to read, if not, return and wait for the next readyRead
-            if (socket->bytesAvailable() < (int)sizeof(quint16))
+            // We check if we have at least the size of quint32 to read, if not, return and wait for the next readyRead
+            if (socket->bytesAvailable() < (int)sizeof(quint32))
                 return;
 
             // blockSize is the first chunk, so fetch that to find out how big this packet is going to be

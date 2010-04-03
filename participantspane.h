@@ -21,7 +21,7 @@ struct Participant {
     int permissions;
     QTcpSocket *socket;
     // Used to store the incoming packet's size
-    quint16 blockSize;
+    quint32 blockSize;
 };
 
 class ParticipantsPane : public QWidget {

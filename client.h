@@ -35,7 +35,7 @@ private:
 
     void processData(QString data, int length = 0);
 
-    quint16 blockSize;
+    quint32 blockSize;
 
 private slots:
     void onTextChange(int pos, int charsRemoved, int charsAdded);
