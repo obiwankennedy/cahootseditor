@@ -50,6 +50,11 @@ void Server::writeToAll(QString data, QTcpSocket *exception)
     }
 }
 
+void Server::writeToSocket(QTcpSocket *socket)
+{
+
+}
+
 void Server::resynchronize()
 {
     for (int i = 0; i < participantPane->participantList.size(); i++) {
@@ -191,6 +196,10 @@ void Server::onIncomingData()
 
     // cast the sender() of this signal to a QTcpSocket
     QTcpSocket *sock = qobject_cast<QTcpSocket *>(sender());
+
+    QDataStream in(sock);
+    in.setVersion(QDataStream::Qt_4_6);
+
     data = sock->readAll();
     if (data.contains(rx)) {
         length = rx.cap(1).toInt(&ok);
@@ -211,6 +220,7 @@ void Server::onNewConnection()
     connect(sock, SIGNAL(readyRead()), this, SLOT(onIncomingData()));
     connect(sock, SIGNAL(disconnected()), this, SLOT(disconnected()));
     participantPane->newParticipant(sock);
+    sock->setSocketOption(QAbstractSocket::KeepAliveOption);
 }
 
 void Server::memberPermissionsChanged(QTcpSocket *participant, QString permissions)

@@ -18,6 +18,9 @@ Client::Client(CodeEditor *editor, ParticipantsPane *participantsPane, ChatPane 
     connect(socket, SIGNAL(connected()), this, SLOT(onNewConnection()));
 
     permissions = Enu::Waiting;
+
+    socket->setSocketOption(QAbstractSocket::KeepAliveOption);
+    blockSize = 0;
 }
 
 void Client::connectToHost(QHostAddress hostName, int port)
@@ -202,6 +205,22 @@ void Client::onIncomingData()
     QRegExp rx = QRegExp("^(\\d+)*.");
     int length;
     bool ok;
+
+    QDataStream in(socket);
+    in.setVersion(QDataStream::Qt_4_6);
+
+//    if (blockSize == 0) { // blocksize is 0, so we don't know how big the next packet is yet
+//        if (socket->bytesAvailable() < (int)sizeof(quint16))
+//            return;
+//
+//        in >> blockSize; // blockSize is the first chunk, so fetch that to find out how big this packet is
+//    }
+//
+//    if (tcpSocket->bytesAvailable() < blockSize) {
+//        return;
+//    }
+
+    blockSize = 0; // reset blockSize to 0 for the next packet
 
     // We are a participant
     data = socket->readAll();
