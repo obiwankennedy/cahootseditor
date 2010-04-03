@@ -116,7 +116,6 @@ void ConnectToDocument::processPendingDatagrams()
         QByteArray datagram;
         datagram.resize(udpSocket->pendingDatagramSize());
         udpSocket->readDatagram(datagram.data(), datagram.size());
-//        qDebug() << "read datagram: " << datagram;
         QRegExp rx = QRegExp("([a-zA-Z0-9_\\.]*)@([0-9\\.]+):(\\d+)");
         QString data = datagram.data();
         if (data.contains(rx)) {
@@ -124,7 +123,7 @@ void ConnectToDocument::processPendingDatagrams()
             for (int i = 0; i < itemList.size(); i++) {
                 if (itemList.at(i)->text() == data) {
                     timerList.at(i)->start(5000);
-                    return; // item already exists in the list, nothing to see here...
+                    return; // item already exists in the list, nothing to do here
                 }
             }
             QListWidgetItem *item = new QListWidgetItem(data, ui->listWidget);

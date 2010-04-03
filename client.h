@@ -33,7 +33,7 @@ private:
     QString myName;
     Enu::Permissions permissions;
 
-    void processData(QString data, int length = 0);
+    void processData(QString data);
 
     quint32 blockSize;
 

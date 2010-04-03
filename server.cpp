@@ -55,8 +55,6 @@ void Server::writeToAll(QString string, QTcpSocket *exception)
         out.device()->seek(0);
         out << (quint32)(block.size() - sizeof(quint32));
 
-//        qDebug() << "[Owner] length: " << block.size() << ", send: " << string;
-
         for (int i = 0; i < participantPane->participantList.size(); i++) {
             if (participantPane->participantList.at(i)->socket != exception && participantPane->canRead(participantPane->participantList.at(i)->socket)) {
                 participantPane->participantList.at(i)->socket->write(block);
@@ -82,8 +80,6 @@ void Server::writeToSocket(QString string, QTcpSocket *socket)
     out.device()->seek(0);
     out << (quint32)(block.size() - sizeof(quint32));
 
-//    qDebug() << "[Owner] length: " << block.size() << ", send: " << string;
-
     socket->write(block);
 }
 
@@ -94,10 +90,12 @@ void Server::resynchronize()
     }
 }
 
-void Server::processData(QString data, QTcpSocket *sender, int length)
+void Server::processData(QString data, QTcpSocket *sender)
 {
     QString toSend;
     QTcpSocket *exception = 0;
+
+    qDebug() << "odata: " << data;
 
     QRegExp rx;
     if (data.startsWith("doc:")) {
@@ -215,10 +213,9 @@ void Server::onIncomingData()
             return;
         }
 
-        //    data = sock->read(participant->blockSize); // read in this packet
         in >> data;
-//        qDebug() << "[Owner] length: " << participant->blockSize << ", read: " << data;
-        processData(data, sock, participant->blockSize);
+
+        processData(data, sock);
 
         participant->blockSize = 0; // reset blockSize to 0 for the next packet
     }
@@ -302,9 +299,7 @@ void Server::broadcastDatagram()
     }
 
     datagram = QString("untitled.txt@%1:%2").arg(ipAddress).arg(server->serverPort()).toAscii();
-    udpSocket->writeDatagram(datagram.data(), datagram.size(),
-                             QHostAddress::Broadcast, 45321);
-//    qDebug() << "Sent datagram: " << datagram.data();
+    udpSocket->writeDatagram(datagram.data(), datagram.size(), QHostAddress::Broadcast, 45321);
 }
 
 void Server::displayError(QAbstractSocket::SocketError socketError)

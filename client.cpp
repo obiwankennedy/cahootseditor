@@ -46,8 +46,6 @@ void Client::writeToServer(QString string)
     out.device()->seek(0);
     out << (quint32)(block.size() - sizeof(quint32));
 
-    qDebug() << "[Client] length: " << block.size() << ", send: " << string;
-
     socket->write(block);
 }
 
@@ -66,9 +64,9 @@ void Client::resynchronize()
     editor->setReadOnly(true);
 }
 
-void Client::processData(QString data, int length)
+void Client::processData(QString data)
 {
-//    qDebug() << "pdata: " << data;
+    qDebug() << "pdata: " << data;
 
     QRegExp rx;
     if (data.startsWith("doc:")) {
@@ -158,8 +156,6 @@ void Client::processData(QString data, int length)
         data.remove(0, 5);
         participantPane->setOwnerName(data);
     }
-
-    // Now that we're done processing this packet, process the next packet in the buffer
 }
 
 void Client::onTextChange(int pos, int charsRemoved, int charsAdded)
@@ -200,7 +196,7 @@ void Client::onIncomingData()
     // disconnect the signal that fires when the contents of the editor change so we don't echo
     disconnect(editor->document(), SIGNAL(contentsChange(int,int,int)), this, SLOT(onTextChange(int,int,int)));
 
-    while (socket->bytesAvailable() > 0) {
+    while (socket->bytesAvailable() > 0) { // process data until we run out, or have an incomplete packet - the returns will handle that case
         QString data;
         QDataStream in(socket);
         in.setVersion(QDataStream::Qt_4_6);
@@ -220,9 +216,8 @@ void Client::onIncomingData()
         }
 
         in >> data;
-        //    data = socket->read(blockSize); // read in this packet
-        qDebug() << "[Client] length: " << blockSize << ", read: " << data;
-        processData(data, blockSize);
+
+        processData(data);
 
         blockSize = 0; // reset blockSize to 0 for the next packet
     }

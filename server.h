@@ -36,7 +36,7 @@ private:
     QUdpSocket *udpSocket;
     QTimer *timer;
 
-    void processData(QString data, QTcpSocket *sender, int length = 0);
+    void processData(QString data, QTcpSocket *sender);
 
 private slots:
     void onTextChange(int pos, int charsRemoved, int charsAdded);
