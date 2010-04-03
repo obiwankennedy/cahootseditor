@@ -317,9 +317,11 @@ void Document::toggleLineWrap()
 {
     if (editor->lineWrapMode() == QPlainTextEdit::NoWrap) {
         editor->setLineWrapMode(QPlainTextEdit::WidgetWidth);
+        bottomEditor->setLineWrapMode(QPlainTextEdit::WidgetWidth);
     }
     else {
         editor->setLineWrapMode(QPlainTextEdit::NoWrap);
+        bottomEditor->setLineWrapMode(QPlainTextEdit::NoWrap);
     }
 }
 

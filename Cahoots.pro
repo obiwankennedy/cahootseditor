@@ -30,7 +30,8 @@ SOURCES += main.cpp \
     server.cpp \
     chatbrowser.cpp \
     utilities.cpp \
-    highlighters/pythonhighlighter.cpp
+    highlighters/pythonhighlighter.cpp \
+    announcedocumentdialog.cpp
 HEADERS += mainwindow.h \
     document.h \
     highlighters/cpphighlighter.h \
@@ -46,7 +47,8 @@ HEADERS += mainwindow.h \
     server.h \
     chatbrowser.h \
     utilities.h \
-    highlighters/pythonhighlighter.h
+    highlighters/pythonhighlighter.h \
+    announcedocumentdialog.h
 FORMS += mainwindow.ui \
     document.ui \
     connecttodocument.ui \
@@ -54,7 +56,8 @@ FORMS += mainwindow.ui \
     preferencesdialog.ui \
     participantspane.ui \
     chatpane.ui \
-    findtoolbar.ui
+    findtoolbar.ui \
+    announcedocumentdialog.ui
 RESOURCES += cahootsresc.qrc \
     highlighters.qrc
 OTHER_FILES += highlighters/xml.plist \
