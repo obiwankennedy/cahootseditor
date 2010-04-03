@@ -46,6 +46,7 @@ private slots:
 
     void disconnected();
 
+    void displayError(QAbstractSocket::SocketError socketError);
 };
 
 #endif // CLIENT_H

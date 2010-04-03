@@ -2,6 +2,7 @@
 
 #include <QTextDocumentFragment>
 #include <QNetworkInterface>
+#include <QMessageBox>
 
 Server::Server(CodeEditor *editor, ParticipantsPane *participantsPane, ChatPane *chatPane, QObject *parent) :
     QObject(parent)
@@ -143,9 +144,10 @@ void Server::processData(QString data, QTcpSocket *sender, int length)
                 QString myName = "Chris";
                 writeToSocket(QString("helo:%2").arg(myName).toAscii(), sender);
             }
-            else {                
-                participantPane->removeParticipant(sender);
-                toSend = "";
+            else {
+                disconnect(sender, SIGNAL(disconnected()), this, SLOT(disconnected()));
+                sender->disconnectFromHost();
+                return; // we're rejecting the particpant because he's joining with a duplicate name.
             }
         }
     }
@@ -240,7 +242,6 @@ void Server::memberPermissionsChanged(QTcpSocket *participant, QString permissio
     QString toSend = QString("updateperm:%1").arg(permissions);
     writeToSocket(toSend, participant);
 
-
     // update all users with the users' new permissions
     toSend = QString("setperm:%1:%2").arg(participantPane->getNameAddressForSocket(participant)).arg(permissions);
     writeToAll(toSend);
@@ -306,3 +307,28 @@ void Server::broadcastDatagram()
 //    qDebug() << "Sent datagram: " << datagram.data();
 }
 
+void Server::displayError(QAbstractSocket::SocketError socketError)
+{    
+    QTcpSocket *sock = qobject_cast<QTcpSocket *>(sender());
+
+    switch (socketError) {
+    case QAbstractSocket::RemoteHostClosedError:
+        break;
+    case QAbstractSocket::HostNotFoundError:
+        QMessageBox::information(editor, tr("Cahoots"),
+                                 tr("The host was not found. Please check the "
+                                    "host name and port settings."));
+        break;
+    case QAbstractSocket::ConnectionRefusedError:
+        QMessageBox::information(editor, tr("Cahoots"),
+                                 tr("The connection was refused by the peer. "
+                                    "Make sure the fortune server is running, "
+                                    "and check that the host name and port "
+                                    "settings are correct."));
+        break;
+    default:
+        QMessageBox::information(editor, tr("Cahoots"),
+                                 tr("The following error occurred: %1.")
+                                 .arg(sock->errorString()));
+    }
+}

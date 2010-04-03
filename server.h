@@ -52,6 +52,8 @@ private slots:
     void disconnected();
 
     void broadcastDatagram();
+
+    void displayError(QAbstractSocket::SocketError socketError);
 };
 
 #endif // SERVER_H

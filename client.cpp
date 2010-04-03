@@ -1,6 +1,7 @@
 #include "client.h"
 
 #include <QTextDocumentFragment>
+#include <QMessageBox>
 
 Client::Client(CodeEditor *editor, ParticipantsPane *participantsPane, ChatPane *chatPane, QObject *parent) :
     QObject(parent)
@@ -234,7 +235,6 @@ void Client::onNewConnection()
     connect(socket, SIGNAL(readyRead()), this, SLOT(onIncomingData()));
     QString toSend = QString("helo:%1").arg(myName);
     writeToServer(toSend);
-
 }
 
 void Client::disconnected()
@@ -242,4 +242,28 @@ void Client::disconnected()
     participantPane->removeAllParticipants();
     chatPane->hide();
     participantPane->hide();
+}
+
+void Client::displayError(QAbstractSocket::SocketError socketError)
+{
+    switch (socketError) {
+    case QAbstractSocket::RemoteHostClosedError:
+        break;
+    case QAbstractSocket::HostNotFoundError:
+        QMessageBox::information(editor, tr("Cahoots"),
+                                 tr("The host was not found. Please check the "
+                                    "host name and port settings."));
+        break;
+    case QAbstractSocket::ConnectionRefusedError:
+        QMessageBox::information(editor, tr("Cahoots"),
+                                 tr("The connection was refused by the peer. "
+                                    "Make sure the fortune server is running, "
+                                    "and check that the host name and port "
+                                    "settings are correct."));
+        break;
+    default:
+        QMessageBox::information(editor, tr("Cahoots"),
+                                 tr("The following error occurred: %1.")
+                                 .arg(socket->errorString()));
+    }
 }

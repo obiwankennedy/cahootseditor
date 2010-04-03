@@ -73,11 +73,12 @@ bool ParticipantsPane::addParticipant(QString name, QTcpSocket *socket)
     Participant *participant = participantMap.value(socket);
 
     for (int i = 0; i < participantList.size(); i++) {
-        if (participantList.at(i)->socket->peerAddress() == participantList.at(i)->address && participantList.at(i)->name == name) {
+        if (socket->peerAddress() == participantList.at(i)->address && participantList.at(i)->name == name) {
             // duplicate connection, reject
-            socket->disconnectFromHost();
+            qDebug() << "duplicate connection, rejecting...";
             participantList.removeOne(participant);
             participantMap.remove(socket);
+            delete participant;
             return false;
         }
     }
@@ -151,11 +152,16 @@ void ParticipantsPane::removeAllParticipants()
 
 void ParticipantsPane::removeParticipant(QTcpSocket *socket)
 {
-    Participant *participant = participantMap.value(socket);
-    participant->item->parent()->removeChild(participant->item);
-    participantMap.remove(socket);
-    participantList.removeOne(participant); // this iterates through the list
-    delete participant;
+    for (int i = 0; i < participantList.size(); i++) {
+        if (participantList.at(i)->socket == socket) {
+            Participant *participant = participantList.at(i);
+            participant->item->parent()->removeChild(participant->item);
+            participantMap.remove(socket);
+            participantList.removeAt(i);
+            delete participant;
+            return;
+        }
+    }
 }
 
 void ParticipantsPane::removeParticipant(QString name, QString address)
