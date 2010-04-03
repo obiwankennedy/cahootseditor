@@ -17,6 +17,8 @@ public:
 
     void connectToHost(QHostAddress hostName, int port);
 
+    void writeToServer(QString string);
+
     void setUsername(QString username);
 
     void resynchronize();

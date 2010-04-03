@@ -20,9 +20,9 @@ public:
     quint16 serverPort();
 
     // This writes to all sockets except exception
-    void writeToAll(QString data, QTcpSocket *exception = 0);
+    void writeToAll(QString string, QTcpSocket *exception = 0);
 
-    void writeToSocket(QTcpSocket *socket);
+    void writeToSocket(QString string, QTcpSocket *socket);
 
     void resynchronize();
 

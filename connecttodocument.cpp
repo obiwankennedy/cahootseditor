@@ -116,7 +116,7 @@ void ConnectToDocument::processPendingDatagrams()
         QByteArray datagram;
         datagram.resize(udpSocket->pendingDatagramSize());
         udpSocket->readDatagram(datagram.data(), datagram.size());
-        qDebug() << "read datagram: " << datagram;
+//        qDebug() << "read datagram: " << datagram;
         QRegExp rx = QRegExp("([a-zA-Z0-9_\\.]*)@([0-9\\.]+):(\\d+)");
         QString data = datagram.data();
         if (data.contains(rx)) {

@@ -5,18 +5,12 @@
 #include "enu.h"
 
 #include <QDialog>
-#include <QKeyEvent>
-#include <QTextCursor>
 #include <QRegExp>
 #include <QDebug>
-#include <QWheelEvent>
-#include <QTextEdit>
-#include <QTextBlock>
 #include <QFontMetrics>
 #include <QWebView>
 #include <QLayout>
 #include <QMessageBox>
-#include <QStringList>
 
 #include <QTextDocumentFragment>
 

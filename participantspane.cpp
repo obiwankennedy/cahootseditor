@@ -63,6 +63,9 @@ void ParticipantsPane::newParticipant(QTcpSocket *socket)
     participant->permissions = Enu::Waiting;
     participant->socket = socket;
     participant->address = socket->peerAddress();
+
+    // Initializes the incoming block size to 0
+    participant->blockSize = 0;
 }
 
 bool ParticipantsPane::addParticipant(QString name, QTcpSocket *socket)

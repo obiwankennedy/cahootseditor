@@ -20,6 +20,8 @@ struct Participant {
     // Only used by the owner:
     int permissions;
     QTcpSocket *socket;
+    // Used to store the incoming packet's size
+    quint16 blockSize;
 };
 
 class ParticipantsPane : public QWidget {

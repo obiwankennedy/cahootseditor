@@ -37,22 +37,53 @@ quint16 Server::serverPort()
     return server->serverPort();
 }
 
-void Server::writeToAll(QString data, QTcpSocket *exception)
+void Server::writeToAll(QString string, QTcpSocket *exception)
 {
-    qDebug() << "toSend: " << data;
+    if (string != "") {
+        QByteArray block;
+        QDataStream out(&block, QIODevice::WriteOnly);
+        out.setVersion(QDataStream::Qt_4_6);
 
-    if (data != "") {
+        // Reserve space for a 16 bit int that will contain the total size of the block we're sending
+        out << (quint16)0;
+
+        // Write the data to the stream
+        out << string;
+
+        // Move the head to the beginning and replace the reserved space at the beginning with the size of the block.
+        out.device()->seek(0);
+        out << (quint16)(block.size() - sizeof(quint16));
+
+        qDebug() << "[Owner] length: " << block.size() << ", send: " << string;
+
         for (int i = 0; i < participantPane->participantList.size(); i++) {
             if (participantPane->participantList.at(i)->socket != exception && participantPane->canRead(participantPane->participantList.at(i)->socket)) {
-                participantPane->participantList.at(i)->socket->write(QString("%1 %2").arg(data.length()).arg(data).toAscii());
+                participantPane->participantList.at(i)->socket->write(block);
+//                writeToSocket(string, participantPane->participantList.at(i)->socket);
             }
         }
     }
 }
 
-void Server::writeToSocket(QTcpSocket *socket)
+void Server::writeToSocket(QString string, QTcpSocket *socket)
 {
+    QByteArray block;
+    QDataStream out(&block, QIODevice::WriteOnly);
+    out.setVersion(QDataStream::Qt_4_6);
 
+    // Reserve space for a 16 bit int that will contain the total size of the block we're sending
+    out << (quint16)0;
+
+    // Write the data to the stream
+    out << string;
+
+    // Move the head to the beginning and replace the reserved space at the beginning with the size of the block, minus the size of the uint.
+    out.device()->seek(0);
+    out << (quint16)(block.size() - sizeof(quint16));
+
+    qDebug() << "[Owner] length: " << block.size() << ", send: " << string;
+
+    socket->write(block);
 }
 
 void Server::resynchronize()
@@ -64,26 +95,8 @@ void Server::resynchronize()
 
 void Server::processData(QString data, QTcpSocket *sender, int length)
 {
-
-    if (length != data.length()) { // someone pasted something too big, until we error handle that, just repopulate them.
-        populateDocumentForUser(sender);
-        return;
-    }
-
     QString toSend;
     QTcpSocket *exception = 0;
-    bool haveExtra = false;
-    QString rest;
-
-    if (length < data.length()) { // in case incoming data packets were concatenated
-        haveExtra = true;
-        rest = data;
-        rest.remove(0, length);
-        data.remove(length, data.length() - length);
-    }
-    else if (length > data.length()) {
-        // we have incomplete data
-    }
 
     QRegExp rx;
     if (data.startsWith("doc:")) {
@@ -128,7 +141,7 @@ void Server::processData(QString data, QTcpSocket *sender, int length)
                 toSend = "join:" + participantPane->getNameAddressForSocket(sender);
 #warning "implement owner name"
                 QString myName = "Chris";
-                sender->write(QString("%1 helo:%2").arg(5 + myName.length()).arg(myName).toAscii());
+                writeToSocket(QString("helo:%2").arg(myName).toAscii(), sender);
             }
             else {                
                 participantPane->removeParticipant(sender);
@@ -139,18 +152,6 @@ void Server::processData(QString data, QTcpSocket *sender, int length)
 
     // Distribute data to all the other participants
     writeToAll(toSend, exception);
-
-    if (haveExtra) {
-        QRegExp rx = QRegExp("^(\\d+)*.");
-        if (rest.contains(rx)) {
-            bool ok;
-            length = rx.cap(1).toInt(&ok);
-            rest.remove(0, rx.cap(1).length() + 1); // remove digit indicating packet length and whitespace
-            if (ok) {
-                processData(rest, sender, length);
-            }
-        }
-    }
 }
 
 void Server::onTextChange(int pos, int charsRemoved, int charsAdded)
@@ -189,29 +190,39 @@ void Server::onIncomingData()
     // disconnect the signal that fires when the contents of the editor change so we don't echo
     disconnect(editor->document(), SIGNAL(contentsChange(int,int,int)), this, SLOT(onTextChange(int,int,int)));
 
-    QString data;
-    QRegExp rx = QRegExp("^(\\d+)*.");
-    int length;
-    bool ok;
-
     // cast the sender() of this signal to a QTcpSocket
     QTcpSocket *sock = qobject_cast<QTcpSocket *>(sender());
+    Participant *participant = participantPane->participantMap.value(sock);
 
-    QDataStream in(sock);
-    in.setVersion(QDataStream::Qt_4_6);
+    while (sock->bytesAvailable() > 0) {
+        QString data;
+        QDataStream in(sock);
+        in.setVersion(QDataStream::Qt_4_6);
 
-    data = sock->readAll();
-    if (data.contains(rx)) {
-        length = rx.cap(1).toInt(&ok);
-        data.remove(0, rx.cap(1).length() + 1); // remove digit indicating packet length and whitespace
-        if (ok) {
-            processData(data, sock, length);
+        if (participant->blockSize == 0) { // blockSize is 0, so we don't know how big the next packet is yet
+            // We check if we have at least the size of quint16 to read, if not, return and wait for the next readyRead
+            if (sock->bytesAvailable() < (int)sizeof(quint16))
+                return;
+
+            // blockSize is the first chunk, so fetch that to find out how big this packet is going to be
+            in >> participant->blockSize;
         }
+
+        // If we don't yet have the full size of the packet, return and wait for the rest
+        if (sock->bytesAvailable() < participant->blockSize) {
+            return;
+        }
+
+        //    data = sock->read(participant->blockSize); // read in this packet
+        in >> data;
+        qDebug() << "[Owner] length: " << participant->blockSize << ", read: " << data;
+        processData(data, sock, participant->blockSize);
+
+        participant->blockSize = 0; // reset blockSize to 0 for the next packet
     }
 
     // reconnect the signal that fires when the contents of the editor change so we continue to send new text
     connect(editor->document(), SIGNAL(contentsChange(int,int,int)), this, SLOT(onTextChange(int,int,int)));
-
 }
 
 void Server::onNewConnection()
@@ -220,30 +231,26 @@ void Server::onNewConnection()
     connect(sock, SIGNAL(readyRead()), this, SLOT(onIncomingData()));
     connect(sock, SIGNAL(disconnected()), this, SLOT(disconnected()));
     participantPane->newParticipant(sock);
-    sock->setSocketOption(QAbstractSocket::KeepAliveOption);
+    sock->setSocketOption(QAbstractSocket::KeepAliveOption, 1);
 }
 
 void Server::memberPermissionsChanged(QTcpSocket *participant, QString permissions)
 {
     // send the participant itself the updated permissions specifically
     QString toSend = QString("updateperm:%1").arg(permissions);
-    participant->write(QString("%1 %2").arg(toSend.length()).arg(toSend).toAscii());
+    writeToSocket(toSend, participant);
+
 
     // update all users with the users' new permissions
     toSend = QString("setperm:%1:%2").arg(participantPane->getNameAddressForSocket(participant)).arg(permissions);
-
-    for (int i = 0; i < participantPane->participantList.size(); i++) {
-        if (participantPane->canRead(participantPane->participantList.at(i)->socket)) {
-            participantPane->participantList.at(i)->socket->write(QString("%1 %2").arg(toSend.length()).arg(toSend).toAscii());
-        }
-    }
+    writeToAll(toSend);
 }
 
 void Server::populateDocumentForUser(QTcpSocket *socket)
 {
     // Send entire document
     QString toSend = QString("sync:%1").arg(editor->toPlainText());
-    socket->write(QString("%1 %2").arg(toSend.length()).arg(toSend).toAscii());
+    writeToSocket(toSend, socket);
 
     // Send participants
     toSend.clear();
@@ -264,7 +271,7 @@ void Server::populateDocumentForUser(QTcpSocket *socket)
         }
 
         toSend = QString("adduser:%1@%2:%3").arg(name).arg(address).arg(permissions);
-        socket->write(QString("%1 %2").arg(toSend.length()).arg(toSend).toAscii());
+        writeToSocket(toSend, socket);
     }
 }
 
@@ -296,6 +303,6 @@ void Server::broadcastDatagram()
     datagram = QString("untitled.txt@%1:%2").arg(ipAddress).arg(server->serverPort()).toAscii();
     udpSocket->writeDatagram(datagram.data(), datagram.size(),
                              QHostAddress::Broadcast, 45321);
-    qDebug() << "Sent datagram: " << datagram.data();
+//    qDebug() << "Sent datagram: " << datagram.data();
 }
 

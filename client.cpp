@@ -19,13 +19,34 @@ Client::Client(CodeEditor *editor, ParticipantsPane *participantsPane, ChatPane 
 
     permissions = Enu::Waiting;
 
-    socket->setSocketOption(QAbstractSocket::KeepAliveOption);
+    socket->setSocketOption(QAbstractSocket::KeepAliveOption, 1);
     blockSize = 0;
 }
 
 void Client::connectToHost(QHostAddress hostName, int port)
 {
     socket->connectToHost(hostName, port);
+}
+
+void Client::writeToServer(QString string)
+{
+    QByteArray block;
+    QDataStream out(&block, QIODevice::WriteOnly);
+    out.setVersion(QDataStream::Qt_4_6);
+
+    // Reserve space for a 16 bit int that will contain the total size of the block we're sending
+    out << (quint16)0;
+
+    // Write the data to the stream
+    out << string;
+
+    // Move the head to the beginning and replace the reserved space at the beginning with the size of the block.
+    out.device()->seek(0);
+    out << (quint16)(block.size() - sizeof(quint16));
+
+    qDebug() << "[Client] length: " << block.size() << ", send: " << string;
+
+    socket->write(block);
 }
 
 void Client::setUsername(QString username)
@@ -38,26 +59,13 @@ void Client::resynchronize()
     QString toSend;
 
     toSend = "resync";
-    socket->write(QString("%1 %2").arg(toSend.length()).arg(toSend).toAscii());
+    writeToServer(toSend);
     participantPane->removeAllParticipants();
     editor->setReadOnly(true);
 }
 
 void Client::processData(QString data, int length)
 {
-    bool haveExtra = false;
-    QString rest;
-
-    if (length < data.length()) { // in case incoming data packets were concatenated
-        haveExtra = true;
-        rest = data;
-        rest.remove(0, length);
-        data.remove(length, data.length() - length);
-    }
-    else if (length > data.length()) {
-        // we have incomplete data
-    }
-
     qDebug() << "pdata: " << data;
 
     QRegExp rx;
@@ -149,18 +157,7 @@ void Client::processData(QString data, int length)
         participantPane->setOwnerName(data);
     }
 
-    bool ok;
-
-    if (haveExtra) {
-        QRegExp rx = QRegExp("^(\\d+)*.");
-        if (rest.contains(rx)) {
-            length = rx.cap(1).toInt(&ok);
-            rest.remove(0, rx.cap(1).length() + 1); // remove digit indicating packet length and whitespace
-            if (ok) {
-                processData(rest, length);
-            }
-        }
-    }
+    // Now that we're done processing this packet, process the next packet in the buffer
 }
 
 void Client::onTextChange(int pos, int charsRemoved, int charsAdded)
@@ -183,7 +180,7 @@ void Client::onTextChange(int pos, int charsRemoved, int charsAdded)
     }
 
     toSend = QString("doc:%1 %2 %3 %4").arg(pos).arg(charsRemoved).arg(charsAdded).arg(data);
-    socket->write(QString("%1 %2").arg(toSend.length()).arg(toSend).toAscii());
+    writeToServer(toSend);
 }
 
 void Client::onChatSend(QString str)
@@ -191,7 +188,7 @@ void Client::onChatSend(QString str)
     QString toSend;
 
     toSend = "chat:" + str;
-    socket->write(QString("%1 %2").arg(toSend.length()).arg(toSend).toAscii());
+    writeToServer(toSend);
 
     chatPane->appendChatMessage(QString("%1:\t%2").arg(myName).arg(str));
 }
@@ -201,36 +198,33 @@ void Client::onIncomingData()
     // disconnect the signal that fires when the contents of the editor change so we don't echo
     disconnect(editor->document(), SIGNAL(contentsChange(int,int,int)), this, SLOT(onTextChange(int,int,int)));
 
-    QString data;
-    QRegExp rx = QRegExp("^(\\d+)*.");
-    int length;
-    bool ok;
+    while (socket->bytesAvailable() > 0) {
+        QString data;
+        QDataStream in(socket);
+        in.setVersion(QDataStream::Qt_4_6);
 
-    QDataStream in(socket);
-    in.setVersion(QDataStream::Qt_4_6);
+        if (blockSize == 0) { // blockSize is 0, so we don't know how big the next packet is yet
+            // We check if we have at least the size of quint16 to read, if not, return and wait for the next readyRead
+            if (socket->bytesAvailable() < (int)sizeof(quint16))
+                return;
 
-//    if (blockSize == 0) { // blocksize is 0, so we don't know how big the next packet is yet
-//        if (socket->bytesAvailable() < (int)sizeof(quint16))
-//            return;
-//
-//        in >> blockSize; // blockSize is the first chunk, so fetch that to find out how big this packet is
-//    }
-//
-//    if (tcpSocket->bytesAvailable() < blockSize) {
-//        return;
-//    }
-
-    blockSize = 0; // reset blockSize to 0 for the next packet
-
-    // We are a participant
-    data = socket->readAll();
-    if (data.contains(rx)) {
-        length = rx.cap(1).toInt(&ok);
-        data.remove(0, rx.cap(1).length() + 1); // remove digit indicating packet length and whitespace
-        if (ok) {
-            processData(data, length);
+            // blockSize is the first chunk, so fetch that to find out how big this packet is going to be
+            in >> blockSize;
         }
+
+        // If we don't yet have the full size of the packet, return and wait for the rest
+        if (socket->bytesAvailable() < blockSize) {
+            return;
+        }
+
+        in >> data;
+        //    data = socket->read(blockSize); // read in this packet
+        qDebug() << "[Client] length: " << blockSize << ", read: " << data;
+        processData(data, blockSize);
+
+        blockSize = 0; // reset blockSize to 0 for the next packet
     }
+
     // reconnect the signal that fires when the contents of the editor change so we continue to send new text
     connect(editor->document(), SIGNAL(contentsChange(int,int,int)), this, SLOT(onTextChange(int,int,int)));
 }
@@ -239,7 +233,8 @@ void Client::onNewConnection()
 {
     connect(socket, SIGNAL(readyRead()), this, SLOT(onIncomingData()));
     QString toSend = QString("helo:%1").arg(myName);
-    socket->write(QString("%1 %2").arg(toSend.length()).arg(toSend).toAscii());
+    writeToServer(toSend);
+
 }
 
 void Client::disconnected()
