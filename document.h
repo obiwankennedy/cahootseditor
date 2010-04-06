@@ -98,7 +98,7 @@ private:
     CodeEditor *bottomEditor;
     bool isAlreadyAnnounced;
 
-    FindToolBar *findToolbar;
+    FindToolBar *findAllToolbar;
     ParticipantsPane *participantPane;
     ChatPane *chatPane;
 

@@ -49,6 +49,11 @@ Document::Document(QWidget *parent) :
     chatPane = new ChatPane();
     ui->codeChatSplitter->insertWidget(1, chatPane);
 
+    delete ui->findAllFrame;
+    findAllToolbar = new FindToolBar(this);
+    ui->editorVerticalLayout->insertWidget(1, findAllToolbar);
+    findAllToolbar->hide();
+
     connect(editor, SIGNAL(undoAvailable(bool)), this, SIGNAL(undoAvailable(bool)));
     connect(editor, SIGNAL(redoAvailable(bool)), this, SIGNAL(redoAvailable(bool)));
 
