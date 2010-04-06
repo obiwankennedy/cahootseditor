@@ -403,12 +403,12 @@ void MainWindow::on_actionEdit_None_triggered()
 
 void MainWindow::on_actionEdit_C_triggered()
 {
-
+    tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->setHighlighter(Document::CPlusPlus);
 }
 
 void MainWindow::on_actionEdit_Python_triggered()
 {
-
+    tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->setHighlighter(Document::Python);
 }
 
 void MainWindow::on_actionView_Line_Wrap_triggered()

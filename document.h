@@ -3,6 +3,7 @@
 
 #include <QtGui/QWidget>
 #include "highlighters/cpphighlighter.h"
+#include "highlighters/pythonhighlighter.h"
 #include "codeeditor.h"
 #include "participantspane.h"
 #include "chatpane.h"
@@ -91,7 +92,7 @@ private:
     Client *client;
     Server *server;
 
-    CppHighlighter *highlighter;
+    QSyntaxHighlighter *highlighter;
 
     CodeEditor *editor;
     CodeEditor *bottomEditor;

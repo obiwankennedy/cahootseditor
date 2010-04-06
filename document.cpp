@@ -11,7 +11,6 @@
 #include <QWebView>
 #include <QLayout>
 #include <QMessageBox>
-
 #include <QTextDocumentFragment>
 
 Document::Document(QWidget *parent) :
@@ -228,13 +227,20 @@ void Document::resynchronizeTriggered()
 void Document::setHighlighter(int Highlighter)
 {
     if (Highlighter == None) {
-        highlighter->deleteLater();
+        delete highlighter;
+        highlighter = NULL;
     }
     else if (Highlighter == CPlusPlus) {
-
+        if (highlighter) {
+            delete highlighter;
+        }
+        highlighter = new CppHighlighter(editor->document());
     }
     else if (Highlighter == Python) {
-
+        if (highlighter) {
+            delete highlighter;
+        }
+        highlighter = new PythonHighlighter(editor->document());
     }
 }
 
