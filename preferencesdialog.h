@@ -19,6 +19,14 @@ protected:
 private:
     Ui::PreferencesDialog *ui;
 
+private slots:
+    void on_changeEditor_clicked();
+    void on_changeChat_clicked();
+    void on_changeParticipants_clicked();
+    void on_editorDefault_clicked();
+    void on_chatDefault_clicked();
+    void on_participantsDefault_clicked();
+
 signals:
     void preferencesClicked();
 };

@@ -24,3 +24,33 @@ void PreferencesDialog::changeEvent(QEvent *e)
         break;
     }
 }
+
+void PreferencesDialog::on_changeEditor_clicked()
+{
+
+}
+
+void PreferencesDialog::on_changeChat_clicked()
+{
+
+}
+
+void PreferencesDialog::on_changeParticipants_clicked()
+{
+
+}
+
+void PreferencesDialog::on_editorDefault_clicked()
+{
+
+}
+
+void PreferencesDialog::on_chatDefault_clicked()
+{
+
+}
+
+void PreferencesDialog::on_participantsDefault_clicked()
+{
+
+}
