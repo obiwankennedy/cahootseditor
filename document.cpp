@@ -119,6 +119,7 @@ void Document::connectToDocument(QStringList list)
 
     setChatHidden(false);
     setParticipantsHidden(false);
+    editor->setReadOnly(true);
 
     client = new Client(editor, participantPane, chatPane, this);
     client->setUsername(myName);
