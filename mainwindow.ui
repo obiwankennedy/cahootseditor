@@ -92,6 +92,7 @@
     <addaction name="actionEdit_Copy"/>
     <addaction name="actionEdit_Paste"/>
     <addaction name="separator"/>
+    <addaction name="actionEdit_Find_All"/>
     <addaction name="actionEdit_Find"/>
     <addaction name="menuEdit_Syntax_Highlighting"/>
    </widget>
@@ -327,7 +328,7 @@
     <string>Find...</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+F</string>
+    <string>Ctrl+Shift+F</string>
    </property>
   </action>
   <action name="actionView_Line_Wrap">
@@ -484,6 +485,14 @@
   <action name="actionTools_Preferences">
    <property name="text">
     <string>Preferences</string>
+   </property>
+  </action>
+  <action name="actionEdit_Find_All">
+   <property name="text">
+    <string>Find All</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+F</string>
    </property>
   </action>
  </widget>

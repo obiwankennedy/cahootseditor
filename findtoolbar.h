@@ -13,11 +13,15 @@ public:
     FindToolBar(QWidget *parent = 0);
     ~FindToolBar();
 
+    void giveFocus();
+
 private:
     Ui::FindToolBar *ui;
 
 private slots:
     void returnPressed();
+
+    void closeButtonClicked();
 
 signals:
     void findAll(QString);

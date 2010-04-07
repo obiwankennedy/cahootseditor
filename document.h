@@ -57,7 +57,7 @@ public:
     bool isParticipantsHidden();
 
     // Find functions
-    void findAll(QString searchString);
+    void findAll();
     void findNext(QString searchString, Qt::CaseSensitivity sensitivity, bool wrapAround, Enu::FindMode mode);
     void findPrev(QString searchString, Qt::CaseSensitivity sensitivity, bool wrapAround, Enu::FindMode mode);
     void replaceAll(QString searchString, QString replaceString, Qt::CaseSensitivity sensitivity,Enu::FindMode mode);

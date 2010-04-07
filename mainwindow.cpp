@@ -391,6 +391,11 @@ void MainWindow::on_actionEdit_Paste_triggered()
     tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->paste();
 }
 
+void MainWindow::on_actionEdit_Find_All_triggered()
+{
+    tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->findAll();
+}
+
 void MainWindow::on_actionEdit_Find_triggered()
 {
     findDialog->show();
@@ -563,11 +568,6 @@ void MainWindow::tabCloseClicked(int index)
         tabWidgetToDocumentMap.remove(ui->tabWidget->widget(index));
         ui->tabWidget->removeTab(index);
     }
-}
-
-void MainWindow::findAllTriggered(QString str)
-{
-    tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->findAll(str);
 }
 
 void MainWindow::findNextTriggered(QString str, Qt::CaseSensitivity sensitivity, bool wrapAround, Enu::FindMode mode)

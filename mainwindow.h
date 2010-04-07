@@ -62,6 +62,7 @@ private slots:
     void on_actionEdit_Cut_triggered();
     void on_actionEdit_Copy_triggered();
     void on_actionEdit_Paste_triggered();
+    void on_actionEdit_Find_All_triggered();
     void on_actionEdit_Find_triggered();
 
     void on_actionEdit_None_triggered();
@@ -94,7 +95,6 @@ private slots:
     void documentChanged(int index);
     void tabCloseClicked(int index);
 
-    void findAllTriggered(QString str);
     void findNextTriggered(QString str, Qt::CaseSensitivity, bool wrapAround, Enu::FindMode mode);
     void findPrevTriggered(QString str, Qt::CaseSensitivity, bool wrapAround, Enu::FindMode mode);
     void replaceAllTriggered(QString find, QString replace, Qt::CaseSensitivity sensitivity, Enu::FindMode mode);

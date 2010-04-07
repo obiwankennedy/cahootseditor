@@ -8,6 +8,7 @@ FindToolBar::FindToolBar(QWidget *parent) :
     ui->setupUi(this);
 
     connect(ui->lineEdit, SIGNAL(returnPressed()), this, SLOT(returnPressed()));
+    connect(ui->pushButton, SIGNAL(clicked()), this, SLOT(closeButtonClicked()));
 }
 
 FindToolBar::~FindToolBar()
@@ -15,7 +16,17 @@ FindToolBar::~FindToolBar()
     delete ui;
 }
 
+void FindToolBar::giveFocus()
+{
+    ui->lineEdit->setFocus();
+}
+
 void FindToolBar::returnPressed()
 {
     emit findAll(ui->lineEdit->text());
+}
+
+void FindToolBar::closeButtonClicked()
+{
+    this->hide();
 }
