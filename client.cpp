@@ -132,7 +132,7 @@ void Client::processData(QString data)
             permissions = Enu::Waiting;
             editor->setReadOnly(true);
             participantPane->setDisabled(true);
-            participantPane->removeAllParticipants();
+//            participantPane->removeAllParticipants();
         }
     }
     else if (data.startsWith("adduser:")) {

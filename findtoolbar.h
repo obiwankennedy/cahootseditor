@@ -22,6 +22,8 @@ private:
 private slots:
     void findTriggered(QString string);
 
+    void findNextTriggered();
+
     void closeButtonClicked();
 
 protected:
@@ -29,6 +31,7 @@ protected:
 
 signals:
     void findAll(QString);
+    void findNext(QString);
 };
 
 #endif // FINDTOOLBAR_H

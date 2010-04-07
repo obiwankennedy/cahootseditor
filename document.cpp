@@ -54,6 +54,7 @@ Document::Document(QWidget *parent) :
     ui->editorVerticalLayout->insertWidget(1, findAllToolbar);
     findAllToolbar->hide();
     connect(findAllToolbar, SIGNAL(findAll(QString)), editor, SLOT(findAll(QString)));
+    connect(findAllToolbar, SIGNAL(findNext(QString)), this, SLOT(findNext(QString)));
 
     connect(editor, SIGNAL(undoAvailable(bool)), this, SIGNAL(undoAvailable(bool)));
     connect(editor, SIGNAL(redoAvailable(bool)), this, SIGNAL(redoAvailable(bool)));
@@ -120,6 +121,7 @@ void Document::connectToDocument(QStringList list)
     setChatHidden(false);
     setParticipantsHidden(false);
     editor->setReadOnly(true);
+    editor->setDisabled(true);
 
     client = new Client(editor, participantPane, chatPane, this);
     client->setUsername(myName);
@@ -393,3 +395,9 @@ bool Document::isConnected()
 {
     return isAlreadyConnected;
 }
+
+void Document::findNext(QString string)
+{
+    editor->findNext(string, Qt::CaseInsensitive, true, Enu::Contains);
+}
+

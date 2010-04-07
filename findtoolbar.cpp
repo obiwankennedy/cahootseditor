@@ -9,6 +9,7 @@ FindToolBar::FindToolBar(QWidget *parent) :
 
     connect(ui->lineEdit, SIGNAL(textEdited(QString)), this, SLOT(findTriggered(QString)));
     connect(ui->pushButton, SIGNAL(clicked()), this, SLOT(closeButtonClicked()));
+    connect(ui->lineEdit, SIGNAL(returnPressed()), this, SLOT(findNextTriggered()));
 }
 
 FindToolBar::~FindToolBar()
@@ -27,6 +28,11 @@ void FindToolBar::findTriggered(QString string)
     if (string.length() > 2) {
         emit findAll(string);
     }
+}
+
+void FindToolBar::findNextTriggered()
+{
+    emit findNext(ui->lineEdit->text());
 }
 
 void FindToolBar::closeButtonClicked()

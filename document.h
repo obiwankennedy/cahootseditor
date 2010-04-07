@@ -104,6 +104,10 @@ private:
     ParticipantsPane *participantPane;
     ChatPane *chatPane;
 
+private slots:
+    // triggered by the find toolbar, not the dialog
+    void findNext(QString string);
+
 signals:
     void redoAvailable(bool);
     void undoAvailable(bool);
