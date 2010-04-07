@@ -555,7 +555,7 @@ void MainWindow::documentChanged(int index)
     ui->actionWindow_Split_Side_by_Side->setDisabled(document->isEditorSplit() && document->isEditorSplitSideBySide());
 
     ui->actionWindow_Remove_Split->setEnabled(document->isEditorSplit());
-    ui->actionTools_Announce_Document->setDisabled(document->isAnnounced());
+    ui->actionTools_Announce_Document->setDisabled(document->isAnnounced() || document->isConnected());
 }
 
 void MainWindow::tabCloseClicked(int index)

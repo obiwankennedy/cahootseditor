@@ -78,6 +78,7 @@ public:
     bool isEditorSplit();
     bool isEditorSplitSideBySide();
     bool isAnnounced();
+    bool isConnected();
 
     // This tells us if we're the host/owner of the document,
     // and affects how we talk with participants
@@ -97,6 +98,7 @@ private:
     CodeEditor *editor;
     CodeEditor *bottomEditor;
     bool isAlreadyAnnounced;
+    bool isAlreadyConnected;
 
     FindToolBar *findAllToolbar;
     ParticipantsPane *participantPane;

@@ -2,6 +2,7 @@
 #define FINDTOOLBAR_H
 
 #include <QWidget>
+#include <QKeyEvent>
 
 namespace Ui {
     class FindToolBar;
@@ -19,9 +20,12 @@ private:
     Ui::FindToolBar *ui;
 
 private slots:
-    void returnPressed();
+    void findTriggered(QString string);
 
     void closeButtonClicked();
+
+protected:
+    void keyPressEvent(QKeyEvent *e);
 
 signals:
     void findAll(QString);

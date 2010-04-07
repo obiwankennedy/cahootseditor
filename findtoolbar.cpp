@@ -7,7 +7,7 @@ FindToolBar::FindToolBar(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    connect(ui->lineEdit, SIGNAL(returnPressed()), this, SLOT(returnPressed()));
+    connect(ui->lineEdit, SIGNAL(textEdited(QString)), this, SLOT(findTriggered(QString)));
     connect(ui->pushButton, SIGNAL(clicked()), this, SLOT(closeButtonClicked()));
 }
 
@@ -19,14 +19,24 @@ FindToolBar::~FindToolBar()
 void FindToolBar::giveFocus()
 {
     ui->lineEdit->setFocus();
+    ui->lineEdit->setText("");
 }
 
-void FindToolBar::returnPressed()
+void FindToolBar::findTriggered(QString string)
 {
-    emit findAll(ui->lineEdit->text());
+    if (string.length() > 2) {
+        emit findAll(string);
+    }
 }
 
 void FindToolBar::closeButtonClicked()
 {
     this->hide();
+}
+
+void FindToolBar::keyPressEvent(QKeyEvent *e)
+{
+    if (e->key() == Qt::Key_Escape) {
+        closeButtonClicked();
+    }
 }

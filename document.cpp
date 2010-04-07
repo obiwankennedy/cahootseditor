@@ -65,6 +65,7 @@ Document::Document(QWidget *parent) :
     myName = "Owner"; // temporary
 
     isAlreadyAnnounced = false;
+    isAlreadyConnected = false;
     myPermissions = Enu::ReadWrite;
 }
 
@@ -100,6 +101,8 @@ void Document::announceDocument()
     chatPane->appendChatMessage("Listening at " + ipAddress + ":" + port);
 
     participantPane->setConnectInfo(ipAddress, port);
+
+    isAlreadyConnected = true;
 }
 
 void Document::connectToDocument(QStringList list)
@@ -384,4 +387,9 @@ bool Document::isEditorSplitSideBySide()
 bool Document::isAnnounced()
 {
     return isAlreadyAnnounced;
+}
+
+bool Document::isConnected()
+{
+    return isAlreadyConnected;
 }

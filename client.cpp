@@ -120,18 +120,18 @@ void Client::processData(QString data)
         data.remove(0, 11);
         if (data == "write") {
             permissions = Enu::ReadWrite;
-            editor->setDisabled(false);
             editor->setReadOnly(false);
+            participantPane->setDisabled(false);
         }
         else if (data == "read") {
             permissions = Enu::ReadOnly;
-            editor->setDisabled(false);
             editor->setReadOnly(true);
+            participantPane->setDisabled(false);
         }
         else if (data == "waiting") {
             permissions = Enu::Waiting;
-            editor->setDisabled(true);
             editor->setReadOnly(true);
+            participantPane->setDisabled(true);
             participantPane->removeAllParticipants();
         }
     }
