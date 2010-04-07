@@ -35,6 +35,7 @@ protected:
 signals:
     void findAll(QString);
     void findNext(QString);
+    void findPrevious(QString);
 };
 
 #endif // FINDTOOLBAR_H

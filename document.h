@@ -107,6 +107,7 @@ private:
 private slots:
     // triggered by the find toolbar, not the dialog
     void findNext(QString string);
+    void findPrevious(QString string);
 
 signals:
     void redoAvailable(bool);

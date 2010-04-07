@@ -55,6 +55,7 @@ Document::Document(QWidget *parent) :
     findAllToolbar->hide();
     connect(findAllToolbar, SIGNAL(findAll(QString)), editor, SLOT(findAll(QString)));
     connect(findAllToolbar, SIGNAL(findNext(QString)), this, SLOT(findNext(QString)));
+    connect(findAllToolbar, SIGNAL(findPrevious(QString)), this, SLOT(findPrevious(QString)));
 
     connect(editor, SIGNAL(undoAvailable(bool)), this, SIGNAL(undoAvailable(bool)));
     connect(editor, SIGNAL(redoAvailable(bool)), this, SIGNAL(redoAvailable(bool)));
@@ -401,3 +402,7 @@ void Document::findNext(QString string)
     editor->findNext(string, Qt::CaseInsensitive, true, Enu::Contains);
 }
 
+void Document::findPrevious(QString string)
+{
+    editor->findPrev(string, Qt::CaseInsensitive, true, Enu::Contains);
+}

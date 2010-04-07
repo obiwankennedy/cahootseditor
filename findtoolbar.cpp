@@ -9,7 +9,7 @@ FindToolBar::FindToolBar(QWidget *parent) :
 
     connect(ui->lineEdit, SIGNAL(textEdited(QString)), this, SLOT(findTriggered(QString)));
     connect(ui->pushButton, SIGNAL(clicked()), this, SLOT(closeButtonClicked()));
-    connect(ui->lineEdit, SIGNAL(returnPressed()), this, SLOT(findNextTriggered()));
+//    connect(ui->lineEdit, SIGNAL(returnPressed()), this, SLOT(findNextTriggered()));
 }
 
 FindToolBar::~FindToolBar()
@@ -44,5 +44,11 @@ void FindToolBar::keyPressEvent(QKeyEvent *e)
 {
     if (e->key() == Qt::Key_Escape) {
         closeButtonClicked();
+    }
+    else if (ui->lineEdit->hasFocus() && e->key() == Qt::Key_Return && e->modifiers() != Qt::ShiftModifier) {
+        emit findNext(ui->lineEdit->text());
+    }
+    else if (ui->lineEdit->hasFocus() && e->key() == Qt::Key_Return && e->modifiers() == Qt::ShiftModifier) {
+        emit findPrevious(ui->lineEdit->text());
     }
 }
