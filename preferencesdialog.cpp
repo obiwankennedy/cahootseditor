@@ -27,7 +27,7 @@ void PreferencesDialog::changeEvent(QEvent *e)
 
 void PreferencesDialog::on_changeEditor_clicked()
 {
-
+//    QFont newFont = QFontDialog::getFont(&ok, QFont(font()), this, "Set Input Font", QFontDialog::DontUseNativeDialog);
 }
 
 void PreferencesDialog::on_changeChat_clicked()

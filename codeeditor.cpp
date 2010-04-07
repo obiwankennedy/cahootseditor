@@ -449,6 +449,16 @@ bool CodeEditor::findAll(QString searchString)
     bool isFound = false;
 
     QTextCursor cursor(document());
+
+    cursor.select(QTextCursor::Document);
+    QTextCharFormat format;
+    format.setBackground(Qt::white);
+    cursor.mergeCharFormat(format);
+
+    QTextCharFormat plainFormat(cursor.charFormat());
+    QTextCharFormat colorFormat = plainFormat;
+    colorFormat.setBackground(Qt::yellow);
+
     int position = 0;
     cursor.setPosition(position);
 
@@ -463,6 +473,7 @@ bool CodeEditor::findAll(QString searchString)
             cursor.setPosition(position, QTextCursor::MoveAnchor);
             for (int i = 0; i < length; i++) {
                  cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor);
+                 cursor.mergeCharFormat(colorFormat);
             }
             setTextCursor(cursor);
             isFound = true;
