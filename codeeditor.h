@@ -30,6 +30,8 @@ public:
     void shiftLeft();
     void shiftRight();
 
+    void removeHighlight();
+
 //    void changeFont();
 
     // Find functions
@@ -51,6 +53,8 @@ private slots:
     void updateLineNumberArea(const QRect &, int);
 
 private:
+    bool isFirstTime;
+    
     QWidget *lineNumberArea;
 };
 

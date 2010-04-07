@@ -4,6 +4,8 @@
 #include <QWidget>
 #include <QKeyEvent>
 
+#include "codeeditor.h"
+
 namespace Ui {
     class FindToolBar;
 }
@@ -18,6 +20,7 @@ public:
 
 private:
     Ui::FindToolBar *ui;
+    CodeEditor *codeEditor;
 
 private slots:
     void findTriggered(QString string);

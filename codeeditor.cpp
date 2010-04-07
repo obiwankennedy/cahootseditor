@@ -16,6 +16,8 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
 
     updateLineNumberAreaWidth(0);
     highlightCurrentLine();
+
+    isFirstTime = true;
 }
 
 int CodeEditor::lineNumberAreaWidth()
@@ -257,6 +259,11 @@ void CodeEditor::shiftRight()
     setTextCursor(cursor);
 }
 
+void CodeEditor::removeHighlight()
+{
+
+}
+
 //void CodeEditor::changeFont()
 //{
 ////    bool ok = false;
@@ -448,6 +455,10 @@ bool CodeEditor::findAll(QString searchString)
     QString documentString = document()->toPlainText();
     bool isFound = false;
 
+    if (!isFirstTime) {
+        undo();
+    }
+
     QTextCursor cursor(document());
 
     cursor.select(QTextCursor::Document);
@@ -479,6 +490,9 @@ bool CodeEditor::findAll(QString searchString)
             isFound = true;
         }
     }
+
+    cursor.endEditBlock();
+    isFirstTime = false;
 
     return isFound;
 }
