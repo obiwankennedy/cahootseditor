@@ -52,7 +52,8 @@ Document::Document(QWidget *parent) :
     delete ui->findAllFrame;
     findAllToolbar = new FindToolBar(this);
     ui->editorVerticalLayout->insertWidget(1, findAllToolbar);
-    findAllToolbar->hide();
+//    findAllToolbar->hide();
+    connect(findAllToolbar, SIGNAL(findAll(QString)), editor, SLOT(findAll(QString)));
 
     connect(editor, SIGNAL(undoAvailable(bool)), this, SIGNAL(undoAvailable(bool)));
     connect(editor, SIGNAL(redoAvailable(bool)), this, SIGNAL(redoAvailable(bool)));
@@ -274,9 +275,9 @@ bool Document::isParticipantsHidden()
     return ui->participantSplitter->widget(1)->isHidden();
 }
 
-void Document::findAll(QString searchString, Qt::CaseSensitivity sensitivity)
+void Document::findAll(QString searchString)
 {
-    editor->findAll(searchString, sensitivity);
+    editor->findAll(searchString);
 }
 
 void Document::findNext(QString searchString, Qt::CaseSensitivity sensitivity, bool wrapAround, Enu::FindMode mode)

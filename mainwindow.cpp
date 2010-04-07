@@ -567,9 +567,7 @@ void MainWindow::tabCloseClicked(int index)
 
 void MainWindow::findAllTriggered(QString str)
 {
-// I am going to set Sensitivity to insensitive until I find out more...
-    Qt::CaseSensitivity sensitivity = Qt::CaseInsensitive;
-    tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->findAll(str, sensitivity);
+    tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->findAll(str);
 }
 
 void MainWindow::findNextTriggered(QString str, Qt::CaseSensitivity sensitivity, bool wrapAround, Enu::FindMode mode)

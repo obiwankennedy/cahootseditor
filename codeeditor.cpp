@@ -266,35 +266,6 @@ void CodeEditor::shiftRight()
 ////    }
 //}
 
-bool CodeEditor::findAll(QString searchString, Qt::CaseSensitivity sensitivity)
-{
-    QString documentString = document()->toPlainText();
-    bool isFound = false;
-
-    QTextCursor cursor(document());
-    int position = 0;
-    cursor.setPosition(position);
-
-    int length = searchString.size();
-
-    cursor.beginEditBlock();
-
-    while (position != -1) {
-        position = documentString.indexOf(searchString, position + 1, sensitivity);
-
-        if (position != -1) {
-            cursor.setPosition(position, QTextCursor::MoveAnchor);
-            for (int i = 0; i < length; i++) {
-                 cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor);
-            }
-            setTextCursor(cursor);
-            isFound = true;
-        }
-    }
-
-    return isFound;
-}
-
 bool CodeEditor::findNext(QString searchString, Qt::CaseSensitivity sensitivity, bool wrapAround, Enu::FindMode mode)
 {
     QString documentString = document()->toPlainText();
@@ -470,6 +441,35 @@ bool CodeEditor::findReplace(QString searchString, QString replaceString, Qt::Ca
         return true;
     }
     return false;
+}
+
+bool CodeEditor::findAll(QString searchString)
+{
+    QString documentString = document()->toPlainText();
+    bool isFound = false;
+
+    QTextCursor cursor(document());
+    int position = 0;
+    cursor.setPosition(position);
+
+    int length = searchString.size();
+
+    cursor.beginEditBlock();
+
+    while (position != -1) {
+        position = documentString.indexOf(searchString, position + 1, Qt::CaseInsensitive);
+
+        if (position != -1) {
+            cursor.setPosition(position, QTextCursor::MoveAnchor);
+            for (int i = 0; i < length; i++) {
+                 cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor);
+            }
+            setTextCursor(cursor);
+            isFound = true;
+        }
+    }
+
+    return isFound;
 }
 
 void CodeEditor::updateLineNumberAreaWidth(int /* newBlockCount */)
