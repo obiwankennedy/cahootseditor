@@ -26,6 +26,8 @@ public:
 
     void resynchronize();
 
+    void setOwnerName(QString name);
+
 private:
     CodeEditor *editor;
     ParticipantsPane *participantPane;
@@ -35,6 +37,8 @@ private:
 
     QUdpSocket *udpSocket;
     QTimer *timer;
+
+    QString myName;
 
     void processData(QString data, QTcpSocket *sender);
 

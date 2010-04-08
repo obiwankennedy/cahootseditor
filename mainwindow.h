@@ -7,6 +7,7 @@
 #include "finddialog.h"
 #include "findtoolbar.h"
 #include "preferencesdialog.h"
+#include "announcedocumentdialog.h"
 
 namespace Ui
 {
@@ -29,6 +30,7 @@ private:
     QMap<QWidget *, Document *> tabWidgetToDocumentMap;
     QString openPath;
     ConnectToDocument *connectDialog;
+    AnnounceDocumentDialog *announceDocumentDialog;
     FindDialog *findDialog;
     PreferencesDialog *preferencesDialog;
 
@@ -102,7 +104,7 @@ private slots:
     void findReplaceTriggered(QString find, QString replace, Qt::CaseSensitivity sensitivity, bool wrapAround, Enu::FindMode mode);
 
     void connectToDocument(QStringList list);
-    //void viewChanged();
+    void announceDocument(QString ownerName);
 };
 
 #endif // MAINWINDOW_H

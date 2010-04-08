@@ -79,6 +79,8 @@ public:
     bool isEditorSplitSideBySide();
     bool isAnnounced();
     bool isConnected();
+    void setOwnerName(QString name);
+
 
     // This tells us if we're the host/owner of the document,
     // and affects how we talk with participants

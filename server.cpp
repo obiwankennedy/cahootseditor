@@ -90,6 +90,13 @@ void Server::resynchronize()
     }
 }
 
+void Server::setOwnerName(QString name)
+{
+    myName = name;
+    writeToAll(QString("helo:%1").arg(myName).toAscii());
+    participantPane->setOwnerName(name);
+}
+
 void Server::processData(QString data, QTcpSocket *sender)
 {
     QString toSend;
@@ -138,9 +145,7 @@ void Server::processData(QString data, QTcpSocket *sender)
             QString name = rx.cap(1);
             if (participantPane->addParticipant(name, sender)) { // returns false if there is a duplicate
                 toSend = "join:" + participantPane->getNameAddressForSocket(sender);
-#warning "implement owner name"
-                QString myName = "Chris";
-                writeToSocket(QString("helo:%2").arg(myName).toAscii(), sender);
+                writeToSocket(QString("helo:%1").arg(myName).toAscii(), sender);
             }
             else {
                 disconnect(sender, SIGNAL(disconnected()), this, SLOT(disconnected()));

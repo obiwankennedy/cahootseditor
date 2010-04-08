@@ -406,3 +406,8 @@ void Document::findPrevious(QString string)
 {
     editor->findPrev(string, Qt::CaseInsensitive, true, Enu::Contains);
 }
+
+void Document::setOwnerName(QString name)
+{
+    server->setOwnerName(name);
+}

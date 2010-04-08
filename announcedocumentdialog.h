@@ -2,6 +2,7 @@
 #define ANNOUNCEDOCUMENTDIALOG_H
 
 #include <QDialog>
+#include <QRegExpValidator>
 
 namespace Ui {
     class AnnounceDocumentDialog;
@@ -15,6 +16,14 @@ public:
 
 private:
     Ui::AnnounceDocumentDialog *ui;
+
+    QRegExpValidator* nameValidator;
+
+private slots:
+    void dialogAccepted();
+
+signals:
+    void announceDocument(QString name);
 };
 
 #endif // ANNOUNCEDOCUMENTDIALOG_H

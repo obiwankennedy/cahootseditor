@@ -41,8 +41,10 @@ MainWindow::MainWindow(QWidget *parent)
             SLOT(findReplaceTriggered(QString,QString,Qt::CaseSensitivity,bool,Enu::FindMode)));
 
     preferencesDialog = new PreferencesDialog(this);
-    connect(preferencesDialog, SIGNAL(preferencesClicked()), this,
-            SLOT(on_actionTools_Preferences_triggered()));
+    connect(preferencesDialog, SIGNAL(preferencesClicked()), this, SLOT(on_actionTools_Preferences_triggered()));
+
+    announceDocumentDialog = new AnnounceDocumentDialog(this);
+    connect(announceDocumentDialog, SIGNAL(announceDocument(QString)), this, SLOT(announceDocument(QString)));
 
     Document *document = new Document(ui->tab);
     QGridLayout *tabLayout = new QGridLayout;
@@ -445,8 +447,7 @@ void MainWindow::on_actionView_Hide_Show_Chat_triggered()
 
 void MainWindow::on_actionTools_Announce_Document_triggered()
 {
-    tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->announceDocument();
-    ui->actionTools_Announce_Document->setEnabled(false);
+    announceDocumentDialog->show();
 }
 
 void MainWindow::on_actionTools_Connect_to_Document_triggered()
@@ -602,4 +603,11 @@ void MainWindow::connectToDocument(QStringList list)
     if (tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->myName != "") {
         myName = tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->myName;
     }
+}
+
+void MainWindow::announceDocument(QString ownerName)
+{
+    tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->announceDocument();
+    tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->setOwnerName(ownerName);
+    ui->actionTools_Announce_Document->setEnabled(false);
 }
