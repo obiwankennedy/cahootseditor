@@ -104,7 +104,7 @@ private slots:
     void findReplaceTriggered(QString find, QString replace, Qt::CaseSensitivity sensitivity, bool wrapAround, Enu::FindMode mode);
 
     void connectToDocument(QStringList list);
-    void announceDocument(QString ownerName);
+    void announceDocument(QString ownerName, Qt::CheckState checkState);
 };
 
 #endif // MAINWINDOW_H

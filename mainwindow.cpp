@@ -44,7 +44,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(preferencesDialog, SIGNAL(preferencesClicked()), this, SLOT(on_actionTools_Preferences_triggered()));
 
     announceDocumentDialog = new AnnounceDocumentDialog(this);
-    connect(announceDocumentDialog, SIGNAL(announceDocument(QString)), this, SLOT(announceDocument(QString)));
+    connect(announceDocumentDialog, SIGNAL(announceDocument(QString,Qt::CheckState)), this, SLOT(announceDocument(QString,Qt::CheckState)));
 
     Document *document = new Document(ui->tab);
     QGridLayout *tabLayout = new QGridLayout;
@@ -605,9 +605,12 @@ void MainWindow::connectToDocument(QStringList list)
     }
 }
 
-void MainWindow::announceDocument(QString ownerName)
+void MainWindow::announceDocument(QString ownerName, Qt::CheckState checkState)
 {
+    qDebug() << "announcing document";
     tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->announceDocument();
     tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->setOwnerName(ownerName);
     ui->actionTools_Announce_Document->setEnabled(false);
+
+#warning "store the checkState in the preferences pane"
 }

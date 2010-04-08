@@ -23,7 +23,7 @@ private slots:
     void dialogAccepted();
 
 signals:
-    void announceDocument(QString name);
+    void announceDocument(QString name, Qt::CheckState checkState);
 };
 
 #endif // ANNOUNCEDOCUMENTDIALOG_H
