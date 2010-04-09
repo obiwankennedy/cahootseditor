@@ -53,6 +53,7 @@ Document::Document(QWidget *parent) :
     findAllToolbar = new FindToolBar(this);
     ui->editorVerticalLayout->insertWidget(1, findAllToolbar);
     findAllToolbar->hide();
+
     connect(findAllToolbar, SIGNAL(findAll(QString)), editor, SLOT(findAll(QString)));
     connect(findAllToolbar, SIGNAL(findNext(QString)), this, SLOT(findNext(QString)));
     connect(findAllToolbar, SIGNAL(findPrevious(QString)), this, SLOT(findPrevious(QString)));

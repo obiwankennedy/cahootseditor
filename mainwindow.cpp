@@ -607,10 +607,16 @@ void MainWindow::connectToDocument(QStringList list)
 
 void MainWindow::announceDocument(QString ownerName, Qt::CheckState checkState)
 {
-    qDebug() << "announcing document";
     tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->announceDocument();
     tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->setOwnerName(ownerName);
     ui->actionTools_Announce_Document->setEnabled(false);
 
 #warning "store the checkState in the preferences pane"
+    if (checkState == Qt::Checked) {
+        preferencesDialog->setAlwaysUseMyName(true);
+        preferencesDialog->setMyName(ownerName);
+    }
+    else {
+        preferencesDialog->setAlwaysUseMyName(false);
+    }
 }

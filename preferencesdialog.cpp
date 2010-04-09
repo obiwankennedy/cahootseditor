@@ -13,6 +13,18 @@ PreferencesDialog::~PreferencesDialog()
     delete ui;
 }
 
+void PreferencesDialog::setMyName(QString name)
+{
+    myName = name;
+    ui->defaultNameLineEdit->setText(name);
+}
+
+void PreferencesDialog::setAlwaysUseMyName(bool b)
+{
+    alwaysUseMyName = b;
+    ui->useDefaultNameCheckBox->setChecked(b);
+}
+
 void PreferencesDialog::changeEvent(QEvent *e)
 {
     QDialog::changeEvent(e);

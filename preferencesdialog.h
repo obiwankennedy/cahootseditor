@@ -13,11 +13,21 @@ public:
     PreferencesDialog(QWidget *parent = 0);
     ~PreferencesDialog();
 
+    void setMyName(QString name);
+    void setAlwaysUseMyName(bool b);
+
 protected:
     void changeEvent(QEvent *e);
 
 private:
     Ui::PreferencesDialog *ui;
+
+    QFont editorFont;
+    QFont participantFont;
+    QFont chatFont;
+
+    QString myName;
+    bool alwaysUseMyName;
 
 private slots:
     void on_changeEditor_clicked();
