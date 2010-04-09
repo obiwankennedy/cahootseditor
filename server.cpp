@@ -182,9 +182,6 @@ void Server::onChatSend(QString str)
 {
     QString toSend;
 
-#warning "Need a way to set the name for the document owner"
-    QString myName = "Owner";
-
     toSend = QString("chat:%1:\t%2").arg(myName).arg(str);
     writeToAll(toSend);
     chatPane->appendChatMessage(QString("%1:\t%2").arg(myName).arg(str));

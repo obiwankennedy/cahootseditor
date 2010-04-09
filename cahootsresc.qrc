@@ -1,5 +1,5 @@
 <RCC>
-    <qresource prefix="/" >
+    <qresource prefix="/">
         <file>images/paste.png</file>
         <file>images/close.png</file>
         <file>images/copy.png</file>
@@ -11,5 +11,7 @@
         <file>images/redo.png</file>
         <file>images/save.png</file>
         <file>images/undo.png</file>
+        <file>images/cahootsicon.png</file>
+        <file>images/cahootssplash.png</file>
     </qresource>
 </RCC>

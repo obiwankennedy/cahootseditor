@@ -19,10 +19,20 @@ void PreferencesDialog::setMyName(QString name)
     ui->defaultNameLineEdit->setText(name);
 }
 
+QString PreferencesDialog::getMyName()
+{
+    return myName;
+}
+
 void PreferencesDialog::setAlwaysUseMyName(bool b)
 {
     alwaysUseMyName = b;
     ui->useDefaultNameCheckBox->setChecked(b);
+}
+
+bool PreferencesDialog::getAlwaysUseMyName()
+{
+    return alwaysUseMyName;
 }
 
 void PreferencesDialog::changeEvent(QEvent *e)

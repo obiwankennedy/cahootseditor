@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>720</width>
-    <height>635</height>
+    <width>758</width>
+    <height>439</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -55,7 +55,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>720</width>
+     <width>758</width>
      <height>22</height>
     </rect>
    </property>
@@ -136,12 +136,20 @@
     <addaction name="actionWindow_Next_Document"/>
     <addaction name="actionWindow_Previous_Document"/>
    </widget>
+   <widget class="QMenu" name="menuHelp">
+    <property name="title">
+     <string>Help</string>
+    </property>
+    <addaction name="actionHelp_About_Cahoots"/>
+    <addaction name="actionHelp_About_Qt"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
    <addaction name="menuView"/>
    <addaction name="menuText"/>
    <addaction name="menuTools"/>
    <addaction name="menuWindow"/>
+   <addaction name="menuHelp"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
    <property name="enabled">
@@ -161,7 +169,6 @@
    </attribute>
    <addaction name="actionFile_New"/>
    <addaction name="actionFile_Open"/>
-   <addaction name="actionFile_Close"/>
    <addaction name="actionFile_Save"/>
    <addaction name="actionFile_Print"/>
    <addaction name="actionEdit_Undo"/>
@@ -493,6 +500,16 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+F</string>
+   </property>
+  </action>
+  <action name="actionHelp_About_Cahoots">
+   <property name="text">
+    <string>About Cahoots</string>
+   </property>
+  </action>
+  <action name="actionHelp_About_Qt">
+   <property name="text">
+    <string>About Qt</string>
    </property>
   </action>
  </widget>

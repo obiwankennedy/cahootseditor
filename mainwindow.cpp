@@ -14,6 +14,7 @@
 #include <QDebug>
 #include <QCloseEvent>
 #include <QDesktopWidget>
+#include <QDesktopServices>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow)
@@ -59,6 +60,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     readSettings();
     openPath = QDir::homePath();
+
+    aboutDialog = new AboutDialog(this);
 }
 
 MainWindow::~MainWindow()
@@ -95,6 +98,10 @@ void MainWindow::readSettings()
     resize(size);
     move(pos);
 
+    if (settings.value("isNotFirstRun").toBool() != true) {
+        firstRunDialog = new FirstRunDialog(this);
+        firstRunDialog->show();
+    }
     myName = settings.value("name", "Owner").toString();
 }
 
@@ -103,7 +110,8 @@ void MainWindow::writeSettings()
     QSettings settings("Cahoots", "MainWindow");
     settings.setValue("pos", pos());
     settings.setValue("size", size());
-    settings.setValue("name", myName);
+    settings.setValue("name", preferencesDialog->getMyName());
+    settings.setValue("isNotFirstRun", true);
 }
 
 QString MainWindow::getSystem() {
@@ -447,7 +455,27 @@ void MainWindow::on_actionView_Hide_Show_Chat_triggered()
 
 void MainWindow::on_actionTools_Announce_Document_triggered()
 {
-    announceDocumentDialog->show();
+    if (tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->isConnected()
+        || tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->isAnnounced()) {
+        return; // this should never happen, but just in case.
+    }
+    if (preferencesDialog->getAlwaysUseMyName() && preferencesDialog->getMyName() != "") {
+        tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->announceDocument();
+        tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->setOwnerName(preferencesDialog->getMyName());
+    }
+    else {
+        announceDocumentDialog->show();
+    }
+}
+
+void MainWindow::on_actionHelp_About_Cahoots_triggered()
+{
+    aboutDialog->exec();
+}
+
+void MainWindow::on_actionHelp_About_Qt_triggered()
+{
+    QDesktopServices::openUrl(QUrl("http://www.qtsoftware.com/"));
 }
 
 void MainWindow::on_actionTools_Connect_to_Document_triggered()
@@ -611,12 +639,11 @@ void MainWindow::announceDocument(QString ownerName, Qt::CheckState checkState)
     tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->setOwnerName(ownerName);
     ui->actionTools_Announce_Document->setEnabled(false);
 
-#warning "store the checkState in the preferences pane"
     if (checkState == Qt::Checked) {
         preferencesDialog->setAlwaysUseMyName(true);
         preferencesDialog->setMyName(ownerName);
     }
     else {
-        preferencesDialog->setAlwaysUseMyName(false);
+        preferencesDialog->setAlwaysUseMyName(true);
     }
 }

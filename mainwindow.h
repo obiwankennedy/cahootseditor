@@ -8,6 +8,8 @@
 #include "findtoolbar.h"
 #include "preferencesdialog.h"
 #include "announcedocumentdialog.h"
+#include "aboutdialog.h"
+#include "firstrundialog.h"
 
 namespace Ui
 {
@@ -33,6 +35,8 @@ private:
     AnnounceDocumentDialog *announceDocumentDialog;
     FindDialog *findDialog;
     PreferencesDialog *preferencesDialog;
+    AboutDialog *aboutDialog;
+    FirstRunDialog *firstRunDialog;
 
     bool save(int index);
     bool maybeSave(int index);
@@ -90,6 +94,9 @@ private slots:
     void on_actionWindow_Remove_Split_triggered();
     void on_actionWindow_Next_Document_triggered();
     void on_actionWindow_Previous_Document_triggered();
+
+    void on_actionHelp_About_Cahoots_triggered();
+    void on_actionHelp_About_Qt_triggered();
 
     void setUndoability(bool b);
     void setRedoability(bool b);
