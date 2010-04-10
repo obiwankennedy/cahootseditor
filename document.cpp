@@ -19,8 +19,6 @@ Document::Document(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    ui->bottomEditorFrame->hide();
-
     delete ui->editorFrame;
     editor = new CodeEditor(this);
     editor->setFont(QFont(Utilities::codeFont, Utilities::codeFontSize));
@@ -34,6 +32,7 @@ Document::Document(QWidget *parent) :
     bottomEditor->setFont(editor->font());
     bottomEditor->setTabStopWidth(fm.averageCharWidth() * 4);
     ui->editorSplitter->insertWidget(1, bottomEditor);
+
     // we don't need the default document since we're using the document of the original editor
     bottomEditor->document()->deleteLater();
     bottomEditor->setDocument(editor->document());
@@ -60,6 +59,11 @@ Document::Document(QWidget *parent) :
 
     connect(editor, SIGNAL(undoAvailable(bool)), this, SIGNAL(undoAvailable(bool)));
     connect(editor, SIGNAL(redoAvailable(bool)), this, SIGNAL(redoAvailable(bool)));
+
+    QList<int> sizeList;
+    sizeList << 9000 << 1;
+    ui->codeChatSplitter->setSizes(sizeList);
+    ui->participantSplitter->setSizes(sizeList);
 
     // Hide the panels that only matter if we're using the collaborative portion of the app
     setChatHidden(true);
@@ -197,6 +201,7 @@ void Document::setParticipantsHidden(bool b)
     }
     else {
         ui->participantSplitter->widget(1)->show();
+        editor->resize(QSize(9000, 9000));
     }
 }
 
@@ -362,12 +367,18 @@ void Document::splitEditor()
 {
     ui->editorSplitter->setOrientation(Qt::Vertical);
     bottomEditor->show();
+    QList<int> sizes;
+    sizes << 500 << 500;
+    ui->editorSplitter->setSizes(sizes);
 }
 
 void Document::splitEditorSideBySide()
 {
     ui->editorSplitter->setOrientation(Qt::Horizontal);
     bottomEditor->show();
+    QList<int> sizes;
+    sizes << 500 << 500;
+    ui->editorSplitter->setSizes(sizes);
 }
 
 void Document::unSplitEditor()
