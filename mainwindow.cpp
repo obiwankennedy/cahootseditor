@@ -62,27 +62,13 @@ MainWindow::MainWindow(QWidget *parent)
     openPath = QDir::homePath();
 
     aboutDialog = new AboutDialog(this);
+
+    qApp->installEventFilter(this);
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
-}
-
-// Protected closeEvent
-void MainWindow::closeEvent(QCloseEvent *event)
-{
-    bool okToQuit = true;
-    for (int i = 0; i < ui->tabWidget->count() && okToQuit; i++) {
-        okToQuit = maybeSave(i);
-    }
-    if (okToQuit) {
-        writeSettings();
-        event->accept();
-    }
-    else {
-        event->ignore();
-    }
 }
 
 void MainWindow::readSettings()
@@ -130,6 +116,58 @@ QString MainWindow::getSystem() {
     #ifdef Q_WS_WIN
     return QString("Windows");
     #endif
+}
+
+// Protected closeEvent
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+    bool okToQuit = true;
+    for (int i = 0; i < ui->tabWidget->count() && okToQuit; i++) {
+        okToQuit = maybeSave(i);
+    }
+    if (okToQuit) {
+        writeSettings();
+        event->accept();
+    }
+    else {
+        event->ignore();
+    }
+}
+
+bool MainWindow::eventFilter(QObject *, QEvent *event)
+{
+    if (event->type() == QEvent::FileOpen) {
+        QString fileName = static_cast<QFileOpenEvent *>(event)->file(); // for the sake of mirroring code in our open slot
+        if (!fileName.isEmpty()) {
+
+            int index = ui->tabWidget->addTab(new QWidget(), QFileInfo(fileName).fileName());
+
+            Document *document = new Document(ui->tabWidget->widget(index));
+
+            QGridLayout *tabLayout = new QGridLayout;
+            tabLayout->addWidget(document);
+            tabLayout->setContentsMargins(0,0,0,0);
+            ui->tabWidget->widget(index)->setLayout(tabLayout);
+
+            tabWidgetToDocumentMap.insert(ui->tabWidget->widget(index), document);
+
+            connect(document, SIGNAL(undoAvailable(bool)), this, SLOT(setUndoability(bool)));
+            connect(document, SIGNAL(redoAvailable(bool)), this, SLOT(setRedoability(bool)));
+
+            ui->tabWidget->setCurrentIndex(index);
+
+            loadFile(fileName);
+            openPath = QFileInfo(fileName).path();
+
+            ui->actionTools_Announce_Document->setEnabled(true);
+
+            ui->actionWindow_Next_Document->setEnabled(ui->tabWidget->count() > 1);
+            ui->actionWindow_Previous_Document->setEnabled(ui->tabWidget->count() > 1);
+        }
+        event->accept();
+        return true;
+    }
+    return false;
 }
 
 // Save methods
@@ -254,13 +292,12 @@ void MainWindow::on_actionFile_Open_triggered()
             this,
             "Open text file",
             openPath,
-            "Text files (*.cpp *.txt *.h)");
+            "Text files (*.*)");
     if (!fileName.isEmpty()) {
-        loadFile(fileName);
-
         int index = ui->tabWidget->addTab(new QWidget(), QFileInfo(fileName).fileName());
 
         Document *document = new Document(ui->tabWidget->widget(index));
+
         QGridLayout *tabLayout = new QGridLayout;
         tabLayout->addWidget(document);
         tabLayout->setContentsMargins(0,0,0,0);
@@ -273,6 +310,7 @@ void MainWindow::on_actionFile_Open_triggered()
 
         ui->tabWidget->setCurrentIndex(index);
 
+        loadFile(fileName);
         openPath = QFileInfo(fileName).path();
 
         ui->actionTools_Announce_Document->setEnabled(true);

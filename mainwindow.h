@@ -24,8 +24,6 @@ public:
     MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
-protected:
-    void closeEvent(QCloseEvent *event);
 
 private:
     Ui::MainWindow *ui;
@@ -51,6 +49,11 @@ private:
     QString myName; // global name used for connecting to documents
 
     QString getSystem();
+
+protected:
+    void closeEvent(QCloseEvent *event);
+
+    bool eventFilter(QObject *, QEvent *event);
 
 private slots:
     void on_actionFile_New_triggered();
