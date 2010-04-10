@@ -20,17 +20,19 @@ Server::Server(CodeEditor *editor, ParticipantsPane *participantsPane, ChatPane 
     connect(participantPane, SIGNAL(memberPermissionsChanged(QTcpSocket*,QString)), this, SLOT(memberPermissionsChanged(QTcpSocket*,QString)));
 
     connect(server, SIGNAL(newConnection()), this, SLOT(onNewConnection()));
-
-    // set up udp broadcasting of our document. have a preference for this later?
-    timer = new QTimer(this);
-    udpSocket = new QUdpSocket(this);
-    timer->start(1000); // 1 second delay between broadcasts
-    connect(timer, SIGNAL(timeout()), this, SLOT(broadcastDatagram()));
 }
 
 bool Server::listen(const QHostAddress &address, quint16 port)
 {
     return server->listen(address, port);
+}
+
+void Server::startBroadcasting()
+{
+    timer = new QTimer(this);
+    udpSocket = new QUdpSocket(this);
+    timer->start(1000); // 1 second delay between broadcasts
+    connect(timer, SIGNAL(timeout()), this, SLOT(broadcastDatagram()));
 }
 
 quint16 Server::serverPort()
@@ -237,13 +239,18 @@ void Server::onNewConnection()
 
 void Server::memberPermissionsChanged(QTcpSocket *participant, QString permissions)
 {
-    // send the participant itself the updated permissions specifically
-    QString toSend = QString("updateperm:%1").arg(permissions);
-    writeToSocket(toSend, participant);
+    if (permissions == "kick") {
+        participant->disconnectFromHost(); // disconnected() socket will handle things from here.
+    }
+    else {
+        // send the participant itself the updated permissions specifically
+        QString toSend = QString("updateperm:%1").arg(permissions);
+        writeToSocket(toSend, participant);
 
-    // update all users with the users' new permissions
-    toSend = QString("setperm:%1:%2").arg(participantPane->getNameAddressForSocket(participant)).arg(permissions);
-    writeToAll(toSend);
+        // update all users with the users' new permissions
+        toSend = QString("setperm:%1:%2").arg(participantPane->getNameAddressForSocket(participant)).arg(permissions);
+        writeToAll(toSend);
+    }
 }
 
 void Server::populateDocumentForUser(QTcpSocket *socket)

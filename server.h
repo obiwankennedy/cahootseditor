@@ -17,6 +17,8 @@ public:
 
     bool listen(const QHostAddress & address = QHostAddress::Any, quint16 port = 0);
 
+    void startBroadcasting();
+
     quint16 serverPort();
 
     // This writes to all sockets except exception

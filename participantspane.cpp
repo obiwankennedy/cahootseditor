@@ -104,8 +104,13 @@ QString ParticipantsPane::getNameForSocket(QTcpSocket *socket)
 
 QString ParticipantsPane::getNameAddressForSocket(QTcpSocket *socket)
 {
-    Participant *participant = participantMap.value(socket);
-    return QString("%1@%2").arg(participant->name).arg(participant->address.toString());
+    if (participantMap.contains(socket)) {
+        Participant *participant = participantMap.value(socket);
+        return QString("%1@%2").arg(participant->name).arg(participant->address.toString());
+    }
+    else {
+        return "NULL";
+    }
 }
 
 void ParticipantsPane::newParticipant(QString name, QString address, QString permissions)
@@ -226,13 +231,16 @@ void ParticipantsPane::onCurrentItemChanged(QTreeWidgetItem *item, QTreeWidgetIt
             ui->demotePushButton->setDisabled(false);
         }
         ui->promotePushButton->setDisabled(true);
+        ui->demotePushButton->setText("Demote");
     }
     else if (item->parent() == roItem) {
         ui->demotePushButton->setDisabled(false);
         ui->promotePushButton->setDisabled(false);
+        ui->demotePushButton->setText("Demote");
     }
     else if (item->parent() == waitItem) {
-        ui->demotePushButton->setDisabled(true);
+        ui->demotePushButton->setDisabled(false);
+        ui->demotePushButton->setText("Kick");
         ui->promotePushButton->setDisabled(false);
     }
 }
@@ -306,10 +314,8 @@ void ParticipantsPane::on_demotePushButton_clicked()
                 permissions = "waiting";
             }
             else if (participantList.at(i)->permissions == Enu::Waiting) {
-                // This should not happen, but we won't crash.
-                // Instead, disable the demote button.
-                ui->demotePushButton->setEnabled(false);
-                permissions = "waiting";
+                // This should only happen when we're kicking someone out of the document.
+                permissions = "kick";
             }
             emit memberPermissionsChanged(participantList.at(i)->socket, permissions);
             return;

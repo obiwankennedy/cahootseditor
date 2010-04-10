@@ -45,7 +45,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(preferencesDialog, SIGNAL(preferencesClicked()), this, SLOT(on_actionTools_Preferences_triggered()));
 
     announceDocumentDialog = new AnnounceDocumentDialog(this);
-    connect(announceDocumentDialog, SIGNAL(announceDocument(QString,Qt::CheckState)), this, SLOT(announceDocument(QString,Qt::CheckState)));
+    connect(announceDocumentDialog, SIGNAL(announceDocument(QString,Qt::CheckState,Qt::CheckState)), this, SLOT(announceDocument(QString,Qt::CheckState,Qt::CheckState)));
 
     Document *document = new Document(ui->tab);
     QGridLayout *tabLayout = new QGridLayout;
@@ -460,7 +460,7 @@ void MainWindow::on_actionTools_Announce_Document_triggered()
         return; // this should never happen, but just in case.
     }
     if (preferencesDialog->getAlwaysUseMyName() && preferencesDialog->getMyName() != "") {
-        tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->announceDocument();
+        tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->announceDocument(announceDocumentDialog->isBroadcastingChecked());
         tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->setOwnerName(preferencesDialog->getMyName());
     }
     else {
@@ -633,13 +633,13 @@ void MainWindow::connectToDocument(QStringList list)
     }
 }
 
-void MainWindow::announceDocument(QString ownerName, Qt::CheckState checkState)
+void MainWindow::announceDocument(QString ownerName, Qt::CheckState broadcastCheckState, Qt::CheckState alwaysUserNameCheckState)
 {
-    tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->announceDocument();
+    tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->announceDocument(broadcastCheckState == Qt::Checked);
     tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->setOwnerName(ownerName);
     ui->actionTools_Announce_Document->setEnabled(false);
 
-    if (checkState == Qt::Checked) {
+    if (alwaysUserNameCheckState == Qt::Checked) {
         preferencesDialog->setAlwaysUseMyName(true);
         preferencesDialog->setMyName(ownerName);
     }

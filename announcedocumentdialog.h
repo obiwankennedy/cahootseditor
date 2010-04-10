@@ -14,6 +14,8 @@ public:
     AnnounceDocumentDialog(QWidget *parent = 0);
     ~AnnounceDocumentDialog();
 
+    bool isBroadcastingChecked();
+
 private:
     Ui::AnnounceDocumentDialog *ui;
 
@@ -23,7 +25,7 @@ private slots:
     void dialogAccepted();
 
 signals:
-    void announceDocument(QString name, Qt::CheckState checkState);
+    void announceDocument(QString name, Qt::CheckState broadcastCheckState, Qt::CheckState alwaysUseChecked);
 };
 
 #endif // ANNOUNCEDOCUMENTDIALOG_H

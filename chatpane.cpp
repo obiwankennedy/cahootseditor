@@ -89,6 +89,18 @@ void ChatPane::paste()
     ui->lineEdit->paste();
 }
 
+void ChatPane::setReadOnly(bool ro)
+{
+    chatBrowser->setReadOnly(ro);
+    ui->lineEdit->setReadOnly(ro);
+}
+
+void ChatPane::setChatFont(QFont font)
+{
+    chatBrowser->setFont(font);
+    ui->lineEdit->setFont(font);
+}
+
 void ChatPane::on_lineEdit_returnPressed()
 {
     QString sendString = ui->lineEdit->text();

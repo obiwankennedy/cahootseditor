@@ -26,7 +26,9 @@ public:
     void copy();
     void paste();
 
-//    void changeFont();
+    void setReadOnly(bool ro);
+
+    void setChatFont(QFont font);
 
 private:
     Ui::ChatPane *ui;

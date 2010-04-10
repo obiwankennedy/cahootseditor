@@ -19,9 +19,14 @@ AnnounceDocumentDialog::~AnnounceDocumentDialog()
     delete ui;
 }
 
+bool AnnounceDocumentDialog::isBroadcastingChecked()
+{
+    return ui->broadcastCheckBox->isChecked();
+}
+
 void AnnounceDocumentDialog::dialogAccepted()
 {
     if (ui->nameLineEdit->text().length() != 0) {
-        emit announceDocument(ui->nameLineEdit->text(), ui->checkBox->checkState());
+        emit announceDocument(ui->nameLineEdit->text(), ui->broadcastCheckBox->checkState(), ui->alwaysUseCheckBox->checkState());
     }
 }

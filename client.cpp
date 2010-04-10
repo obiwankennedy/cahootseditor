@@ -235,9 +235,8 @@ void Client::onNewConnection()
 
 void Client::disconnected()
 {
-    participantPane->removeAllParticipants();
-    chatPane->hide();
-    participantPane->hide();
+    chatPane->appendChatMessage("Disconnected.", Qt::red);
+    chatPane->setReadOnly(true);
 }
 
 void Client::displayError(QAbstractSocket::SocketError socketError)

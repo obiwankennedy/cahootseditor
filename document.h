@@ -30,7 +30,7 @@ public:
     // This sets up the document so people can connect to it.
     // Hopefully we can do something with Bonjour so you can browse for local documents
     // but that's down the road.
-    void announceDocument();
+    void announceDocument(bool broadcastDocument);
 
     void connectToDocument(QStringList list);
 
