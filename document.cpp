@@ -19,6 +19,7 @@ Document::Document(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    // Set up the editor
     delete ui->editorFrame;
     editor = new CodeEditor(this);
     editor->setFont(QFont(Utilities::codeFont, Utilities::codeFontSize));
@@ -26,7 +27,7 @@ Document::Document(QWidget *parent) :
     editor->setTabStopWidth(fm.averageCharWidth() * 4);
     ui->editorSplitter->insertWidget(0, editor);
     
-    // for split pane editing
+    // editor for split pane editing
     delete ui->bottomEditorFrame;
     bottomEditor = new CodeEditor(this);
     bottomEditor->setFont(editor->font());
@@ -38,16 +39,20 @@ Document::Document(QWidget *parent) :
     bottomEditor->setDocument(editor->document());
     bottomEditor->hide();
 
+    // editor highlighter
     highlighter = new CppHighlighter(editor->document());
 
+    // Participant frame
     delete ui->participantFrame;
     participantPane = new ParticipantsPane();
     ui->participantSplitter->insertWidget(1, participantPane);
 
+    // Chat frame
     delete ui->chatFrame;
     chatPane = new ChatPane();
     ui->codeChatSplitter->insertWidget(1, chatPane);
 
+    // Find all toolbar widget
     delete ui->findAllFrame;
     findAllToolbar = new FindToolBar(this);
     ui->editorVerticalLayout->insertWidget(1, findAllToolbar);
@@ -57,6 +62,7 @@ Document::Document(QWidget *parent) :
     connect(findAllToolbar, SIGNAL(findNext(QString)), this, SLOT(findNext(QString)));
     connect(findAllToolbar, SIGNAL(findPrevious(QString)), this, SLOT(findPrevious(QString)));
 
+    // Emit signals to the mainwindow when redoability/undoability changes
     connect(editor, SIGNAL(undoAvailable(bool)), this, SIGNAL(undoAvailable(bool)));
     connect(editor, SIGNAL(redoAvailable(bool)), this, SIGNAL(redoAvailable(bool)));
 
@@ -73,7 +79,6 @@ Document::Document(QWidget *parent) :
 
     isAlreadyAnnounced = false;
     isAlreadyConnected = false;
-    myPermissions = Enu::ReadWrite;
 }
 
 Document::~Document()
@@ -118,8 +123,6 @@ void Document::announceDocument(bool broadcastDocument)
 
 void Document::connectToDocument(QStringList list)
 {
-    myPermissions = Enu::Waiting;
-
     myName = list.at(0);    
     QString address = list.at(1);
     QString portString = list.at(2);

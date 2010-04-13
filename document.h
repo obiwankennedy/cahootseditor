@@ -39,21 +39,34 @@ public:
     void cut();
     void copy();
     void paste();
+
+    // shows/hides the participants pane
     void setParticipantsHidden(bool b);
+    // shows/hides the chat pane
     void setChatHidden(bool b);
+    // shifts the current line/selected lines left
     void shiftLeft();
+    // shifts the current line/selected lines right
     void shiftRight();
+    // C++ style (un)commenting
     void unCommentSelection();
 
+    // User wants to resynchronize the document with the owner
     void resynchronizeTriggered();
 
+    // Sets the highlighting style to the below Highlighter
     void setHighlighter(int Highlighter);
     enum Highlighter {None, CPlusPlus, Python};
 
+    // returns if the editor is undable
     bool isUndoable();
+    // returns if the editor is redoable
     bool isRedoable();
+    // returns if the editor is modified (unsaved since last edit)
     bool isModified();
+    // returns if the chat pane is hidden, used for determining which actions to enable/disable by the main window
     bool isChatHidden();
+    // returns if the participants pane is hidden, used for determining which actions to enable/disable in the MW
     bool isParticipantsHidden();
 
     // Find functions
@@ -66,25 +79,32 @@ public:
 
     QString getPlainText();
     void setPlainText(QString text);
+
+    // Toggles line wrapping in the editor
     void toggleLineWrap();
 
+    // Used for setting the document's modified attribute to b (for the modified-since-last-save attribute)
     void setModified(bool b);
 
+    // Previews the current document as an HTML webpage in a dialog box
     void previewAsHtml();
 
+    // Splits the editor vertically from horizontal or no split
     void splitEditor();
+    // Splits the editor horizontally from vertical or no split
     void splitEditorSideBySide();
+    // Unsplits the editor
     void unSplitEditor();
     bool isEditorSplit();
     bool isEditorSplitSideBySide();
+
+#warning "rework this for the main window"
+    // returns if the document has been announced
     bool isAnnounced();
+    // returns if the document has connected to another document previously
     bool isConnected();
     void setOwnerName(QString name);
 
-
-    // This tells us if we're the host/owner of the document,
-    // and affects how we talk with participants
-    Enu::Permissions myPermissions;
     QString curFile;
     
     QString myName;

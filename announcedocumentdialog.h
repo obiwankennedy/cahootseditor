@@ -19,7 +19,7 @@ public:
 private:
     Ui::AnnounceDocumentDialog *ui;
 
-    QRegExpValidator* nameValidator;
+    QRegExpValidator *nameValidator;
 
 private slots:
     void dialogAccepted();

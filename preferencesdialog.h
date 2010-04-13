@@ -3,9 +3,6 @@
 
 #include <QDialog>
 
-#include "mainwindow.h"
-
-
 namespace Ui {
     class PreferencesDialog;
 }
@@ -43,9 +40,9 @@ private slots:
     void on_participantsDefault_clicked();
 
 signals:
-    void editorChangeFont(QFont font);
-    void chatChangeFont(QFont font);
-    void participantsChangeFont(QFont font);
+    void editorChangeFont(QFont);
+    void chatChangeFont(QFont);
+    void participantsChangeFont(QFont);
 };
 
 #endif // PREFERENCESDIALOG_H

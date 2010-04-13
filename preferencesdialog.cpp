@@ -16,10 +16,10 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+
 #include "preferencesdialog.h"
 #include "ui_preferencesdialog.h"
 #include "utilities.h"
-
 #include <QFont>
 #include <QFontDialog>
 
