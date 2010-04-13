@@ -42,7 +42,7 @@ MainWindow::MainWindow(QWidget *parent)
             SLOT(findReplaceTriggered(QString,QString,Qt::CaseSensitivity,bool,Enu::FindMode)));
 
     preferencesDialog = new PreferencesDialog(this);
-    connect(preferencesDialog, SIGNAL(preferencesClicked()), this, SLOT(on_actionTools_Preferences_triggered()));
+    connect(preferencesDialog, SIGNAL(editorChangeFont(QFont)), this, SLOT(codeEditorChangeFont(QFont)));
 
     announceDocumentDialog = new AnnounceDocumentDialog(this);
     connect(announceDocumentDialog, SIGNAL(announceDocument(QString,Qt::CheckState,Qt::CheckState)), this, SLOT(announceDocument(QString,Qt::CheckState,Qt::CheckState)));
@@ -683,5 +683,12 @@ void MainWindow::announceDocument(QString ownerName, Qt::CheckState broadcastChe
     }
     else {
         preferencesDialog->setAlwaysUseMyName(true);
+    }
+}
+
+void MainWindow::codeEditorChangeFont(QFont font)
+{
+    for (int i = 0; i < tabWidgetToDocumentMap.size(); i++) {
+//        tabWidgetToDocumentMap.value(ui->tabWidget->widget(i))->changeFont(font);
     }
 }

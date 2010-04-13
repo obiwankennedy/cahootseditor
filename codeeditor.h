@@ -30,10 +30,6 @@ public:
     void shiftLeft();
     void shiftRight();
 
-    void removeHighlight();
-
-//    void changeFont();
-
     // Find functions
     bool findNext(QString searchString, Qt::CaseSensitivity sensitivity, bool wrapAround, Enu::FindMode mode);
     bool findPrev(QString searchString, Qt::CaseSensitivity sensitivity, bool wrapAround, Enu::FindMode mode);

@@ -3,6 +3,9 @@
 
 #include <QDialog>
 
+#include "mainwindow.h"
+
+
 namespace Ui {
     class PreferencesDialog;
 }
@@ -12,7 +15,6 @@ class PreferencesDialog : public QDialog {
 public:
     PreferencesDialog(QWidget *parent = 0);
     ~PreferencesDialog();
-
 
     void setMyName(QString name);
     QString getMyName();
@@ -41,7 +43,9 @@ private slots:
     void on_participantsDefault_clicked();
 
 signals:
-    void preferencesClicked();
+    void editorChangeFont(QFont font);
+    void chatChangeFont(QFont font);
+    void participantsChangeFont(QFont font);
 };
 
 #endif // PREFERENCESDIALOG_H

@@ -259,20 +259,6 @@ void CodeEditor::shiftRight()
     setTextCursor(cursor);
 }
 
-void CodeEditor::removeHighlight()
-{
-
-}
-
-//void CodeEditor::changeFont()
-//{
-////    bool ok = false;
-////    QFont newFont = QFontDialog::getFont(&ok, QFont(font()), this, "Set Input Font", QFontDialog::DontUseNativeDialog);
-////    if (ok) {
-////        setFont(newFont);
-////    }
-//}
-
 bool CodeEditor::findNext(QString searchString, Qt::CaseSensitivity sensitivity, bool wrapAround, Enu::FindMode mode)
 {
     QString documentString = document()->toPlainText();

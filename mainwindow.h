@@ -6,10 +6,10 @@
 #include "connecttodocument.h"
 #include "finddialog.h"
 #include "findtoolbar.h"
-#include "preferencesdialog.h"
 #include "announcedocumentdialog.h"
 #include "aboutdialog.h"
 #include "firstrundialog.h"
+#include "preferencesdialog.h"
 
 namespace Ui
 {
@@ -23,7 +23,6 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = 0);
     ~MainWindow();
-
 
 private:
     Ui::MainWindow *ui;
@@ -115,6 +114,8 @@ private slots:
 
     void connectToDocument(QStringList list);
     void announceDocument(QString ownerName, Qt::CheckState broadcastCheckState, Qt::CheckState alwaysUserNameCheckState);
+
+    void codeEditorChangeFont(QFont font);
 };
 
 #endif // MAINWINDOW_H

@@ -18,6 +18,10 @@
 */
 #include "preferencesdialog.h"
 #include "ui_preferencesdialog.h"
+#include "utilities.h"
+
+#include <QFont>
+#include <QFontDialog>
 
 PreferencesDialog::PreferencesDialog(QWidget *parent) :
     QDialog(parent),
@@ -67,30 +71,49 @@ void PreferencesDialog::changeEvent(QEvent *e)
 
 void PreferencesDialog::on_changeEditor_clicked()
 {
-//    QFont newFont = QFontDialog::getFont(&ok, QFont(font()), this, "Set Input Font", QFontDialog::DontUseNativeDialog);
+    bool ok = false;
+    QFont newFont = QFontDialog::getFont(&ok, QFont(font()), this, "Code Editor Font", QFontDialog::DontUseNativeDialog);
+    if (ok) {
+        ui->showEditorFont->setFont(newFont);
+        ui->showEditorFont->setText("New Font");
+        emit editorChangeFont(newFont);
+    }
 }
 
 void PreferencesDialog::on_changeChat_clicked()
 {
-
+    bool ok = false;
+    QFont newFont = QFontDialog::getFont(&ok, QFont(font()), this, "Chat Pane Font", QFontDialog::DontUseNativeDialog);
+    if (ok) {
+        ui->showChatFont->setFont(newFont);
+        ui->showChatFont->setText("New Font");
+    }
 }
 
 void PreferencesDialog::on_changeParticipants_clicked()
 {
-
+    bool ok = false;
+    QFont newFont = QFontDialog::getFont(&ok, QFont(font()), this, "Participants Pane Font", QFontDialog::DontUseNativeDialog);
+    if (ok) {
+        ui->showParticipantsFont->setFont(newFont);
+        ui->showParticipantsFont->setText("New Font");
+    }
 }
 
 void PreferencesDialog::on_editorDefault_clicked()
 {
-
+    ui->showEditorFont->setFont(QFont(Utilities::labelFont, Utilities::labelFontSize));
+    ui->showEditorFont->setText("Default Text");
 }
 
 void PreferencesDialog::on_chatDefault_clicked()
 {
-
+    ui->showChatFont->setFont(QFont(Utilities::labelFont, Utilities::labelFontSize));
+    ui->showChatFont->setText("Default Text");
 }
 
 void PreferencesDialog::on_participantsDefault_clicked()
 {
-
+    ui->showParticipantsFont->setFont(QFont(Utilities::labelFont, Utilities::labelFontSize));
+    ui->showParticipantsFont->setText("Default Text");
 }
