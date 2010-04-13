@@ -89,6 +89,8 @@ void MainWindow::readSettings()
     if (settings.value("isNotFirstRun").toBool() != true) {
         firstRunDialog = new FirstRunDialog(this);
         firstRunDialog->show();
+        firstRunDialog->raise();
+        firstRunDialog->activateWindow();
     }
     myName = settings.value("name", "Owner").toString();
 }
