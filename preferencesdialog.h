@@ -28,10 +28,6 @@ private:
     QString myName;
     bool alwaysUseMyName;
 
-    QFont editorFont;
-    QFont participantFont;
-    QFont chatFont;
-
 private slots:
     void on_changeEditor_clicked();
     void on_changeChat_clicked();
@@ -41,9 +37,9 @@ private slots:
     void on_participantsDefault_clicked();
 
 signals:
-    void editorChangeFont(QString);
-    void chatChangeFont(QString);
-    void participantsChangeFont(QString);
+    void setEditorFont(QFont);
+    void setChatFont(QFont);
+    void setParticipantsFont(QFont);
 };
 
 #endif // PREFERENCESDIALOG_H

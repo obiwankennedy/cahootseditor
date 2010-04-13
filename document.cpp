@@ -23,10 +23,6 @@ Document::Document(QWidget *parent) :
     // Set up the editor
     delete ui->editorFrame;
     editor = new CodeEditor(this);
-
-    QSettings editorFontSettings("Cahoots", "Preferences");
-    changeEditorFont(editorFontSettings.value("editorFont").toString());
-
     QFontMetrics fm(editor->font());
     editor->setTabStopWidth(fm.averageCharWidth() * 4);
     ui->editorSplitter->insertWidget(0, editor);
@@ -81,8 +77,7 @@ Document::Document(QWidget *parent) :
 
     myName = "Owner"; // temporary
 
-    isAlreadyAnnounced = false;
-    isAlreadyConnected = false;
+    startedCollaborating = false;
 }
 
 Document::~Document()
@@ -92,7 +87,7 @@ Document::~Document()
 
 void Document::announceDocument(bool broadcastDocument)
 {
-    isAlreadyAnnounced = true;
+    startedCollaborating = true;
     setChatHidden(false);
     setParticipantsHidden(false);
 
@@ -121,8 +116,6 @@ void Document::announceDocument(bool broadcastDocument)
     chatPane->appendChatMessage("Listening at " + ipAddress + ":" + port);
 
     participantPane->setConnectInfo(ipAddress, port);
-
-    isAlreadyConnected = true;
 }
 
 void Document::connectToDocument(QStringList list)
@@ -133,7 +126,7 @@ void Document::connectToDocument(QStringList list)
 
     int port = portString.toInt();
     participantPane->setOwnership(false);
-    isAlreadyAnnounced = true;
+    startedCollaborating = true;
 
     setChatHidden(false);
     setParticipantsHidden(false);
@@ -146,19 +139,21 @@ void Document::connectToDocument(QStringList list)
     participantPane->setConnectInfo(address, portString);
 }
 
-void Document::changeEditorFont(QString fontString)
+void Document::setEditorFont(QFont font)
 {
-    editor->changeFont(fontString);
+    editor->setFont(font);
+    QFontMetrics fm(editor->font());
+    editor->setTabStopWidth(fm.averageCharWidth() * 4);
 }
 
-void Document::changeChatFont(QString fontString)
+void Document::setChatFont(QFont font)
 {
-    chatPane->changeFont(fontString);
+    chatPane->setFont(font);
 }
 
-void Document::changeParticipantsFont(QString fontString)
+void Document::setParticipantsFont(QFont font)
 {
-    participantPane->changeFont(fontString);
+    participantPane->setFont(font);
 }
 
 void Document::undo()
@@ -407,6 +402,11 @@ void Document::splitEditorSideBySide()
     ui->editorSplitter->setSizes(sizes);
 }
 
+bool Document::docHasCollaborated()
+{
+    return startedCollaborating;
+}
+
 void Document::unSplitEditor()
 {
     if (!isEditorSplit()) {
@@ -423,16 +423,6 @@ bool Document::isEditorSplit()
 bool Document::isEditorSplitSideBySide()
 {
     return ui->editorSplitter->orientation() == Qt::Horizontal;
-}
-
-bool Document::isAnnounced()
-{
-    return isAlreadyAnnounced;
-}
-
-bool Document::isConnected()
-{
-    return isAlreadyConnected;
 }
 
 void Document::findNext(QString string)

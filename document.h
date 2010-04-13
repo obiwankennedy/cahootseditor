@@ -35,9 +35,9 @@ public:
 
     void connectToDocument(QStringList list);
 
-    void changeEditorFont(QString fontString);
-    void changeChatFont(QString fontString);
-    void changeParticipantsFont(QString fontString);
+    void setEditorFont(QFont font);
+    void setChatFont(QFont font);
+    void setParticipantsFont(QFont font);
 
     void undo();
     void redo();
@@ -103,15 +103,11 @@ public:
     bool isEditorSplit();
     bool isEditorSplitSideBySide();
 
-#warning "rework this for the main window"
-    // returns if the document has been announced
-    bool isAnnounced();
-    // returns if the document has connected to another document previously
-    bool isConnected();
+    bool docHasCollaborated();
+
     void setOwnerName(QString name);
 
     QString curFile;
-    
     QString myName;
 
 private:
@@ -124,8 +120,7 @@ private:
 
     CodeEditor *editor;
     CodeEditor *bottomEditor;
-    bool isAlreadyAnnounced;
-    bool isAlreadyConnected;
+    bool startedCollaborating;
 
     FindToolBar *findAllToolbar;
     ParticipantsPane *participantPane;

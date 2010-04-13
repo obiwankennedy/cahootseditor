@@ -117,9 +117,9 @@ private slots:
     void connectToDocument(QStringList list);
     void announceDocument(QString ownerName, Qt::CheckState broadcastCheckState, Qt::CheckState alwaysUserNameCheckState);
 
-    void codeEditorChangeFont(QString fontString);
-    void chatPaneChangeFont(QString fontString);
-    void participantsChangeFont(QString fontString);
+    void setEditorFont(QFont font);
+    void setChatFont(QFont font);
+    void setParticipantsFont(QFont font);
 };
 
 #endif // MAINWINDOW_H

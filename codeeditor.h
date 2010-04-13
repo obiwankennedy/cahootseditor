@@ -27,8 +27,6 @@ public:
 
     void collabTextChange(int pos, int charsRemoved, int charsAdded, QString data);
 
-    void changeFont(QString fontString);
-
     void unCommentSelection();
     void shiftLeft();
     void shiftRight();

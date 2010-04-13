@@ -42,9 +42,9 @@ MainWindow::MainWindow(QWidget *parent)
             SLOT(findReplaceTriggered(QString,QString,Qt::CaseSensitivity,bool,Enu::FindMode)));
 
     preferencesDialog = new PreferencesDialog(this);
-    connect(preferencesDialog, SIGNAL(editorChangeFont(QString)), this, SLOT(codeEditorChangeFont(QString)));
-    connect(preferencesDialog, SIGNAL(chatChangeFont(QString)), this, SLOT(chatPaneChangeFont(QString)));
-    connect(preferencesDialog, SIGNAL(participantsChangeFont(QString)), this, SLOT(participantsChangeFont(QString)));
+    connect(preferencesDialog, SIGNAL(setEditorFont(QFont)), this, SLOT(setEditorFont(QFont)));
+    connect(preferencesDialog, SIGNAL(setChatFont(QFont)), this, SLOT(setChatFont(QFont)));
+    connect(preferencesDialog, SIGNAL(setParticipantsFont(QFont)), this, SLOT(setParticipantsFont(QFont)));
 
     announceDocumentDialog = new AnnounceDocumentDialog(this);
     connect(announceDocumentDialog, SIGNAL(announceDocument(QString,Qt::CheckState,Qt::CheckState)), this, SLOT(announceDocument(QString,Qt::CheckState,Qt::CheckState)));
@@ -496,9 +496,8 @@ void MainWindow::on_actionView_Hide_Show_Chat_triggered()
 
 void MainWindow::on_actionTools_Announce_Document_triggered()
 {
-    if (tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->isConnected()
-        || tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->isAnnounced()) {
-        return; // this should never happen, but just in case.
+    if (tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->docHasCollaborated()) {
+        return; // this SHOULD never happen, but just in case.
     }
     if (preferencesDialog->getAlwaysUseMyName() && preferencesDialog->getMyName() != "") {
         tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->announceDocument(announceDocumentDialog->isBroadcastingChecked());
@@ -625,7 +624,7 @@ void MainWindow::documentChanged(int index)
     ui->actionWindow_Split_Side_by_Side->setDisabled(document->isEditorSplit() && document->isEditorSplitSideBySide());
 
     ui->actionWindow_Remove_Split->setEnabled(document->isEditorSplit());
-    ui->actionTools_Announce_Document->setDisabled(document->isAnnounced() || document->isConnected());
+    ui->actionTools_Announce_Document->setDisabled(document->docHasCollaborated());
 }
 
 void MainWindow::tabCloseClicked(int index)
@@ -689,23 +688,23 @@ void MainWindow::announceDocument(QString ownerName, Qt::CheckState broadcastChe
     }
 }
 
-void MainWindow::codeEditorChangeFont(QString fontString)
+void MainWindow::setEditorFont(QFont font)
 {
     for (int i = 0; i < tabWidgetToDocumentMap.size(); i++) {
-        tabWidgetToDocumentMap.value(ui->tabWidget->widget(i))->changeEditorFont(fontString);
+        tabWidgetToDocumentMap.value(ui->tabWidget->widget(i))->setEditorFont(font);
     }
 }
 
-void MainWindow::chatPaneChangeFont(QString fontString)
+void MainWindow::setChatFont(QFont font)
 {
     for (int i = 0; i < tabWidgetToDocumentMap.size(); i++) {
-        tabWidgetToDocumentMap.value(ui->tabWidget->widget(i))->changeChatFont(fontString);
+        tabWidgetToDocumentMap.value(ui->tabWidget->widget(i))->setChatFont(font);
     }
 }
 
-void MainWindow::participantsChangeFont(QString fontString)
+void MainWindow::setParticipantsFont(QFont font)
 {
     for (int i = 0; i < tabWidgetToDocumentMap.size(); i++) {
-        tabWidgetToDocumentMap.value(ui->tabWidget->widget(i))->changeParticipantsFont(fontString);
+        tabWidgetToDocumentMap.value(ui->tabWidget->widget(i))->setParticipantsFont(font);
     }
 }

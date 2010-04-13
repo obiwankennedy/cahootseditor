@@ -56,18 +56,6 @@ void CodeEditor::collabTextChange(int pos, int charsRemoved, int charsAdded, QSt
     }
 }
 
-void CodeEditor::changeFont(QString fontString)
-{
-    QFont font;
-    if (fontString == "") {
-        font = QFont(Utilities::codeFont, Utilities::codeFontSize);
-    }
-    else {
-        bool isChanged = font.fromString(fontString);
-    }
-    setFont(font);
-}
-
 void CodeEditor::unCommentSelection()
 {
     QTextCursor cursor = textCursor();

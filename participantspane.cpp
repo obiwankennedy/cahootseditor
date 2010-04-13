@@ -28,9 +28,6 @@ ParticipantsPane::ParticipantsPane(QWidget *parent) :
     roItem = ui->treeWidget->topLevelItem(1);
     waitItem = ui->treeWidget->topLevelItem(2);
     owner = rwItem->child(0);
-
-    QSettings participantsFontSettings("Cahoots", "Preferences");
-    changeFont(participantsFontSettings.value("participantsFont").toString());
 }
 
 ParticipantsPane::~ParticipantsPane()
@@ -222,15 +219,9 @@ bool ParticipantsPane::canRead(QTcpSocket *socket)
     return participantMap.value(socket)->permissions == Enu::ReadOnly || participantMap.value(socket)->permissions == Enu::ReadWrite;
 }
 
-void ParticipantsPane::changeFont(QString fontString)
+void ParticipantsPane::setFont(QFont font)
 {
-    QFont font;
-    if (fontString == "") {
-        font = QFont(Utilities::labelFont, Utilities::labelFontSize);
-    }
-    else {
-        bool isChanged = font.fromString(fontString);
-    }
+    // I'm not sure we want to set all these things to this font.
     ui->treeWidget->setFont(font);
     ui->connectInfoLabel->setFont(font);
     ui->promotePushButton->setFont(font);

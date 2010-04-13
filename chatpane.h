@@ -28,7 +28,7 @@ public:
 
     void setReadOnly(bool ro);
 
-    void changeFont(QString fontString);
+    void setFont(QFont font);
 
 private:
     Ui::ChatPane *ui;
