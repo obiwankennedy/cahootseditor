@@ -16,6 +16,7 @@
 #include <QtNetwork>
 #include <QTcpServer>
 #include <QTcpSocket>
+#include <QSettings>
 
 namespace Ui {
     class Document;
@@ -33,6 +34,10 @@ public:
     void announceDocument(bool broadcastDocument);
 
     void connectToDocument(QStringList list);
+
+    void changeEditorFont(QString fontString);
+    void changeChatFont(QString fontString);
+    void changeParticipantsFont(QString fontString);
 
     void undo();
     void redo();

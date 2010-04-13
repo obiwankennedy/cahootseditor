@@ -60,6 +60,8 @@ public:
     bool canWrite(QTcpSocket *socket);
     bool canRead(QTcpSocket *socket);
 
+    void changeFont(QString fontString);
+
     QList<Participant*> participantList;
     QMap<QTcpSocket *, Participant *> participantMap;
 

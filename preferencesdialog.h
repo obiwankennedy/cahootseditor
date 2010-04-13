@@ -2,6 +2,7 @@
 #define PREFERENCESDIALOG_H
 
 #include <QDialog>
+#include <QSettings>
 
 namespace Ui {
     class PreferencesDialog;
@@ -40,9 +41,9 @@ private slots:
     void on_participantsDefault_clicked();
 
 signals:
-    void editorChangeFont(QFont);
-    void chatChangeFont(QFont);
-    void participantsChangeFont(QFont);
+    void editorChangeFont(QString);
+    void chatChangeFont(QString);
+    void participantsChangeFont(QString);
 };
 
 #endif // PREFERENCESDIALOG_H

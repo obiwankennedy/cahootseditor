@@ -42,7 +42,9 @@ MainWindow::MainWindow(QWidget *parent)
             SLOT(findReplaceTriggered(QString,QString,Qt::CaseSensitivity,bool,Enu::FindMode)));
 
     preferencesDialog = new PreferencesDialog(this);
-    connect(preferencesDialog, SIGNAL(editorChangeFont(QFont)), this, SLOT(codeEditorChangeFont(QFont)));
+    connect(preferencesDialog, SIGNAL(editorChangeFont(QString)), this, SLOT(codeEditorChangeFont(QString)));
+    connect(preferencesDialog, SIGNAL(chatChangeFont(QString)), this, SLOT(chatPaneChangeFont(QString)));
+    connect(preferencesDialog, SIGNAL(participantsChangeFont(QString)), this, SLOT(participantsChangeFont(QString)));
 
     announceDocumentDialog = new AnnounceDocumentDialog(this);
     connect(announceDocumentDialog, SIGNAL(announceDocument(QString,Qt::CheckState,Qt::CheckState)), this, SLOT(announceDocument(QString,Qt::CheckState,Qt::CheckState)));
@@ -687,9 +689,23 @@ void MainWindow::announceDocument(QString ownerName, Qt::CheckState broadcastChe
     }
 }
 
-void MainWindow::codeEditorChangeFont(QFont font)
+void MainWindow::codeEditorChangeFont(QString fontString)
 {
     for (int i = 0; i < tabWidgetToDocumentMap.size(); i++) {
-//        tabWidgetToDocumentMap.value(ui->tabWidget->widget(i))->changeFont(font);
+        tabWidgetToDocumentMap.value(ui->tabWidget->widget(i))->changeEditorFont(fontString);
+    }
+}
+
+void MainWindow::chatPaneChangeFont(QString fontString)
+{
+    for (int i = 0; i < tabWidgetToDocumentMap.size(); i++) {
+        tabWidgetToDocumentMap.value(ui->tabWidget->widget(i))->changeChatFont(fontString);
+    }
+}
+
+void MainWindow::participantsChangeFont(QString fontString)
+{
+    for (int i = 0; i < tabWidgetToDocumentMap.size(); i++) {
+        tabWidgetToDocumentMap.value(ui->tabWidget->widget(i))->changeParticipantsFont(fontString);
     }
 }

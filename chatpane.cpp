@@ -6,6 +6,7 @@
 #include <QDebug>
 #include <QKeyEvent>
 #include <QGridLayout>
+#include <QSettings>
 
 ChatPane::ChatPane(QWidget *parent) :
     QWidget(parent),
@@ -23,8 +24,8 @@ ChatPane::ChatPane(QWidget *parent) :
     layout->addWidget(ui->lineEdit, 1, 0);
     this->setLayout(layout);
 
-    chatBrowser->setFont(QFont(Utilities::chatFont, Utilities::chatFontSize));
-    ui->lineEdit->setFont(QFont(Utilities::chatFont, Utilities::chatFontSize));
+    QSettings chatFontSettings("Cahoots", "Preferences");
+    changeFont(chatFontSettings.value("chatFont").toString());
 
     connect(chatBrowser, SIGNAL(keyPress(QKeyEvent*)), this, SLOT(textBrowserKeyPress(QKeyEvent*)));
 }
@@ -95,8 +96,15 @@ void ChatPane::setReadOnly(bool ro)
     ui->lineEdit->setReadOnly(ro);
 }
 
-void ChatPane::setChatFont(QFont font)
+void ChatPane::changeFont(QString fontString)
 {
+    QFont font;
+    if (fontString == "") {
+        font = QFont(Utilities::chatFont, Utilities::chatFontSize);
+    }
+    else {
+        bool isChanged = font.fromString(fontString);
+    }
     chatBrowser->setFont(font);
     ui->lineEdit->setFont(font);
 }

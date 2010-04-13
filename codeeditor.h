@@ -3,6 +3,7 @@
 
 #include <QPlainTextEdit>
 #include <QObject>
+#include <QSettings>
 
 #include "enu.h"
 
@@ -25,6 +26,8 @@ public:
     int lineNumberAreaWidth();
 
     void collabTextChange(int pos, int charsRemoved, int charsAdded, QString data);
+
+    void changeFont(QString fontString);
 
     void unCommentSelection();
     void shiftLeft();

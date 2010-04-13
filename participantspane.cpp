@@ -7,6 +7,8 @@
 #include <QTime>
 #include <QHostAddress>
 #include <QTreeWidgetItem>
+#include <QSettings>
+
 
 ParticipantsPane::ParticipantsPane(QWidget *parent) :
     QWidget(parent),
@@ -27,10 +29,8 @@ ParticipantsPane::ParticipantsPane(QWidget *parent) :
     waitItem = ui->treeWidget->topLevelItem(2);
     owner = rwItem->child(0);
 
-    ui->treeWidget->setFont(QFont(Utilities::labelFont, Utilities::labelFontSize));
-    ui->connectInfoLabel->setFont(QFont(Utilities::labelFont, Utilities::labelFontSize));
-    ui->promotePushButton->setFont(QFont(Utilities::labelFont, Utilities::labelFontSize));
-    ui->demotePushButton->setFont(QFont(Utilities::labelFont, Utilities::labelFontSize));
+    QSettings participantsFontSettings("Cahoots", "Preferences");
+    changeFont(participantsFontSettings.value("participantsFont").toString());
 }
 
 ParticipantsPane::~ParticipantsPane()
@@ -220,6 +220,21 @@ bool ParticipantsPane::canWrite(QTcpSocket *socket)
 bool ParticipantsPane::canRead(QTcpSocket *socket)
 {
     return participantMap.value(socket)->permissions == Enu::ReadOnly || participantMap.value(socket)->permissions == Enu::ReadWrite;
+}
+
+void ParticipantsPane::changeFont(QString fontString)
+{
+    QFont font;
+    if (fontString == "") {
+        font = QFont(Utilities::labelFont, Utilities::labelFontSize);
+    }
+    else {
+        bool isChanged = font.fromString(fontString);
+    }
+    ui->treeWidget->setFont(font);
+    ui->connectInfoLabel->setFont(font);
+    ui->promotePushButton->setFont(font);
+    ui->demotePushButton->setFont(font);
 }
 
 void ParticipantsPane::onCurrentItemChanged(QTreeWidgetItem *item, QTreeWidgetItem *)

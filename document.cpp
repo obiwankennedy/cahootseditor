@@ -12,6 +12,7 @@
 #include <QLayout>
 #include <QMessageBox>
 #include <QTextDocumentFragment>
+#include <QDebug>
 
 Document::Document(QWidget *parent) :
     QWidget(parent),
@@ -22,7 +23,10 @@ Document::Document(QWidget *parent) :
     // Set up the editor
     delete ui->editorFrame;
     editor = new CodeEditor(this);
-    editor->setFont(QFont(Utilities::codeFont, Utilities::codeFontSize));
+
+    QSettings editorFontSettings("Cahoots", "Preferences");
+    changeEditorFont(editorFontSettings.value("editorFont").toString());
+
     QFontMetrics fm(editor->font());
     editor->setTabStopWidth(fm.averageCharWidth() * 4);
     ui->editorSplitter->insertWidget(0, editor);
@@ -140,6 +144,21 @@ void Document::connectToDocument(QStringList list)
     client->setUsername(myName);
     client->connectToHost(QHostAddress(address), port);
     participantPane->setConnectInfo(address, portString);
+}
+
+void Document::changeEditorFont(QString fontString)
+{
+    editor->changeFont(fontString);
+}
+
+void Document::changeChatFont(QString fontString)
+{
+    chatPane->changeFont(fontString);
+}
+
+void Document::changeParticipantsFont(QString fontString)
+{
+    participantPane->changeFont(fontString);
 }
 
 void Document::undo()

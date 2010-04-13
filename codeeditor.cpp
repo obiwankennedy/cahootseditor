@@ -4,6 +4,7 @@
 #include <QTextCursor>
 
 #include "enu.h"
+#include "utilities.h"
 
 
 CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
@@ -53,6 +54,18 @@ void CodeEditor::collabTextChange(int pos, int charsRemoved, int charsAdded, QSt
         cursor.setPosition(pos);
         cursor.insertText(data.toAscii());
     }
+}
+
+void CodeEditor::changeFont(QString fontString)
+{
+    QFont font;
+    if (fontString == "") {
+        font = QFont(Utilities::codeFont, Utilities::codeFontSize);
+    }
+    else {
+        bool isChanged = font.fromString(fontString);
+    }
+    setFont(font);
 }
 
 void CodeEditor::unCommentSelection()

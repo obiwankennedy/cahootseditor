@@ -11,6 +11,8 @@
 #include "firstrundialog.h"
 #include "preferencesdialog.h"
 
+#include <QSettings>
+
 namespace Ui
 {
     class MainWindow;
@@ -115,7 +117,9 @@ private slots:
     void connectToDocument(QStringList list);
     void announceDocument(QString ownerName, Qt::CheckState broadcastCheckState, Qt::CheckState alwaysUserNameCheckState);
 
-    void codeEditorChangeFont(QFont font);
+    void codeEditorChangeFont(QString fontString);
+    void chatPaneChangeFont(QString fontString);
+    void participantsChangeFont(QString fontString);
 };
 
 #endif // MAINWINDOW_H
