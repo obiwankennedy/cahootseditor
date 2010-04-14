@@ -14,6 +14,11 @@
 #include <QTextDocumentFragment>
 #include <QDebug>
 
+#include <srchiliteqt/Qt4SyntaxHighlighter.h>
+#include <srchilite/versions.h>
+
+using namespace srchiliteqt;
+
 Document::Document(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::Document)
@@ -40,7 +45,10 @@ Document::Document(QWidget *parent) :
     bottomEditor->hide();
 
     // editor highlighter
-    highlighter = new CppHighlighter(editor->document());
+    //highlighter = new CppHighlighter(editor->document());
+    srchiliteqt::Qt4SyntaxHighlighter *highlighter = new Qt4SyntaxHighlighter(editor->document());
+    highlighter->init("default.lang");
+
 
     // Participant frame
     delete ui->participantFrame;
@@ -265,21 +273,135 @@ void Document::resynchronizeTriggered()
 
 void Document::setHighlighter(int Highlighter)
 {
-    if (Highlighter == None) {
-        delete highlighter;
-        highlighter = NULL;
+    if (Highlighter == none) {
+        srchiliteqt::Qt4SyntaxHighlighter *highlighter = new Qt4SyntaxHighlighter(editor->document());
+        highlighter->init("nohilite.lang");
     }
-    else if (Highlighter == CPlusPlus) {
-        if (highlighter) {
-            delete highlighter;
-        }
-        highlighter = new CppHighlighter(editor->document());
+    else if (Highlighter == ada) {
+        srchiliteqt::Qt4SyntaxHighlighter *highlighter = new Qt4SyntaxHighlighter(editor->document());
+        highlighter->init("ada.lang");
     }
-    else if (Highlighter == Python) {
-        if (highlighter) {
-            delete highlighter;
-        }
-        highlighter = new PythonHighlighter(editor->document());
+    else if (Highlighter == c) {
+        srchiliteqt::Qt4SyntaxHighlighter *highlighter = new Qt4SyntaxHighlighter(editor->document());
+        highlighter->init("c.lang");
+    }
+    else if (Highlighter == cplusplus) {
+        // highlighter = new CppHighlighter(editor->document());
+        srchiliteqt::Qt4SyntaxHighlighter *highlighter = new Qt4SyntaxHighlighter(editor->document());
+        highlighter->init("cpp.lang");
+    }
+    else if (Highlighter == csharp) {
+        srchiliteqt::Qt4SyntaxHighlighter *highlighter = new Qt4SyntaxHighlighter(editor->document());
+        highlighter->init("csharp.lang");
+    }
+    else if (Highlighter == css) {
+        srchiliteqt::Qt4SyntaxHighlighter *highlighter = new Qt4SyntaxHighlighter(editor->document());
+        highlighter->init("css.lang");
+    }
+    else if (Highlighter == flex) {
+        srchiliteqt::Qt4SyntaxHighlighter *highlighter = new Qt4SyntaxHighlighter(editor->document());
+        highlighter->init("flex.lang");
+    }
+    else if (Highlighter == fortran) {
+        srchiliteqt::Qt4SyntaxHighlighter *highlighter = new Qt4SyntaxHighlighter(editor->document());
+        highlighter->init("fortran.lang");
+    }
+    else if (Highlighter == glsl) {
+        srchiliteqt::Qt4SyntaxHighlighter *highlighter = new Qt4SyntaxHighlighter(editor->document());
+        highlighter->init("glsl.lang");
+    }
+    else if (Highlighter == haxe) {
+        srchiliteqt::Qt4SyntaxHighlighter *highlighter = new Qt4SyntaxHighlighter(editor->document());
+        highlighter->init("haxe.lang");
+    }
+    else if (Highlighter == html) {
+        srchiliteqt::Qt4SyntaxHighlighter *highlighter = new Qt4SyntaxHighlighter(editor->document());
+        highlighter->init("html.lang");
+    }
+    else if (Highlighter == java) {
+        srchiliteqt::Qt4SyntaxHighlighter *highlighter = new Qt4SyntaxHighlighter(editor->document());
+        highlighter->init("java.lang");
+    }
+    else if (Highlighter == javascript) {
+        srchiliteqt::Qt4SyntaxHighlighter *highlighter = new Qt4SyntaxHighlighter(editor->document());
+        highlighter->init("javascript.lang");
+    }
+    else if (Highlighter == latex) {
+        srchiliteqt::Qt4SyntaxHighlighter *highlighter = new Qt4SyntaxHighlighter(editor->document());
+        highlighter->init("latex.lang");
+    }
+    else if (Highlighter == ldap) {
+        srchiliteqt::Qt4SyntaxHighlighter *highlighter = new Qt4SyntaxHighlighter(editor->document());
+        highlighter->init("ldap.lang");
+    }
+    else if (Highlighter == logtalk) {
+        srchiliteqt::Qt4SyntaxHighlighter *highlighter = new Qt4SyntaxHighlighter(editor->document());
+        highlighter->init("logtalk.lang");
+    }
+    else if (Highlighter == lsm) {
+        srchiliteqt::Qt4SyntaxHighlighter *highlighter = new Qt4SyntaxHighlighter(editor->document());
+        highlighter->init("lsm.lang");
+    }
+    else if (Highlighter == lua) {
+        srchiliteqt::Qt4SyntaxHighlighter *highlighter = new Qt4SyntaxHighlighter(editor->document());
+        highlighter->init("lua.lang");
+    }
+    else if (Highlighter == m4) {
+        srchiliteqt::Qt4SyntaxHighlighter *highlighter = new Qt4SyntaxHighlighter(editor->document());
+        highlighter->init("m4.lang");
+    }
+    else if (Highlighter == oz) {
+        srchiliteqt::Qt4SyntaxHighlighter *highlighter = new Qt4SyntaxHighlighter(editor->document());
+        highlighter->init("oz.lang");
+    }
+    else if (Highlighter == pascal) {
+        srchiliteqt::Qt4SyntaxHighlighter *highlighter = new Qt4SyntaxHighlighter(editor->document());
+        highlighter->init("pascal.lang");
+    }
+    else if (Highlighter == perl) {
+        srchiliteqt::Qt4SyntaxHighlighter *highlighter = new Qt4SyntaxHighlighter(editor->document());
+        highlighter->init("perl.lang");
+    }
+    else if (Highlighter == php) {
+        srchiliteqt::Qt4SyntaxHighlighter *highlighter = new Qt4SyntaxHighlighter(editor->document());
+        highlighter->init("php.lang");
+    }
+    else if (Highlighter == postscript) {
+        srchiliteqt::Qt4SyntaxHighlighter *highlighter = new Qt4SyntaxHighlighter(editor->document());
+        highlighter->init("postscript.lang");
+    }
+    else if (Highlighter == prolog) {
+        srchiliteqt::Qt4SyntaxHighlighter *highlighter = new Qt4SyntaxHighlighter(editor->document());
+        highlighter->init("prolog.lang");
+    }
+    else if (Highlighter == python) {
+        // highlighter = new PythonHighlighter(editor->document());
+        srchiliteqt::Qt4SyntaxHighlighter *highlighter = new Qt4SyntaxHighlighter(editor->document());
+        highlighter->init("python.lang");
+    }
+    else if (Highlighter == ruby) {
+        srchiliteqt::Qt4SyntaxHighlighter *highlighter = new Qt4SyntaxHighlighter(editor->document());
+        highlighter->init("ruby.lang");
+    }
+    else if (Highlighter == scala) {
+        srchiliteqt::Qt4SyntaxHighlighter *highlighter = new Qt4SyntaxHighlighter(editor->document());
+        highlighter->init("scala.lang");
+    }
+    else if (Highlighter == sml) {
+        srchiliteqt::Qt4SyntaxHighlighter *highlighter = new Qt4SyntaxHighlighter(editor->document());
+        highlighter->init("sml.lang");
+    }
+    else if (Highlighter == sql) {
+        srchiliteqt::Qt4SyntaxHighlighter *highlighter = new Qt4SyntaxHighlighter(editor->document());
+        highlighter->init("sql.lang");
+    }
+    else if (Highlighter == xml) {
+        srchiliteqt::Qt4SyntaxHighlighter *highlighter = new Qt4SyntaxHighlighter(editor->document());
+        highlighter->init("xml.lang");
+    }
+    else if (Highlighter == xorg) {
+        srchiliteqt::Qt4SyntaxHighlighter *highlighter = new Qt4SyntaxHighlighter(editor->document());
+        highlighter->init("xorg.lang");
     }
 }
 

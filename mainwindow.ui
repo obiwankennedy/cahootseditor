@@ -56,7 +56,7 @@
      <x>0</x>
      <y>0</y>
      <width>758</width>
-     <height>22</height>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -81,9 +81,38 @@
      <property name="title">
       <string>Syntax Highlighting...</string>
      </property>
-     <addaction name="actionEdit_None"/>
-     <addaction name="actionEdit_C"/>
-     <addaction name="actionEdit_Python"/>
+     <addaction name="actionEdit_none"/>
+     <addaction name="actionEdit_ada"/>
+     <addaction name="actionEdit_c"/>
+     <addaction name="actionEdit_cpp"/>
+     <addaction name="actionEdit_csharp"/>
+     <addaction name="actionEdit_css"/>
+     <addaction name="actionEdit_flex"/>
+     <addaction name="actionEdit_fortran"/>
+     <addaction name="actionEdit_glsl"/>
+     <addaction name="actionEdit_haxe"/>
+     <addaction name="actionEdit_html"/>
+     <addaction name="actionEdit_java"/>
+     <addaction name="actionEdit_javascript"/>
+     <addaction name="actionEdit_latex"/>
+     <addaction name="actionEdit_ldap"/>
+     <addaction name="actionEdit_logtalk"/>
+     <addaction name="actionEdit_lsm"/>
+     <addaction name="actionEdit_lua"/>
+     <addaction name="actionEdit_m4"/>
+     <addaction name="actionEdit_oz"/>
+     <addaction name="actionEdit_pascal"/>
+     <addaction name="actionEdit_perl"/>
+     <addaction name="actionEdit_php"/>
+     <addaction name="actionEdit_postscript"/>
+     <addaction name="actionEdit_prolog"/>
+     <addaction name="actionEdit_python"/>
+     <addaction name="actionEdit_ruby"/>
+     <addaction name="actionEdit_scala"/>
+     <addaction name="actionEdit_sml"/>
+     <addaction name="actionEdit_sql"/>
+     <addaction name="actionEdit_xml"/>
+     <addaction name="actionEdit_xorg"/>
     </widget>
     <addaction name="actionEdit_Undo"/>
     <addaction name="actionEdit_Redo"/>
@@ -358,14 +387,9 @@
     <bool>false</bool>
    </property>
   </action>
-  <action name="actionEdit_C">
+  <action name="actionEdit_cpp">
    <property name="text">
     <string>C++</string>
-   </property>
-  </action>
-  <action name="actionEdit_Python">
-   <property name="text">
-    <string>Python</string>
    </property>
   </action>
   <action name="actionText_Shift_Left">
@@ -471,7 +495,7 @@
     <string>Ctrl+Shift+[</string>
    </property>
   </action>
-  <action name="actionEdit_None">
+  <action name="actionEdit_none">
    <property name="text">
     <string>None</string>
    </property>
@@ -510,6 +534,156 @@
   <action name="actionHelp_About_Qt">
    <property name="text">
     <string>About Qt</string>
+   </property>
+  </action>
+  <action name="actionEdit_ada">
+   <property name="text">
+    <string>Ada</string>
+   </property>
+  </action>
+  <action name="actionEdit_c">
+   <property name="text">
+    <string>C</string>
+   </property>
+  </action>
+  <action name="actionEdit_csharp">
+   <property name="text">
+    <string>C#</string>
+   </property>
+  </action>
+  <action name="actionEdit_haxe">
+   <property name="text">
+    <string>haXe</string>
+   </property>
+  </action>
+  <action name="actionEdit_css">
+   <property name="text">
+    <string>CSS</string>
+   </property>
+  </action>
+  <action name="actionEdit_flex">
+   <property name="text">
+    <string>Flex</string>
+   </property>
+  </action>
+  <action name="actionEdit_fortran">
+   <property name="text">
+    <string>Fortran</string>
+   </property>
+  </action>
+  <action name="actionEdit_glsl">
+   <property name="text">
+    <string>GLSL</string>
+   </property>
+  </action>
+  <action name="actionEdit_html">
+   <property name="text">
+    <string>HTML</string>
+   </property>
+  </action>
+  <action name="actionEdit_java">
+   <property name="text">
+    <string>Java</string>
+   </property>
+  </action>
+  <action name="actionEdit_javascript">
+   <property name="text">
+    <string>JavaScript</string>
+   </property>
+  </action>
+  <action name="actionEdit_latex">
+   <property name="text">
+    <string>LaTeX</string>
+   </property>
+  </action>
+  <action name="actionEdit_ldap">
+   <property name="text">
+    <string>LDAP</string>
+   </property>
+  </action>
+  <action name="actionEdit_logtalk">
+   <property name="text">
+    <string>Logtalk</string>
+   </property>
+  </action>
+  <action name="actionEdit_lsm">
+   <property name="text">
+    <string>LSM</string>
+   </property>
+  </action>
+  <action name="actionEdit_lua">
+   <property name="text">
+    <string>Lua</string>
+   </property>
+  </action>
+  <action name="actionEdit_m4">
+   <property name="text">
+    <string>M4</string>
+   </property>
+  </action>
+  <action name="actionEdit_oz">
+   <property name="text">
+    <string>Oz</string>
+   </property>
+  </action>
+  <action name="actionEdit_pascal">
+   <property name="text">
+    <string>Pascal</string>
+   </property>
+  </action>
+  <action name="actionEdit_perl">
+   <property name="text">
+    <string>Perl</string>
+   </property>
+  </action>
+  <action name="actionEdit_php">
+   <property name="text">
+    <string>PHP</string>
+   </property>
+  </action>
+  <action name="actionEdit_postscript">
+   <property name="text">
+    <string>PostScript</string>
+   </property>
+  </action>
+  <action name="actionEdit_prolog">
+   <property name="text">
+    <string>Prolog</string>
+   </property>
+  </action>
+  <action name="actionEdit_python">
+   <property name="text">
+    <string>Python</string>
+   </property>
+  </action>
+  <action name="actionEdit_ruby">
+   <property name="text">
+    <string>Ruby</string>
+   </property>
+  </action>
+  <action name="actionEdit_scala">
+   <property name="text">
+    <string>Scala</string>
+   </property>
+  </action>
+  <action name="actionEdit_sml">
+   <property name="text">
+    <string>SML</string>
+   </property>
+  </action>
+  <action name="actionEdit_sql">
+   <property name="text">
+    <string>SQL</string>
+   </property>
+  </action>
+  <action name="actionEdit_xml">
+   <property name="text">
+    <string>XML</string>
+   </property>
+  </action>
+  <action name="actionEdit_xorg">
+   <property name="text">
+    <string>Xorg</string>
    </property>
   </action>
  </widget>

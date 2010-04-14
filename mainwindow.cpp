@@ -454,19 +454,164 @@ void MainWindow::on_actionEdit_Find_triggered()
     findDialog->show();
 }
 
-void MainWindow::on_actionEdit_None_triggered()
+void MainWindow::on_actionEdit_none_triggered()
 {
-    tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->setHighlighter(Document::None);
+    tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->setHighlighter(Document::none);
 }
 
-void MainWindow::on_actionEdit_C_triggered()
+void MainWindow::on_actionEdit_ada_triggered()
 {
-    tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->setHighlighter(Document::CPlusPlus);
+    tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->setHighlighter(Document::ada);
 }
 
-void MainWindow::on_actionEdit_Python_triggered()
+void MainWindow::on_actionEdit_c_triggered()
 {
-    tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->setHighlighter(Document::Python);
+    tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->setHighlighter(Document::c);
+}
+
+void MainWindow::on_actionEdit_cpp_triggered()
+{
+    tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->setHighlighter(Document::cplusplus);
+}
+
+void MainWindow::on_actionEdit_csharp_triggered()
+{
+    tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->setHighlighter(Document::csharp);
+}
+
+void MainWindow::on_actionEdit_css_triggered()
+{
+    tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->setHighlighter(Document::css);
+}
+
+void MainWindow::on_actionEdit_flex_triggered()
+{
+    tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->setHighlighter(Document::flex);
+}
+
+void MainWindow::on_actionEdit_fortran_triggered()
+{
+    tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->setHighlighter(Document::fortran);
+}
+
+void MainWindow::on_actionEdit_glsl_triggered()
+{
+    tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->setHighlighter(Document::glsl);
+}
+
+void MainWindow::on_actionEdit_haxe_triggered()
+{
+    tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->setHighlighter(Document::haxe);
+}
+
+void MainWindow::on_actionEdit_html_triggered()
+{
+    tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->setHighlighter(Document::html);
+}
+
+void MainWindow::on_actionEdit_java_triggered()
+{
+    tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->setHighlighter(Document::java);
+}
+
+void MainWindow::on_actionEdit_javascript_triggered()
+{
+    tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->setHighlighter(Document::javascript);
+}
+
+void MainWindow::on_actionEdit_latex_triggered()
+{
+    tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->setHighlighter(Document::latex);
+}
+
+void MainWindow::on_actionEdit_ldap_triggered()
+{
+    tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->setHighlighter(Document::ldap);
+}
+
+void MainWindow::on_actionEdit_logtalk_triggered()
+{
+    tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->setHighlighter(Document::logtalk);
+}
+
+void MainWindow::on_actionEdit_lsm_triggered()
+{
+    tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->setHighlighter(Document::lsm);
+}
+
+void MainWindow::on_actionEdit_lua_triggered()
+{
+    tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->setHighlighter(Document::lua);
+}
+
+void MainWindow::on_actionEdit_m4_triggered()
+{
+    tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->setHighlighter(Document::m4);
+}
+
+void MainWindow::on_actionEdit_oz_triggered()
+{
+    tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->setHighlighter(Document::oz);
+}
+
+void MainWindow::on_actionEdit_pascal_triggered()
+{
+    tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->setHighlighter(Document::pascal);
+}
+
+void MainWindow::on_actionEdit_perl_triggered()
+{
+    tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->setHighlighter(Document::perl);
+}
+
+void MainWindow::on_actionEdit_php_triggered()
+{
+    tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->setHighlighter(Document::php);
+}
+
+void MainWindow::on_actionEdit_postscript_triggered()
+{
+    tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->setHighlighter(Document::postscript);
+}
+
+void MainWindow::on_actionEdit_prolog_triggered()
+{
+    tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->setHighlighter(Document::prolog);
+}
+
+void MainWindow::on_actionEdit_ruby_triggered()
+{
+    tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->setHighlighter(Document::ruby);
+}
+
+void MainWindow::on_actionEdit_python_triggered()
+{
+    tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->setHighlighter(Document::python);
+}
+
+void MainWindow::on_actionEdit_scala_triggered()
+{
+    tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->setHighlighter(Document::scala);
+}
+
+void MainWindow::on_actionEdit_sml_triggered()
+{
+    tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->setHighlighter(Document::sml);
+}
+
+void MainWindow::on_actionEdit_sql_triggered()
+{
+    tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->setHighlighter(Document::sql);
+}
+
+void MainWindow::on_actionEdit_xml_triggered()
+{
+    tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->setHighlighter(Document::xml);
+}
+
+void MainWindow::on_actionEdit_xorg_triggered()
+{
+    tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->setHighlighter(Document::xorg);
 }
 
 void MainWindow::on_actionView_Line_Wrap_triggered()
