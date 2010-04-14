@@ -14,7 +14,7 @@ RC_FILE = cahootsresources.rc
 # Mac icon/plist
 ICON = images/icon.icns
 QMAKE_INFO_PLIST = app.plist
-LIBS += /usr/lib/libsource-highlight-qt4.so
+
 SOURCES += main.cpp \
     mainwindow.cpp \
     document.cpp \

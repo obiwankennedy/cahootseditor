@@ -8,6 +8,7 @@ FirstRunDialog::FirstRunDialog(QWidget *parent) :
     ui->setupUi(this);
 
     connect(ui->buttonBox, SIGNAL(accepted()), this, SLOT(dialogAccepted()));
+    ui->labelPc->hide();
 }
 
 FirstRunDialog::~FirstRunDialog()

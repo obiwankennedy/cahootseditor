@@ -28,6 +28,11 @@ ParticipantsPane::ParticipantsPane(QWidget *parent) :
     roItem = ui->treeWidget->topLevelItem(1);
     waitItem = ui->treeWidget->topLevelItem(2);
     owner = rwItem->child(0);
+
+    ui->connectInfoLabel->setFont(QFont(Utilities::labelFont, Utilities::labelFontSize));
+    ui->participantsLabel->setFont(QFont(Utilities::labelFont, Utilities::labelFontSize));
+    ui->promotePushButton->setFont(QFont(Utilities::labelFont, Utilities::labelFontSize));
+    ui->demotePushButton->setFont(QFont(Utilities::labelFont, Utilities::labelFontSize));
 }
 
 ParticipantsPane::~ParticipantsPane()

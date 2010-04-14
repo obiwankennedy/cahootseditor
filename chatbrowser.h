@@ -1,9 +1,9 @@
 #ifndef CHATBROWSER_H
 #define CHATBROWSER_H
 
-#include <QPlainTextEdit>
+#include <QTextEdit>
 
-class ChatBrowser : public QPlainTextEdit
+class ChatBrowser : public QTextEdit
 {
 Q_OBJECT
 public:
@@ -16,7 +16,7 @@ signals:
 
 public slots:
 
-protected:
+private:
     void keyPressEvent(QKeyEvent *e);
 };
 

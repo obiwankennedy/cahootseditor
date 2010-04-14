@@ -1,6 +1,8 @@
 #include "announcedocumentdialog.h"
 #include "ui_announcedocumentdialog.h"
 
+#include "utilities.h"
+
 AnnounceDocumentDialog::AnnounceDocumentDialog(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::AnnounceDocumentDialog)
@@ -12,6 +14,7 @@ AnnounceDocumentDialog::AnnounceDocumentDialog(QWidget *parent) :
     QRegExp nameRx("[a-zA-Z0-9_]*");
     nameValidator = new QRegExpValidator(nameRx, 0);
     ui->nameLineEdit->setValidator(nameValidator);
+    ui->prefrencesLabel->setFont(QFont(Utilities::labelFont, Utilities::labelFontSize - 1));
 }
 
 AnnounceDocumentDialog::~AnnounceDocumentDialog()

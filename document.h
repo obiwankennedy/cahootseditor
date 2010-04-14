@@ -61,10 +61,7 @@ public:
 
     // Sets the highlighting style to the below Highlighter
     void setHighlighter(int Highlighter);
-    enum Highlighter {none, ada, c, cplusplus, csharp, css, flex, fortran, glsl, haxe,
-                      html, java, javascript, latex, ldap, logtalk, lsm, lua, m4, oz,
-                      pascal, perl, php, postscript, prolog, python, ruby, scala, sml,
-                      sql, xml, xorg};
+    enum Highlighter {None, CPlusPlus, Python};
 
     // returns if the editor is undable
     bool isUndoable();

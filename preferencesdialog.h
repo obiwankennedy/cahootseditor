@@ -36,6 +36,8 @@ private slots:
     void on_chatDefault_clicked();
     void on_participantsDefault_clicked();
 
+    void storeSharingSettings();
+
 signals:
     void setEditorFont(QFont);
     void setChatFont(QFont);

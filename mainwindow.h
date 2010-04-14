@@ -76,38 +76,9 @@ private slots:
     void on_actionEdit_Find_triggered();
 
     //Syntax Highlighting
-    void on_actionEdit_none_triggered();
-    void on_actionEdit_ada_triggered();
-    void on_actionEdit_c_triggered();
-    void on_actionEdit_cpp_triggered();
-    void on_actionEdit_csharp_triggered();
-    void on_actionEdit_css_triggered();
-    void on_actionEdit_flex_triggered();
-    void on_actionEdit_fortran_triggered();
-    void on_actionEdit_glsl_triggered();
-    void on_actionEdit_haxe_triggered();
-    void on_actionEdit_html_triggered();
-    void on_actionEdit_java_triggered();
-    void on_actionEdit_javascript_triggered();
-    void on_actionEdit_latex_triggered();
-    void on_actionEdit_ldap_triggered();
-    void on_actionEdit_logtalk_triggered();
-    void on_actionEdit_lsm_triggered();
-    void on_actionEdit_lua_triggered();
-    void on_actionEdit_m4_triggered();
-    void on_actionEdit_oz_triggered();
-    void on_actionEdit_pascal_triggered();
-    void on_actionEdit_perl_triggered();
-    void on_actionEdit_php_triggered();
-    void on_actionEdit_postscript_triggered();
-    void on_actionEdit_prolog_triggered();
-    void on_actionEdit_python_triggered();
-    void on_actionEdit_ruby_triggered();
-    void on_actionEdit_scala_triggered();
-    void on_actionEdit_sml_triggered();
-    void on_actionEdit_sql_triggered();
-    void on_actionEdit_xml_triggered();
-    void on_actionEdit_xorg_triggered();
+    void on_actionEdit_None_triggered();
+    void on_actionEdit_C_triggered();
+    void on_actionEdit_Python_triggered();
 
     void on_actionView_Line_Wrap_triggered();
     void on_actionView_Hide_Show_Participants_triggered();

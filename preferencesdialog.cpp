@@ -30,33 +30,39 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    QSettings fontSettings("Cahoots", "PreferencesPane");
+    QSettings settings("Cahoots", "PreferencesPane");
+
+    connect(ui->useDefaultNameCheckBox, SIGNAL(clicked()), this, SLOT(storeSharingSettings()));
+    connect(ui->defaultNameLineEdit, SIGNAL(textChanged(QString)), this, SLOT(storeSharingSettings()));
+    ui->useDefaultNameCheckBox->setChecked(settings.value("alwaysUseName", false).toBool());
+    ui->defaultNameLineEdit->setText(settings.value("myName", "").toString());
+
     QFont editorFont;
-    if (fontSettings.value("editorFont").toString() == "") {
+    if (settings.value("editorFont").toString() == "") {
         editorFont = QFont(Utilities::codeFont, Utilities::codeFontSize);
     }
     else {
-        editorFont.fromString(fontSettings.value("editorFont").toString());
+        editorFont.fromString(settings.value("editorFont").toString());
     }
     ui->showEditorFont->setFont(editorFont);
     ui->showEditorFont->setText(editorFont.family().toAscii());
 
     QFont chatFont;
-    if (fontSettings.value("chatFont").toString() == "") {
+    if (settings.value("chatFont").toString() == "") {
         chatFont = QFont(Utilities::chatFont, Utilities::chatFontSize);
     }
     else {
-        chatFont.fromString(fontSettings.value("chatFont").toString());
+        chatFont.fromString(settings.value("chatFont").toString());
     }
     ui->showChatFont->setFont(chatFont);
     ui->showChatFont->setText(chatFont.family().toAscii());
 
     QFont participantsFont;
-    if (fontSettings.value("participantsFont").toString() == "") {
+    if (settings.value("participantsFont").toString() == "") {
         participantsFont = QFont(Utilities::labelFont, Utilities::labelFontSize);
     }
     else {
-        participantsFont.fromString(fontSettings.value("participantsFont").toString());
+        participantsFont.fromString(settings.value("participantsFont").toString());
     }
     ui->showParticipantsFont->setFont(participantsFont);
     ui->showParticipantsFont->setText(participantsFont.family().toAscii());
@@ -64,6 +70,14 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) :
     emit setEditorFont(editorFont);
     emit setChatFont(chatFont);
     emit setParticipantsFont(participantsFont);
+
+    ui->changeEditor->setFont(QFont(Utilities::labelFont, Utilities::labelFontSize));
+    ui->changeChat->setFont(QFont(Utilities::labelFont, Utilities::labelFontSize));
+    ui->changeParticipants->setFont(QFont(Utilities::labelFont, Utilities::labelFontSize));
+
+    ui->editorDefault->setFont(QFont(Utilities::labelFont, Utilities::labelFontSize));
+    ui->chatDefault->setFont(QFont(Utilities::labelFont, Utilities::labelFontSize));
+    ui->participantsDefault->setFont(QFont(Utilities::labelFont, Utilities::labelFontSize));
 }
 
 PreferencesDialog::~PreferencesDialog()
@@ -173,3 +187,13 @@ void PreferencesDialog::on_participantsDefault_clicked()
     ui->showParticipantsFont->setText(defaultFont.family().toAscii());
     emit setParticipantsFont(defaultFont);
 }
+
+void PreferencesDialog::storeSharingSettings()
+{
+    QSettings sharingSettings("Cahoots", "Preferences");
+    sharingSettings.setValue("alwaysUseName", ui->useDefaultNameCheckBox->isChecked());
+    if (ui->defaultNameLineEdit->text() != "") {
+        sharingSettings.setValue("myName", ui->defaultNameLineEdit->text());
+    }
+}
+
