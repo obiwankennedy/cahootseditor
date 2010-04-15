@@ -21,7 +21,6 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
-    ui->mainToolBar->hide();
     ui->tabWidget->setFont(QFont(Utilities::labelFont, Utilities::labelFontSize));
 
     connect(ui->tabWidget, SIGNAL(currentChanged(int)), this, SLOT(documentChanged(int)));
@@ -104,24 +103,6 @@ void MainWindow::writeSettings()
     settings.setValue("size", size());
     settings.setValue("name", preferencesDialog->getMyName());
     settings.setValue("isNotFirstRun", true);
-}
-
-QString MainWindow::getSystem() {
-    #ifdef Q_WS_X11
-    return QString("Linux");
-    #endif
-
-    #ifdef Q_WS_MAC
-    return QString("Mac");
-    #endif
-
-    #ifdef Q_WS_QWS
-    return QString("Embedded Linux");
-    #endif
-
-    #ifdef Q_WS_WIN
-    return QString("Windows");
-    #endif
 }
 
 // Protected closeEvent

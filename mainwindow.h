@@ -49,8 +49,6 @@ private:
 
     QString myName; // global name used for connecting to documents
 
-    QString getSystem();
-
 protected:
     void closeEvent(QCloseEvent *event);
 

@@ -1,6 +1,8 @@
 #include "firstrundialog.h"
 #include "ui_firstrundialog.h"
 
+#include "utilities.h"
+
 FirstRunDialog::FirstRunDialog(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::FirstRunDialog)
@@ -8,7 +10,12 @@ FirstRunDialog::FirstRunDialog(QWidget *parent) :
     ui->setupUi(this);
 
     connect(ui->buttonBox, SIGNAL(accepted()), this, SLOT(dialogAccepted()));
-    ui->labelPc->hide();
+    if (Utilities::getSystem() == "Mac") {
+        ui->labelPc->hide();
+    }
+    else {
+        ui->labelMac->hide();
+    }
 }
 
 FirstRunDialog::~FirstRunDialog()
