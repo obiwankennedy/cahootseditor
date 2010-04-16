@@ -27,6 +27,12 @@ bool AnnounceDocumentDialog::isBroadcastingChecked()
     return ui->broadcastCheckBox->isChecked();
 }
 
+void AnnounceDocumentDialog::setAnnounceDialogInfo(QString name, bool alwaysUseThisName)
+{
+    ui->nameLineEdit->setText(name);
+    ui->alwaysUseCheckBox->setChecked(alwaysUseThisName);
+}
+
 void AnnounceDocumentDialog::dialogAccepted()
 {
     if (ui->nameLineEdit->text().length() != 0) {

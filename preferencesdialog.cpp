@@ -24,18 +24,21 @@
 #include <QFontDialog>
 #include <QSettings>
 
+#include <QDebug>
+
 PreferencesDialog::PreferencesDialog(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::PreferencesDialog)
 {
     ui->setupUi(this);
 
-    QSettings settings("Cahoots", "PreferencesPane");
+    QSettings settings("Cahoots", "Preferences");
 
     connect(ui->useDefaultNameCheckBox, SIGNAL(clicked()), this, SLOT(storeSharingSettings()));
-    connect(ui->defaultNameLineEdit, SIGNAL(textChanged(QString)), this, SLOT(storeSharingSettings()));
+    connect(ui->defaultNameLineEdit, SIGNAL(textEdited(QString)), this, SLOT(storeSharingSettings()));
     ui->useDefaultNameCheckBox->setChecked(settings.value("alwaysUseName", false).toBool());
     ui->defaultNameLineEdit->setText(settings.value("myName", "").toString());
+    qDebug() << ui->defaultNameLineEdit->text();
 
     QFont editorFont;
     if (settings.value("editorFont").toString() == "") {
@@ -87,24 +90,24 @@ PreferencesDialog::~PreferencesDialog()
 
 void PreferencesDialog::setMyName(QString name)
 {
-    myName = name;
     ui->defaultNameLineEdit->setText(name);
+    storeSharingSettings();
 }
 
 QString PreferencesDialog::getMyName()
 {
-    return myName;
+    return ui->defaultNameLineEdit->text();
+    storeSharingSettings();
 }
 
 void PreferencesDialog::setAlwaysUseMyName(bool b)
 {
-    alwaysUseMyName = b;
     ui->useDefaultNameCheckBox->setChecked(b);
 }
 
 bool PreferencesDialog::getAlwaysUseMyName()
 {
-    return alwaysUseMyName;
+    return ui->useDefaultNameCheckBox->isChecked();
 }
 
 void PreferencesDialog::changeEvent(QEvent *e)
@@ -122,7 +125,7 @@ void PreferencesDialog::changeEvent(QEvent *e)
 void PreferencesDialog::on_changeEditor_clicked()
 {
     bool ok = false;
-    QFont newFont = QFontDialog::getFont(&ok, QFont(font()), this, "Code Editor Font");
+    QFont newFont = QFontDialog::getFont(&ok, ui->showEditorFont->font(), this, "Code Editor Font");
     if (ok) {
         QSettings editorFontSettings("Cahoots", "Preferences");
         editorFontSettings.setValue("editorFont", newFont.toString());
@@ -135,7 +138,7 @@ void PreferencesDialog::on_changeEditor_clicked()
 void PreferencesDialog::on_changeChat_clicked()
 {
     bool ok = false;
-    QFont newFont = QFontDialog::getFont(&ok, QFont(font()), this, "Chat Pane Font");
+    QFont newFont = QFontDialog::getFont(&ok, ui->showChatFont->font(), this, "Chat Pane Font");
     if (ok) {
         QSettings chatFontSettings("Cahoots", "Preferences");
         chatFontSettings.setValue("chatFont", newFont.toString());
@@ -148,7 +151,7 @@ void PreferencesDialog::on_changeChat_clicked()
 void PreferencesDialog::on_changeParticipants_clicked()
 {
     bool ok = false;
-    QFont newFont = QFontDialog::getFont(&ok, QFont(font()), this, "Participants Pane Font");
+    QFont newFont = QFontDialog::getFont(&ok, ui->showParticipantsFont->font(), this, "Participants Pane Font");
     if (ok) {
         QSettings participantsFontSettings("Cahoots", "Preferences");
         participantsFontSettings.setValue("participantsFont", newFont.toString());
@@ -192,8 +195,9 @@ void PreferencesDialog::storeSharingSettings()
 {
     QSettings sharingSettings("Cahoots", "Preferences");
     sharingSettings.setValue("alwaysUseName", ui->useDefaultNameCheckBox->isChecked());
-    if (ui->defaultNameLineEdit->text() != "") {
+    if (ui->defaultNameLineEdit->text() == "") {
         sharingSettings.setValue("myName", ui->defaultNameLineEdit->text());
     }
+    emit setAnnounceDialogInfo(ui->defaultNameLineEdit->text(), ui->useDefaultNameCheckBox->isChecked());
 }
 

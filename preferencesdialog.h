@@ -25,9 +25,6 @@ protected:
 private:
     Ui::PreferencesDialog *ui;
 
-    QString myName;
-    bool alwaysUseMyName;
-
 private slots:
     void on_changeEditor_clicked();
     void on_changeChat_clicked();
@@ -42,6 +39,7 @@ signals:
     void setEditorFont(QFont);
     void setChatFont(QFont);
     void setParticipantsFont(QFont);
+    void setAnnounceDialogInfo(QString, bool);
 };
 
 #endif // PREFERENCESDIALOG_H

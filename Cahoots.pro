@@ -6,7 +6,7 @@ TARGET = Cahoots
 TEMPLATE = app
 QT += webkit
 QT += xml
-CONFIG += x86
+CONFIG += x86 ppc
 
 # Windows RC file
 RC_FILE = cahootsresources.rc

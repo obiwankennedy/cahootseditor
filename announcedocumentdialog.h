@@ -21,6 +21,9 @@ private:
 
     QRegExpValidator *nameValidator;
 
+public slots:
+    void setAnnounceDialogInfo(QString name, bool alwaysUseThisName);
+
 private slots:
     void dialogAccepted();
 

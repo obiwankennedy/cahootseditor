@@ -49,6 +49,12 @@ MainWindow::MainWindow(QWidget *parent)
     announceDocumentDialog = new AnnounceDocumentDialog(this);
     connect(announceDocumentDialog, SIGNAL(announceDocument(QString,Qt::CheckState,Qt::CheckState)), this, SLOT(announceDocument(QString,Qt::CheckState,Qt::CheckState)));
 
+    // sets the announce dialog to the state of the preferences pane
+    announceDocumentDialog->setAnnounceDialogInfo(preferencesDialog->getMyName(), preferencesDialog->getAlwaysUseMyName());
+
+    // Connects the pref dialog to the announce dialog for when information is changed in the preferences dialog
+    connect(preferencesDialog, SIGNAL(setAnnounceDialogInfo(QString,bool)), announceDocumentDialog, SLOT(setAnnounceDialogInfo(QString,bool)));
+
     Document *document = new Document(ui->tab);
     QGridLayout *tabLayout = new QGridLayout;
     tabLayout->addWidget(document);
@@ -86,8 +92,7 @@ void MainWindow::readSettings()
     resize(size);
     move(pos);
 
-#warning "disable this when we're not messing with this dialog anymore"
-    if (true || settings.value("isNotFirstRun").toBool() != true) {
+    if (settings.value("isNotFirstRun").toBool() != true) {
         firstRunDialog = new FirstRunDialog(this);
         firstRunDialog->show();
         firstRunDialog->raise();
