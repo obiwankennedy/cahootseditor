@@ -47,7 +47,8 @@ MainWindow::MainWindow(QWidget *parent)
     connect(preferencesDialog, SIGNAL(setParticipantsFont(QFont)), this, SLOT(setParticipantsFont(QFont)));
 
     announceDocumentDialog = new AnnounceDocumentDialog(this);
-    connect(announceDocumentDialog, SIGNAL(announceDocument(QString,Qt::CheckState,Qt::CheckState)), this, SLOT(announceDocument(QString,Qt::CheckState,Qt::CheckState)));
+    connect(announceDocumentDialog, SIGNAL(announceDocument(QString,Qt::CheckState,Qt::CheckState)),
+            this, SLOT(announceDocument(QString,Qt::CheckState,Qt::CheckState)));
 
     // sets the announce dialog to the state of the preferences pane
     announceDocumentDialog->setAnnounceDialogInfo(preferencesDialog->getMyName(), preferencesDialog->getAlwaysUseMyName());
@@ -60,6 +61,10 @@ MainWindow::MainWindow(QWidget *parent)
     tabLayout->addWidget(document);
     tabLayout->setContentsMargins(0,0,0,0);
     ui->tabWidget->widget(0)->setLayout(tabLayout);
+
+    document->setEditorFont(preferencesDialog->getEditorFont());
+    document->setChatFont(preferencesDialog->getChatFont());
+    document->setParticipantsFont(preferencesDialog->getParticipantsFont());
 
     tabWidgetToDocumentMap.insert(ui->tabWidget->currentWidget(), document);
 
@@ -264,6 +269,10 @@ void MainWindow::on_actionFile_New_triggered()
     tabLayout->addWidget(document);
     tabLayout->setContentsMargins(0,0,0,0);
     ui->tabWidget->widget(index)->setLayout(tabLayout);
+
+    document->setEditorFont(preferencesDialog->getEditorFont());
+    document->setChatFont(preferencesDialog->getChatFont());
+    document->setParticipantsFont(preferencesDialog->getParticipantsFont());
 
     tabWidgetToDocumentMap.insert(ui->tabWidget->widget(index), document);
 

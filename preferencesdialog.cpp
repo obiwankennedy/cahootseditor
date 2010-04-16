@@ -110,6 +110,21 @@ bool PreferencesDialog::getAlwaysUseMyName()
     return ui->useDefaultNameCheckBox->isChecked();
 }
 
+QFont PreferencesDialog::getEditorFont()
+{
+    return ui->showEditorFont->font();
+}
+
+QFont PreferencesDialog::getChatFont()
+{
+    return ui->showChatFont->font();
+}
+
+QFont PreferencesDialog::getParticipantsFont()
+{
+    return ui->showParticipantsFont->font();
+}
+
 void PreferencesDialog::changeEvent(QEvent *e)
 {
     QDialog::changeEvent(e);
@@ -164,7 +179,7 @@ void PreferencesDialog::on_changeParticipants_clicked()
 void PreferencesDialog::on_editorDefault_clicked()
 {
     QSettings fontSettings("Cahoots", "Preferences");
-    QFont defaultFont = QFont(Utilities::labelFont, Utilities::labelFontSize);
+    QFont defaultFont = QFont(Utilities::codeFont, Utilities::codeFontSize);
     ui->showEditorFont->setFont(defaultFont);
     fontSettings.setValue("editorFont", defaultFont.toString());
     ui->showEditorFont->setText(defaultFont.family().toAscii());
@@ -174,8 +189,8 @@ void PreferencesDialog::on_editorDefault_clicked()
 void PreferencesDialog::on_chatDefault_clicked()
 {
     QSettings fontSettings("Cahoots", "Preferences");
-    QFont defaultFont = QFont(Utilities::labelFont, Utilities::labelFontSize);
-    ui->showEditorFont->setFont(defaultFont);
+    QFont defaultFont = QFont(Utilities::chatFont, Utilities::chatFontSize);
+    ui->showChatFont->setFont(defaultFont);
     fontSettings.setValue("chatFont", defaultFont.toString());
     ui->showChatFont->setText(defaultFont.family().toAscii());
     emit setChatFont(defaultFont);
@@ -185,7 +200,7 @@ void PreferencesDialog::on_participantsDefault_clicked()
 {
     QSettings fontSettings("Cahoots", "Preferences");
     QFont defaultFont = QFont(Utilities::labelFont, Utilities::labelFontSize);
-    ui->showEditorFont->setFont(defaultFont);
+    ui->showParticipantsFont->setFont(defaultFont);
     fontSettings.setValue("participantsFont", defaultFont.toString());
     ui->showParticipantsFont->setText(defaultFont.family().toAscii());
     emit setParticipantsFont(defaultFont);

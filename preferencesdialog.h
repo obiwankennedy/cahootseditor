@@ -19,6 +19,10 @@ public:
     void setAlwaysUseMyName(bool b);
     bool getAlwaysUseMyName();
 
+    QFont getEditorFont();
+    QFont getChatFont();
+    QFont getParticipantsFont();
+
 protected:
     void changeEvent(QEvent *e);
 
