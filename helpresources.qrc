@@ -1,0 +1,9 @@
+<RCC>
+    <qresource prefix="/">
+        <file>help/images/announcedialog.png</file>
+        <file>help/images/chatlistening.png</file>
+        <file>help/images/connectdialog.png</file>
+        <file>help/images/parpanelistening.png</file>
+        <file>help/collaboration.html</file>
+    </qresource>
+</RCC>
