@@ -56,7 +56,7 @@
      <x>0</x>
      <y>0</y>
      <width>758</width>
-     <height>25</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -140,6 +140,8 @@
     <property name="title">
      <string>Help</string>
     </property>
+    <addaction name="actionHelp_How_to_Collaborate"/>
+    <addaction name="separator"/>
     <addaction name="actionHelp_About_Cahoots"/>
     <addaction name="actionHelp_About_Qt"/>
    </widget>
@@ -176,6 +178,7 @@
    <addaction name="actionEdit_Cut"/>
    <addaction name="actionEdit_Copy"/>
    <addaction name="actionEdit_Paste"/>
+   <addaction name="actionHelp_How_to_Collaborate"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="actionFile_Open">
@@ -512,7 +515,18 @@
     <string>About Qt</string>
    </property>
   </action>
-
+  <action name="actionHelp_How_to_Collaborate">
+   <property name="icon">
+    <iconset resource="cahootsresc.qrc">
+     <normaloff>:/images/help.png</normaloff>:/images/help.png</iconset>
+   </property>
+   <property name="text">
+    <string>How to Collaborate</string>
+   </property>
+   <property name="iconVisibleInMenu">
+    <bool>false</bool>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources>

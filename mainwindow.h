@@ -10,6 +10,7 @@
 #include "aboutdialog.h"
 #include "firstrundialog.h"
 #include "preferencesdialog.h"
+#include "helpdialog.h"
 
 #include <QSettings>
 
@@ -36,6 +37,7 @@ private:
     PreferencesDialog *preferencesDialog;
     AboutDialog *aboutDialog;
     FirstRunDialog *firstRunDialog;
+    HelpDialog *helpDialog;
 
     bool save(int index);
     bool maybeSave(int index);
@@ -98,6 +100,7 @@ private slots:
     void on_actionWindow_Next_Document_triggered();
     void on_actionWindow_Previous_Document_triggered();
 
+    void on_actionHelp_How_to_Collaborate_triggered();
     void on_actionHelp_About_Cahoots_triggered();
     void on_actionHelp_About_Qt_triggered();
 

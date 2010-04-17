@@ -50,6 +50,8 @@ MainWindow::MainWindow(QWidget *parent)
     connect(announceDocumentDialog, SIGNAL(announceDocument(QString,Qt::CheckState,Qt::CheckState)),
             this, SLOT(announceDocument(QString,Qt::CheckState,Qt::CheckState)));
 
+    helpDialog = new HelpDialog(this);
+
     // sets the announce dialog to the state of the preferences pane
     announceDocumentDialog->setAnnounceDialogInfo(preferencesDialog->getMyName(), preferencesDialog->getAlwaysUseMyName());
 
@@ -504,6 +506,11 @@ void MainWindow::on_actionTools_Announce_Document_triggered()
     else {
         announceDocumentDialog->show();
     }
+}
+
+void MainWindow::on_actionHelp_How_to_Collaborate_triggered()
+{
+    helpDialog->show();
 }
 
 void MainWindow::on_actionHelp_About_Cahoots_triggered()

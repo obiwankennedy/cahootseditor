@@ -20,6 +20,8 @@ HelpDialog::HelpDialog(QWidget *parent) :
     else if (Utilities::getSystem() == "Windows") {
         ui->treeWidget->setFont(QFont(Utilities::labelFont, 8));
     }
+
+    ui->webView->load(QUrl("qrc:/help/collaboration.html"));
 }
 
 HelpDialog::~HelpDialog()
@@ -56,7 +58,7 @@ void HelpDialog::onCurrentItemChanged(QTreeWidgetItem*, QTreeWidgetItem*) {
 
 bool HelpDialog::hasFocus()
 {
-    return ui->leftTextEdit->hasFocus() || ui->rightCppTextEdit->hasFocus() || ui->webView->hasFocus();
+    return ui->webView->hasFocus();
 }
 
 void HelpDialog::copy()
