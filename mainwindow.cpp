@@ -562,7 +562,7 @@ void MainWindow::on_actionTools_Preview_as_Html_triggered()
 
 void MainWindow::on_actionTools_Resynchronize_Document_triggered()
 {
-    tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget()); // do more
+    tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->resynchronizeTriggered();
 }
 
 void MainWindow::on_actionTools_Preferences_triggered()
@@ -637,12 +637,16 @@ void MainWindow::on_actionWindow_Previous_Document_triggered()
 
 void MainWindow::setUndoability(bool b)
 {
-    ui->actionEdit_Undo->setEnabled(b);
+    if (sender() == tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())) {
+        ui->actionEdit_Undo->setEnabled(b);
+    }
 }
 
 void MainWindow::setRedoability(bool b)
 {
-    ui->actionEdit_Redo->setEnabled(b);
+    if (sender() == tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())) {
+        ui->actionEdit_Redo->setEnabled(b);
+    }
 }
 
 void MainWindow::documentChanged(int index)
