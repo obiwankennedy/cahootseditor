@@ -1,3 +1,21 @@
+/*
+    Cahoots is a crossplatform real-time collaborative text editor.
+
+    Copyright (C) 2010 Chris Dimpfl, Anandi Hira, David Vega
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 #include "connecttodocument.h"
 #include "ui_connecttodocument.h"
 
@@ -148,7 +166,7 @@ void ConnectToDocument::timerTimedOut()
             index = i;
         }
     }
-    qDebug() << "removing item";
+//    qDebug() << "removing item";
     ui->listWidget->takeItem(index); // This is guaranteed to be at the same index as the itemList/timerList
     itemList.removeAt(index);
     timerList.removeAt(index);
@@ -157,7 +175,7 @@ void ConnectToDocument::timerTimedOut()
 void ConnectToDocument::listWidgetItemClicked(QListWidgetItem *current)
 {
     QString text = current->text();
-    qDebug() << "Clicked: " << text;
+//    qDebug() << "Clicked: " << text;
     QRegExp rx = QRegExp("([a-zA-Z0-9_\\.]*),\\s([0-9\\.]+):(\\d+)");
     if (text.contains(rx)) {
         ui->addressLineEdit->setText(rx.cap(2));

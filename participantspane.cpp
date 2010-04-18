@@ -1,3 +1,21 @@
+/*
+    Cahoots is a crossplatform real-time collaborative text editor.
+
+    Copyright (C) 2010 Chris Dimpfl, Anandi Hira, David Vega
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 #include "participantspane.h"
 #include "ui_participantspane.h"
 
@@ -54,7 +72,7 @@ void ParticipantsPane::setConnectInfo(QString address, QString port)
 
 void ParticipantsPane::newParticipant(QTcpSocket *socket)
 {
-    qDebug() << socket << " connected";
+//    qDebug() << socket << " connected";
     // Add a participant, but don't make an item until we have a name.
     // Once we have a name, we updateName() (below) and insert it to the treeWidget
     Participant *participant = new Participant;
@@ -77,7 +95,7 @@ bool ParticipantsPane::addParticipant(QString name, QTcpSocket *socket)
     for (int i = 0; i < participantList.size(); i++) {
         if (socket->peerAddress() == participantList.at(i)->address && participantList.at(i)->name == name) {
             // duplicate connection, reject
-            qDebug() << "duplicate connection, rejecting...";
+//            qDebug() << "duplicate connection, rejecting...";
             participantList.removeOne(participant);
             participantMap.remove(socket);
             delete participant;
@@ -90,7 +108,6 @@ bool ParticipantsPane::addParticipant(QString name, QTcpSocket *socket)
     participant->item->setText(0, name);
 
     participant->color = QColor::fromHsv(qrand() % 256, 190, 190);
-//    participant->color = participant->color.lighter(150);
 
     participant->item->setBackgroundColor(1, participant->color);
     participant->item->setToolTip(0, QString("%1@%2").arg(name).arg(participant->address.toString()));
@@ -126,19 +143,16 @@ void ParticipantsPane::newParticipant(QString name, QString address, QString per
 
     // everyone has their own colors - colors aren't consistent across participants
     participant->color = QColor::fromHsv(qrand() % 256, 190, 190);
-//    participant->color = participant->color.lighter(150);
 
     if (permissions == "waiting") {
         participant->item = new QTreeWidgetItem(waitItem);
         participant->permissions = Enu::Waiting;
     }
     else if (permissions == "read") {
-        qDebug() << "adding read-only participant " << name;
         participant->item = new QTreeWidgetItem(roItem);
         participant->permissions = Enu::ReadOnly;
     }
     else if (permissions == "write") {
-        qDebug() << "adding read-write participant " << name;
         participant->item = new QTreeWidgetItem(rwItem);
         participant->permissions = Enu::ReadWrite;
     }
@@ -210,7 +224,7 @@ void ParticipantsPane::setParticipantPermissions(QString name, QString address, 
 
 void ParticipantsPane::setOwnerName(QString name)
 {
-    qDebug() << "setting owner name: " << name;
+//    qDebug() << "setting owner name: " << name;
     owner->setText(0, name);
 }
 
@@ -333,10 +347,3 @@ void ParticipantsPane::on_demotePushButton_clicked()
         }
     }
 }
-
-
-
-
-
-
-

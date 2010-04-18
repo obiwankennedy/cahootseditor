@@ -1,3 +1,21 @@
+/*
+    Cahoots is a crossplatform real-time collaborative text editor.
+
+    Copyright (C) 2010 Chris Dimpfl, Anandi Hira, David Vega
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 #include "client.h"
 
 #include <QTextDocumentFragment>
@@ -66,7 +84,7 @@ void Client::resynchronize()
 
 void Client::processData(QString data)
 {
-    qDebug() << "pdata: " << data;
+//    qDebug() << "pdata: " << data;
 
     QRegExp rx;
     if (data.startsWith("doc:")) {
@@ -137,7 +155,7 @@ void Client::processData(QString data)
     }
     else if (data.startsWith("adduser:")) {
         data.remove(0, 8);
-        qDebug() << "add user: " << data;
+//        qDebug() << "add user: " << data;
         rx = QRegExp("([a-zA-Z0-9_]*)@([0-9\\.]*):(waiting|read|write)");
         if (data.contains(rx)) {
             QString name = rx.cap(1);

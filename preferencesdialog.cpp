@@ -1,7 +1,7 @@
 /*
     Cahoots is a crossplatform real-time collaborative text editor.
 
-    Copyright (C) 2010 Chris Dimpfl
+    Copyright (C) 2010 Chris Dimpfl, Anandi Hira, David Vega
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -38,7 +38,6 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) :
     connect(ui->defaultNameLineEdit, SIGNAL(textEdited(QString)), this, SLOT(storeSharingSettings()));
     ui->useDefaultNameCheckBox->setChecked(settings.value("alwaysUseName", false).toBool());
     ui->defaultNameLineEdit->setText(settings.value("myName", "").toString());
-    qDebug() << ui->defaultNameLineEdit->text();
 
     QFont editorFont;
     if (settings.value("editorFont").toString() == "") {
