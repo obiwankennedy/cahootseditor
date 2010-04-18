@@ -237,6 +237,13 @@ void MainWindow::loadFile(const QString &fileName)
      QApplication::restoreOverrideCursor();
 
      setCurrentFile(fileName);
+
+     if (fileName.endsWith(".py")) {
+         tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->setHighlighter(Document::Python);
+     }
+     else if (fileName.endsWith(".cpp") || fileName.endsWith(".c") || fileName.endsWith(".h") || fileName.endsWith(".hpp")) {
+         tabWidgetToDocumentMap.value(ui->tabWidget->currentWidget())->setHighlighter(Document::CPlusPlus);
+     }
      statusBar()->showMessage("File loaded", 4000);
 }
 

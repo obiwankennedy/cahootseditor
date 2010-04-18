@@ -40,7 +40,7 @@ Document::Document(QWidget *parent) :
     bottomEditor->hide();
 
     // editor highlighter
-    highlighter = new CppHighlighter(editor->document());
+    // highlighter = new CppHighlighter(editor->document());
 
     // Participant frame
     delete ui->participantFrame;
