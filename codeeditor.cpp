@@ -235,7 +235,9 @@ void CodeEditor::shiftRight()
     int end = cursor.selectionEnd();
     int start = cursor.selectionStart();
     if (cursor.hasSelection()) {
+//        setWordWrapMode(QTextOption::NoWrap);    //I need to figure out how to handle if WordWrap is enabled
         cursor.setPosition(start);
+        cursor.movePosition(QTextCursor::StartOfLine);
         int i = cursor.position();
         cursor.beginEditBlock();
         while (i < end) {
@@ -249,7 +251,12 @@ void CodeEditor::shiftRight()
                 cursor.movePosition(QTextCursor::Down);
                 i = cursor.position();
             }
+//            if (wordWrapMode()) {
+//
+//            }
+//            Need to figure out what to do here
         }
+        start += 4;
         cursor.endEditBlock();
     } else {
         cursor.movePosition(QTextCursor::StartOfLine);
@@ -441,7 +448,7 @@ bool CodeEditor::findAll(QString searchString)
 {
     QString documentString = document()->toPlainText();
     bool isFound = false;
-
+    #warning: This needs to be refined so that not just any action is undone.
     if (!isFirstTime) {
         undo();
     }
