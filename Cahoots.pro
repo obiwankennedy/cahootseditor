@@ -3,7 +3,7 @@
 # -------------------------------------------------
 TARGET = Cahoots
 TEMPLATE = app
-CONFIG += x86
+CONFIG += x86 ppc
 QT += network \
     webkit
 
