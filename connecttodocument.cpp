@@ -160,7 +160,7 @@ void ConnectToDocument::timerTimedOut()
 {
     QTimer *timer = qobject_cast<QTimer *>(sender());
     timer->stop();
-    int index;
+    int index = 0;
     for (int i = 0; i < timerList.size(); i++) {
         if (timer == timerList.at(i)) {
             index = i;

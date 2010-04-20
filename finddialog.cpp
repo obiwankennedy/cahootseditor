@@ -55,7 +55,7 @@ void FindDialog::on_findNextPushButton_clicked()
     else {
         sensitivity = Qt::CaseSensitive;
     }
-    Enu::FindMode mode;
+    Enu::FindMode mode = Enu::Contains;
     if (ui->findModeComboBox->currentText() == "Contains") {
         mode = Enu::Contains;
     }
@@ -79,7 +79,7 @@ void FindDialog::on_findPreviousPushButton_clicked()
     else {
         sensitivity = Qt::CaseSensitive;
     }
-    Enu::FindMode mode;
+    Enu::FindMode mode = Enu::Contains;
     if (ui->findModeComboBox->currentText() == "Contains") {
         mode = Enu::Contains;
     }
@@ -103,7 +103,7 @@ void FindDialog::on_replaceAllPushButton_clicked()
     else {
         sensitivity = Qt::CaseSensitive;
     }
-    Enu::FindMode mode;
+    Enu::FindMode mode = Enu::Contains;
     if (ui->findModeComboBox->currentText() == "Contains") {
         mode = Enu::Contains;
     }
@@ -133,7 +133,7 @@ void FindDialog::on_findReplacePushButton_clicked()
     else {
         sensitivity = Qt::CaseSensitive;
     }
-    Enu::FindMode mode;
+    Enu::FindMode mode = Enu::Contains;
     if (ui->findModeComboBox->currentText() == "Contains") {
         mode = Enu::Contains;
     }
