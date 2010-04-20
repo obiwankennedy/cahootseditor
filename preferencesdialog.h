@@ -55,6 +55,8 @@ private slots:
     void on_chatDefault_clicked();
     void on_participantsDefault_clicked();
 
+    void storeName(QString);
+    // Called by storeName
     void storeSharingSettings();
 
 signals:

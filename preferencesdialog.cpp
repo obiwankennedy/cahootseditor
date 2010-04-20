@@ -35,7 +35,7 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) :
     QSettings settings("Cahoots", "Preferences");
 
     connect(ui->useDefaultNameCheckBox, SIGNAL(clicked()), this, SLOT(storeSharingSettings()));
-    connect(ui->defaultNameLineEdit, SIGNAL(textEdited(QString)), this, SLOT(storeSharingSettings()));
+    connect(ui->defaultNameLineEdit, SIGNAL(textEdited(QString)), this, SLOT(storeName(QString)));
     ui->useDefaultNameCheckBox->setChecked(settings.value("alwaysUseName", false).toBool());
     ui->defaultNameLineEdit->setText(settings.value("myName", "").toString());
 
@@ -205,12 +205,18 @@ void PreferencesDialog::on_participantsDefault_clicked()
     emit setParticipantsFont(defaultFont);
 }
 
+void PreferencesDialog::storeName(QString)
+{
+    storeSharingSettings();
+}
+
 void PreferencesDialog::storeSharingSettings()
 {
     QSettings sharingSettings("Cahoots", "Preferences");
     sharingSettings.setValue("alwaysUseName", ui->useDefaultNameCheckBox->isChecked());
     if (ui->defaultNameLineEdit->text() == "") {
         sharingSettings.setValue("myName", ui->defaultNameLineEdit->text());
+        qDebug() << "set name: " << ui->defaultNameLineEdit->text();
     }
     emit setAnnounceDialogInfo(ui->defaultNameLineEdit->text(), ui->useDefaultNameCheckBox->isChecked());
 }
