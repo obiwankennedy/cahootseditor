@@ -214,7 +214,7 @@ void PreferencesDialog::storeSharingSettings()
 {
     QSettings sharingSettings("Cahoots", "Preferences");
     sharingSettings.setValue("alwaysUseName", ui->useDefaultNameCheckBox->isChecked());
-    if (ui->defaultNameLineEdit->text() == "") {
+    if (ui->defaultNameLineEdit->text() != "") {
         sharingSettings.setValue("myName", ui->defaultNameLineEdit->text());
         qDebug() << "set name: " << ui->defaultNameLineEdit->text();
     }

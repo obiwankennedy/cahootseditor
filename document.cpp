@@ -60,6 +60,8 @@ Document::Document(QWidget *parent) :
     // editor highlighter
     // highlighter = new CppHighlighter(editor->document());
 
+    highlighter = NULL;
+
     // Participant frame
     delete ui->participantFrame;
     participantPane = new ParticipantsPane();
@@ -291,13 +293,16 @@ void Document::setHighlighter(int Highlighter)
     case CPlusPlus:
         if (highlighter) {
             delete highlighter;
+            highlighter = NULL;
         }
         highlighter = new CppHighlighter(editor->document());
         break;
     case Python:
         if (highlighter) {
             delete highlighter;
+            highlighter = NULL;
         }
+        highlighter = new PythonHighlighter(editor->document());
         break;
     default:
         break;
