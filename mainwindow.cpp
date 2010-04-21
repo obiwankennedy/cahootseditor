@@ -180,6 +180,11 @@ bool MainWindow::eventFilter(QObject *, QEvent *event)
 
             ui->actionWindow_Next_Document->setEnabled(ui->tabWidget->count() > 1);
             ui->actionWindow_Previous_Document->setEnabled(ui->tabWidget->count() > 1);
+
+            document->setEditorFont(preferencesDialog->getEditorFont());
+            document->setChatFont(preferencesDialog->getChatFont());
+            document->setParticipantsFont(preferencesDialog->getParticipantsFont());
+
         }
         event->accept();
         return true;
@@ -336,6 +341,10 @@ void MainWindow::on_actionFile_Open_triggered()
 
         connect(document, SIGNAL(undoAvailable(bool)), this, SLOT(setUndoability(bool)));
         connect(document, SIGNAL(redoAvailable(bool)), this, SLOT(setRedoability(bool)));
+
+        document->setEditorFont(preferencesDialog->getEditorFont());
+        document->setChatFont(preferencesDialog->getChatFont());
+        document->setParticipantsFont(preferencesDialog->getParticipantsFont());
 
         ui->tabWidget->setCurrentIndex(index);
 
