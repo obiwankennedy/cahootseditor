@@ -41,45 +41,45 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) :
 
     QFont editorFont;
     if (settings.value("editorFont").toString() == "") {
-        editorFont = QFont(Utilities::codeFont, Utilities::codeFontSize);
+        editorFont = QFont(Utilities::s_codeFont, Utilities::s_codeFontSize);
     }
     else {
         editorFont.fromString(settings.value("editorFont").toString());
     }
     ui->showEditorFont->setFont(editorFont);
-    ui->showEditorFont->setText(editorFont.family().toAscii());
+    ui->showEditorFont->setText(editorFont.family().toLatin1());
 
     QFont chatFont;
     if (settings.value("chatFont").toString() == "") {
-        chatFont = QFont(Utilities::chatFont, Utilities::chatFontSize);
+        chatFont = QFont(Utilities::s_chatFont, Utilities::s_chatFontSize);
     }
     else {
         chatFont.fromString(settings.value("chatFont").toString());
     }
     ui->showChatFont->setFont(chatFont);
-    ui->showChatFont->setText(chatFont.family().toAscii());
+    ui->showChatFont->setText(chatFont.family().toLatin1());
 
     QFont participantsFont;
     if (settings.value("participantsFont").toString() == "") {
-        participantsFont = QFont(Utilities::labelFont, Utilities::labelFontSize);
+        participantsFont = QFont(Utilities::s_labelFont, Utilities::s_labelFontSize);
     }
     else {
         participantsFont.fromString(settings.value("participantsFont").toString());
     }
     ui->showParticipantsFont->setFont(participantsFont);
-    ui->showParticipantsFont->setText(participantsFont.family().toAscii());
+    ui->showParticipantsFont->setText(participantsFont.family().toLatin1());
 
     emit setEditorFont(editorFont);
     emit setChatFont(chatFont);
     emit setParticipantsFont(participantsFont);
 
-    ui->changeEditor->setFont(QFont(Utilities::labelFont, Utilities::labelFontSize));
-    ui->changeChat->setFont(QFont(Utilities::labelFont, Utilities::labelFontSize));
-    ui->changeParticipants->setFont(QFont(Utilities::labelFont, Utilities::labelFontSize));
+    ui->changeEditor->setFont(QFont(Utilities::s_labelFont, Utilities::s_labelFontSize));
+    ui->changeChat->setFont(QFont(Utilities::s_labelFont, Utilities::s_labelFontSize));
+    ui->changeParticipants->setFont(QFont(Utilities::s_labelFont, Utilities::s_labelFontSize));
 
-    ui->editorDefault->setFont(QFont(Utilities::labelFont, Utilities::labelFontSize));
-    ui->chatDefault->setFont(QFont(Utilities::labelFont, Utilities::labelFontSize));
-    ui->participantsDefault->setFont(QFont(Utilities::labelFont, Utilities::labelFontSize));
+    ui->editorDefault->setFont(QFont(Utilities::s_labelFont, Utilities::s_labelFontSize));
+    ui->chatDefault->setFont(QFont(Utilities::s_labelFont, Utilities::s_labelFontSize));
+    ui->participantsDefault->setFont(QFont(Utilities::s_labelFont, Utilities::s_labelFontSize));
 }
 
 PreferencesDialog::~PreferencesDialog()
@@ -144,7 +144,7 @@ void PreferencesDialog::on_changeEditor_clicked()
         QSettings editorFontSettings("Cahoots", "Preferences");
         editorFontSettings.setValue("editorFont", newFont.toString());
         ui->showEditorFont->setFont(newFont);
-        ui->showEditorFont->setText(newFont.family().toAscii());
+        ui->showEditorFont->setText(newFont.family().toLatin1());
         emit setEditorFont(newFont);
     }
 }
@@ -157,7 +157,7 @@ void PreferencesDialog::on_changeChat_clicked()
         QSettings chatFontSettings("Cahoots", "Preferences");
         chatFontSettings.setValue("chatFont", newFont.toString());
         ui->showChatFont->setFont(newFont);
-        ui->showChatFont->setText(newFont.family().toAscii());
+        ui->showChatFont->setText(newFont.family().toLatin1());
         emit setChatFont(newFont);
     }
 }
@@ -170,7 +170,7 @@ void PreferencesDialog::on_changeParticipants_clicked()
         QSettings participantsFontSettings("Cahoots", "Preferences");
         participantsFontSettings.setValue("participantsFont", newFont.toString());
         ui->showParticipantsFont->setFont(newFont);
-        ui->showParticipantsFont->setText(newFont.family().toAscii());
+        ui->showParticipantsFont->setText(newFont.family().toLatin1());
         emit setParticipantsFont(newFont);
     }
 }
@@ -178,30 +178,30 @@ void PreferencesDialog::on_changeParticipants_clicked()
 void PreferencesDialog::on_editorDefault_clicked()
 {
     QSettings fontSettings("Cahoots", "Preferences");
-    QFont defaultFont = QFont(Utilities::codeFont, Utilities::codeFontSize);
+    QFont defaultFont = QFont(Utilities::s_codeFont, Utilities::s_codeFontSize);
     ui->showEditorFont->setFont(defaultFont);
     fontSettings.setValue("editorFont", defaultFont.toString());
-    ui->showEditorFont->setText(defaultFont.family().toAscii());
+    ui->showEditorFont->setText(defaultFont.family().toLatin1());
     emit setEditorFont(defaultFont);
 }
 
 void PreferencesDialog::on_chatDefault_clicked()
 {
     QSettings fontSettings("Cahoots", "Preferences");
-    QFont defaultFont = QFont(Utilities::chatFont, Utilities::chatFontSize);
+    QFont defaultFont = QFont(Utilities::s_chatFont, Utilities::s_chatFontSize);
     ui->showChatFont->setFont(defaultFont);
     fontSettings.setValue("chatFont", defaultFont.toString());
-    ui->showChatFont->setText(defaultFont.family().toAscii());
+    ui->showChatFont->setText(defaultFont.family().toLatin1());
     emit setChatFont(defaultFont);
 }
 
 void PreferencesDialog::on_participantsDefault_clicked()
 {
     QSettings fontSettings("Cahoots", "Preferences");
-    QFont defaultFont = QFont(Utilities::labelFont, Utilities::labelFontSize);
+    QFont defaultFont = QFont(Utilities::s_labelFont, Utilities::s_labelFontSize);
     ui->showParticipantsFont->setFont(defaultFont);
     fontSettings.setValue("participantsFont", defaultFont.toString());
-    ui->showParticipantsFont->setText(defaultFont.family().toAscii());
+    ui->showParticipantsFont->setText(defaultFont.family().toLatin1());
     emit setParticipantsFont(defaultFont);
 }
 

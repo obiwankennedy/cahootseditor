@@ -113,7 +113,7 @@ void Server::resynchronize()
 void Server::setOwnerName(QString name)
 {
     myName = name;
-    writeToAll(QString("helo:%1").arg(myName).toAscii());
+    writeToAll(QString("helo:%1").arg(myName).toLatin1());
     participantPane->setOwnerName(name);
 }
 
@@ -165,7 +165,7 @@ void Server::processData(QString data, QTcpSocket *sender)
             QString name = rx.cap(1);
             if (participantPane->addParticipant(name, sender)) { // returns false if there is a duplicate
                 toSend = "join:" + participantPane->getNameAddressForSocket(sender);
-                writeToSocket(QString("helo:%1").arg(myName).toAscii(), sender);
+                writeToSocket(QString("helo:%1").arg(myName).toLatin1(), sender);
             }
             else {
                 disconnect(sender, SIGNAL(disconnected()), this, SLOT(disconnected()));
@@ -325,7 +325,7 @@ void Server::broadcastDatagram()
         ipAddress = QHostAddress(QHostAddress::LocalHost).toString();
     }
 
-    datagram = QString("untitled.txt@%1:%2").arg(ipAddress).arg(server->serverPort()).toAscii();
+    datagram = QString("untitled.txt@%1:%2").arg(ipAddress).arg(server->serverPort()).toLatin1();
     udpSocket->writeDatagram(datagram.data(), datagram.size(), QHostAddress::Broadcast, 45321);
 }
 

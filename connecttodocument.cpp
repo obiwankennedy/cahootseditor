@@ -121,9 +121,9 @@ void ConnectToDocument::on_previousDocsComboBox_currentIndexChanged()
         QString info = ui->previousDocsComboBox->currentText();
         QRegExp rx = QRegExp("(\\w+)@([0-9\\.]+):(\\d+)");
         if (info.contains(rx)) {
-            ui->usernameLineEdit->setText(rx.cap(1).toAscii());
-            ui->addressLineEdit->setText(rx.cap(2).toAscii());
-            ui->portLineEdit->setText(rx.cap(3).toAscii());
+            ui->usernameLineEdit->setText(rx.cap(1).toLatin1());
+            ui->addressLineEdit->setText(rx.cap(2).toLatin1());
+            ui->portLineEdit->setText(rx.cap(3).toLatin1());
         }
     }
 }

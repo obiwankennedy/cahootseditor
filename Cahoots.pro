@@ -1,18 +1,20 @@
 # -------------------------------------------------
 # Project created by QtCreator 2009-09-14T19:31:57
 # -------------------------------------------------
-TARGET = Cahoots
+TARGET = cahoots
 TEMPLATE = app
-CONFIG += x86 ppc
-QT += network \
-    webkit
+
+QT += gui network widgets printsupport \
+    webkit webkitwidgets
 
 # Windows RC file
 RC_FILE = cahootsresources.rc
 
 # Mac icon/plist
 ICON = images/icon.icns
+
 QMAKE_INFO_PLIST = app.plist
+
 SOURCES += main.cpp \
     mainwindow.cpp \
     document.cpp \
@@ -53,6 +55,7 @@ HEADERS += mainwindow.h \
     firstrundialog.h \
     aboutdialog.h \
     helpdialog.h
+
 FORMS += mainwindow.ui \
     document.ui \
     connecttodocument.ui \
@@ -65,7 +68,10 @@ FORMS += mainwindow.ui \
     firstrundialog.ui \
     aboutdialog.ui \
     helpdialog.ui
+
+
 RESOURCES += cahootsresc.qrc \
     highlighters.qrc \
     helpresources.qrc
+
 OTHER_FILES += help/collaboration.html

@@ -32,7 +32,7 @@ AnnounceDocumentDialog::AnnounceDocumentDialog(QWidget *parent) :
     QRegExp nameRx("[a-zA-Z0-9_]*");
     nameValidator = new QRegExpValidator(nameRx, 0);
     ui->nameLineEdit->setValidator(nameValidator);
-    ui->prefrencesLabel->setFont(QFont(Utilities::labelFont, Utilities::labelFontSize - 1));
+    ui->prefrencesLabel->setFont(QFont(Utilities::s_labelFont, Utilities::s_labelFontSize - 1));
 }
 
 AnnounceDocumentDialog::~AnnounceDocumentDialog()

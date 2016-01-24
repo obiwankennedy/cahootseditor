@@ -47,12 +47,12 @@ void CodeEditor::collabTextChange(int pos, int charsRemoved, int charsAdded, QSt
         QTextCursor cursor = textCursor();
         cursor.setPosition(pos);
         cursor.movePosition(QTextCursor::NextCharacter, QTextCursor::KeepAnchor, charsRemoved);
-        cursor.insertText(data.toAscii());
+        cursor.insertText(data.toLatin1());
     }
     else if (charsRemoved == 0 && charsAdded > 0) {
         QTextCursor cursor = textCursor();
         cursor.setPosition(pos);
-        cursor.insertText(data.toAscii());
+        cursor.insertText(data.toLatin1());
     }
 }
 

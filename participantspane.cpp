@@ -47,10 +47,10 @@ ParticipantsPane::ParticipantsPane(QWidget *parent) :
     waitItem = ui->treeWidget->topLevelItem(2);
     owner = rwItem->child(0);
 
-    ui->connectInfoLabel->setFont(QFont(Utilities::labelFont, Utilities::labelFontSize));
-    ui->participantsLabel->setFont(QFont(Utilities::labelFont, Utilities::labelFontSize));
-    ui->promotePushButton->setFont(QFont(Utilities::labelFont, Utilities::labelFontSize));
-    ui->demotePushButton->setFont(QFont(Utilities::labelFont, Utilities::labelFontSize));
+    ui->connectInfoLabel->setFont(QFont(Utilities::s_labelFont, Utilities::s_labelFontSize));
+    ui->participantsLabel->setFont(QFont(Utilities::s_labelFont, Utilities::s_labelFontSize));
+    ui->promotePushButton->setFont(QFont(Utilities::s_labelFont, Utilities::s_labelFontSize));
+    ui->demotePushButton->setFont(QFont(Utilities::s_labelFont, Utilities::s_labelFontSize));
 }
 
 ParticipantsPane::~ParticipantsPane()
@@ -60,8 +60,8 @@ ParticipantsPane::~ParticipantsPane()
 
 void ParticipantsPane::setOwnership(bool isOwner)
 {
-    ui->promotePushButton->setShown(isOwner);
-    ui->demotePushButton->setShown(isOwner);
+    ui->promotePushButton->setVisible(isOwner);
+    ui->demotePushButton->setVisible(isOwner);
 }
 
 void ParticipantsPane::setConnectInfo(QString address, QString port)

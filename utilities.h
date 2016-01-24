@@ -24,13 +24,14 @@
 class Utilities
 {
 public:
+    Utilities();
     // Fonts:
-    static const QString codeFont;
-    static const int codeFontSize;
-    static const QString labelFont;
-    static const int labelFontSize;
-    static const QString chatFont;
-    static const int chatFontSize;
+    static  QString s_codeFont;
+    static  int s_codeFontSize;
+    static  QString s_labelFont;
+    static  int s_labelFontSize;
+    static  QString s_chatFont;
+    static  int s_chatFontSize;
 
     static QString getSystem();
 

@@ -31,12 +31,15 @@ HelpDialog::HelpDialog(QWidget *parent) :
 //            SLOT(onCurrentItemChanged(QTreeWidgetItem*, QTreeWidgetItem*)));
 
     ui->treeWidget->hide();
+    QString str = Utilities::getSystem();
 
-    if (Utilities::getSystem() == "Linux") {
-        ui->treeWidget->setFont(QFont(Utilities::labelFont, 8));
+    if (str == "Linux")
+    {
+        ui->treeWidget->setFont(QFont(Utilities::s_labelFont, 8));
     }
-    else if (Utilities::getSystem() == "Windows") {
-        ui->treeWidget->setFont(QFont(Utilities::labelFont, 8));
+    else if (str == "Windows")
+    {
+        ui->treeWidget->setFont(QFont(Utilities::s_labelFont, 8));
     }
 
     ui->webView->load(QUrl("qrc:/help/collaboration.html"));

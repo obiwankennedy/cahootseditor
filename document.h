@@ -1,11 +1,16 @@
 #ifndef DOCUMENT_H
 #define DOCUMENT_H
 
-#include <QtGui/QWidget>
+#include <QWidget>
+#include <QtNetwork>
+#include <QTcpServer>
+#include <QTcpSocket>
+#include <QSettings>
+
 #include "highlighters/cpphighlighter.h"
 #include "highlighters/pythonhighlighter.h"
 #include "codeeditor.h"
-/*
+/**
     Cahoots is a crossplatform real-time collaborative text editor.
 
     Copyright (C) 2010 Chris Dimpfl, Anandi Hira, David Vega
@@ -31,10 +36,6 @@
 #include "client.h"
 #include "server.h"
 
-#include <QtNetwork>
-#include <QTcpServer>
-#include <QTcpSocket>
-#include <QSettings>
 
 namespace Ui {
     class Document;

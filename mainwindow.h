@@ -19,7 +19,9 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <QtGui/QMainWindow>
+#include <QSettings>
+#include <QMainWindow>
+
 #include "document.h"
 #include "connecttodocument.h"
 #include "finddialog.h"
@@ -30,7 +32,6 @@
 #include "preferencesdialog.h"
 #include "helpdialog.h"
 
-#include <QSettings>
 
 namespace Ui
 {

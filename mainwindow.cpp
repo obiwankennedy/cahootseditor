@@ -39,7 +39,7 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
-    ui->tabWidget->setFont(QFont(Utilities::labelFont, Utilities::labelFontSize));
+    ui->tabWidget->setFont(QFont(Utilities::s_labelFont, Utilities::s_labelFontSize));
 
     connect(ui->tabWidget, SIGNAL(currentChanged(int)), this, SLOT(documentChanged(int)));
     connect(ui->tabWidget, SIGNAL(tabCloseRequested(int)), this, SLOT(tabCloseClicked(int)));

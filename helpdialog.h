@@ -19,7 +19,7 @@
 #ifndef HELPDIALOG_H
 #define HELPDIALOG_H
 
-#include <QtGui/QDialog>
+#include <QDialog>
 #include <QTreeWidgetItem>
 #include "enu.h"
 
